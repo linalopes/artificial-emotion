@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# KiCad local / generated
+*.kicad_prl
+*.lck
+*.bak
+fp-info-cache
+*-backups/
+.history/
+
+# Nested KiCad history store
+ELECTRONICS/PCB mau-mau/.history/
+ELECTRONICS/PCB mau-mau/mau-mau-backups/
+
+# Desktop screenshots (local reference only)
+ELECTRONICS/Screenshot*.png
