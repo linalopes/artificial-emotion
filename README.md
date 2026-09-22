@@ -18,6 +18,12 @@ The heart and heartbeat belong to that wider research context. The project is al
 
 **This repository does not implement heartbeat sensing.** The kinetic module is not currently heartbeat-controlled. Physiological sensing belongs to the broader *Artificial Emotion* research and may later become an input to the kinetic system.
 
+## Research Whiteboard
+
+[![Artificial Emotion research whiteboard](whiteboard.webp)](https://canva.link/vxelx5a5ojinxqn)
+
+[**Open the live Artificial Emotion research whiteboard in Canva →**](https://canva.link/vxelx5a5ojinxqn)
+
 ## Why a Kinetic Module?
 
 The final physical architecture of *Artificial Emotion* is still open.
