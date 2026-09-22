@@ -172,7 +172,7 @@ This is the wiring assumed by the bench-test firmware.
 
 ### 2. Experimental custom PCB
 
-`ELECTRONICS/PCB mau-mau/` is a KiCad experiment named **mau-mau**. It explores integrating the ESP32-S3 Super Mini, a bare ULN2003 DIP-16, a +5 V / GND screw-terminal input, and a power-indicator LED with series resistor onto a small custom board (approximately 40 × 42 mm).
+`kinetic-module-maumau/ELECTRONICS/PCB mau-mau/` is a KiCad experiment named **mau-mau**. It explores integrating the ESP32-S3 Super Mini, a bare ULN2003 DIP-16, a +5 V / GND screw-terminal input, and a power-indicator LED with series resistor onto a small custom board (approximately 40 × 42 mm).
 
 The board includes a custom symbol and through-hole footprint for the ESP32-S3 Super Mini. Silkscreen on the layout reads *Kinetic Module / Mau Mau / by Lina Lopes*.
 
@@ -186,7 +186,7 @@ Treat it as an experimental alternative to the ready-made ULN2003 module, still 
 
 ## Firmware
 
-File: [`ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino`](ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino)
+File: [`kinetic-module-maumau/ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino`](kinetic-module-maumau/ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino)
 
 This is bench-test firmware for the prototype wiring above. It is not installation firmware.
 
@@ -240,7 +240,7 @@ The enclosure and microswitch bracket are designed for 3 mm sheet. Sources are `
 
 ### PCB
 
-The experimental `mau-mau` KiCad project can be opened from `ELECTRONICS/PCB mau-mau/`. Production fabrication outputs (Gerbers, drill files, BOM) are not committed.
+The experimental `mau-mau` KiCad project can be opened from `kinetic-module-maumau/ELECTRONICS/PCB mau-mau/`. Production fabrication outputs (Gerbers, drill files, BOM) are not committed.
 
 ## Status
 
