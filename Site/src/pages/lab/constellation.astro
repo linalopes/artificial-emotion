@@ -1,0 +1,55 @@
+---
+/**
+ * LAB — tuning environment for the research constellation.
+ * Not in the navigation, not indexed. The same component ships on / and
+ * /research/ in production mode; only this page runs it in "lab" mode.
+ * In dev, append ?debug to the URL for the tuning panel.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ResearchConstellation from '../../components/ResearchConstellation.astro';
+---
+
+<BaseLayout
+  title="Constellation (lab)"
+  description="Experimental research constellation for Artificial Emotion."
+  theme="dark"
+  noindex
+>
+  <main class="lab">
+    <header class="lab__header">
+      <p class="label">Lab · prototype</p>
+      <h1>Research constellation</h1>
+      <p class="lab__lede">
+        A living map of the research: threads, studies, notes, references and events, and the
+        connections between them. Hover to follow a connection; click to open.
+      </p>
+    </header>
+
+    <ResearchConstellation mode="lab" />
+  </main>
+</BaseLayout>
+
+<style>
+  .lab {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-4) var(--page-gutter) var(--space-5);
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .lab__header {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .lab__header h1 {
+    font-size: var(--text-xl);
+    color: var(--accent);
+  }
+
+  .lab__lede {
+    color: var(--fg-muted);
+    max-width: 48ch;
+  }
+</style>

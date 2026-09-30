@@ -1,0 +1,42 @@
+---
+/**
+ * LAB — Tomorrow's Waves (p5.js) prototype. Full-viewport canvas for visual
+ * review of the approved generative system. Not in the navigation, not indexed.
+ *
+ * In development, append ?debug for the tuning panel.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GenerativeWaves from '../../components/GenerativeWaves.astro';
+---
+
+<BaseLayout
+  title="Tomorrow's Waves (lab)"
+  description="A p5.js study of seeded ribbons, mesh, and free threads."
+  noindex
+>
+  <main class="waves-lab">
+    <h1 class="visually-hidden">Tomorrow's Waves — lab prototype</h1>
+    <GenerativeWaves mode="fill" />
+  </main>
+</BaseLayout>
+
+<style>
+  :global(html),
+  :global(body) {
+    height: 100%;
+  }
+
+  :global(body) {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .waves-lab {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+</style>

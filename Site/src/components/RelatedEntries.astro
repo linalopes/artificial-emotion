@@ -1,0 +1,55 @@
+---
+import { resolveRelated, type RelatedRef } from '../lib/content';
+
+interface Props {
+  refs: readonly RelatedRef[];
+  /** Used only for build-log warnings about missing targets. */
+  from?: string;
+}
+
+const { refs, from } = Astro.props;
+const related = refs.length > 0 ? await resolveRelated(refs, from) : [];
+---
+
+{
+  related.length > 0 && (
+    <section class="related" aria-labelledby="related-heading">
+      <h2 id="related-heading" class="label">Related</h2>
+      <ul class="related__list">
+        {related.map((item) => (
+          <li>
+            <a href={item.href}>{item.title}</a>
+            <span class="label related__type">{item.typeLabel}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .related {
+    display: grid;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  .related__list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .related__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  .related__type {
+    font-size: var(--text-xs);
+  }
+</style>

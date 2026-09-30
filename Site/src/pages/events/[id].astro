@@ -1,0 +1,39 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import EntryLayout from '../../layouts/EntryLayout.astro';
+import { formatDate, getPublished, isoDate, youtubeUrl } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const events = await getPublished('events');
+  return events.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'events'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+---
+
+<EntryLayout
+  collection="events"
+  id={entry.id}
+  title={data.title}
+  related={data.related}
+  meta={[
+    { label: 'Date', value: formatDate(data.date), datetime: isoDate(data.date) },
+    data.end
+      ? { label: 'Until', value: formatDate(data.end), datetime: isoDate(data.end) }
+      : { label: 'Until' },
+    { label: 'Location', value: data.location },
+    { label: 'Status', value: data.status },
+    { label: 'RSVP', value: data.rsvp, href: data.rsvp },
+    data.youtube
+      ? { label: 'Video', value: 'Watch on YouTube', href: youtubeUrl(data.youtube) }
+      : { label: 'Video' },
+  ]}
+>
+  <Content />
+</EntryLayout>

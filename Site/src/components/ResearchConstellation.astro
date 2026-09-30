@@ -1,0 +1,300 @@
+---
+/**
+ * Research constellation: D3 force-directed map of the research.
+ * Graph data is built at build time (src/lib/constellation.ts) and handed to
+ * the client script as JSON. Colours, glow and strokes live in the <style>
+ * below; composition, movement and sizes in src/lib/constellation.config.ts.
+ *
+ * Intended for a Deep Purple surface (.theme-dark).
+ *
+ * Modes: "production" (default) never shows development controls;
+ * "lab" allows the ?debug tuning panel in dev builds.
+ */
+import { buildConstellation } from '../lib/constellation';
+
+interface Props {
+  /** "lab" enables the dev-only ?debug panel. Production instances never show it. */
+  mode?: 'production' | 'lab';
+  /** Accessible name of the figure (used when no `labelledBy` is given). */
+  label?: string;
+  /** id of a visible heading that names the figure; preferred over `label`. */
+  labelledBy?: string;
+}
+
+const {
+  mode = 'production',
+  label = 'Research constellation: a living map of the Artificial Emotion research',
+  labelledBy,
+} = Astro.props;
+
+const graph = await buildConstellation();
+---
+
+{/* No role="img": the nodes are real links and must stay reachable by keyboard and screen readers. */}
+<figure
+  class="constellation"
+  data-constellation
+  data-mode={mode}
+  aria-labelledby={labelledBy}
+  aria-label={labelledBy ? undefined : label}
+>
+  <script type="application/json" set:html={JSON.stringify(graph)} />
+  <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+  <figcaption class="visually-hidden">
+    {graph.nodes.length} nodes and {graph.links.length} connections across studies, studio notes,
+    references and events. Hover or focus a node to reveal its connections; follow it to open the
+    entry.
+  </figcaption>
+</figure>
+
+<script>
+  import { mountConstellation } from '../scripts/constellation-client';
+  document.querySelectorAll<HTMLElement>('[data-constellation]').forEach(mountConstellation);
+</script>
+
+<style is:global>
+  /* ------------------------------------------------------------------------
+     Container
+     ------------------------------------------------------------------------ */
+  .constellation {
+    position: relative;
+    width: 100%;
+    /* Never taller than the viewport; portrait on phones, landscape otherwise. */
+    aspect-ratio: 3 / 4;
+    max-height: calc(100dvh - 8rem);
+    margin: 0;
+    overflow: hidden;
+
+    /* Set by the script from config.look; 0–1. */
+    --root-halo: 0.45;
+
+    /* Node/link colours below reference these. */
+    --c-root: var(--color-white);
+    --c-thread: var(--color-turquoise);
+    --c-study: var(--color-pink);
+    --c-note: var(--color-gray-green);
+    --c-reference: var(--color-gray-green);
+    --c-event: var(--color-white);
+    --c-event-accent: var(--color-pink);
+    --c-label: var(--color-white);
+    --c-label-muted: var(--color-gray-green);
+    --c-label-halo: var(--color-deep-purple);
+  }
+
+  @media (min-width: 40rem) {
+    .constellation {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  .constellation svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* ------------------------------------------------------------------------
+     Links — hairline curves, mostly felt rather than seen
+     ------------------------------------------------------------------------ */
+  .constellation .link path {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    transition: opacity 0.6s ease, stroke-width 0.6s ease;
+  }
+
+  .constellation .link__base {
+    stroke-width: 0.75;
+    opacity: 0.2;
+  }
+
+  .constellation .link--root-thread { color: var(--c-thread); }
+  .constellation .link--root-thread .link__base { opacity: 0.14; }
+  .constellation .link--content-thread { color: var(--c-thread); }
+  .constellation .link--content-thread .link__base { opacity: 0.22; }
+  .constellation .link--related { color: var(--c-note); }
+  .constellation .link--related .link__base { opacity: 0.18; }
+  .constellation .link--root-event { color: var(--c-event); }
+  .constellation .link--root-event .link__base { opacity: 0.1; }
+
+  /* Signal travelling along a `related` link (positioned by the script). */
+  .constellation .link__pulse {
+    fill: var(--color-white);
+    filter: drop-shadow(0 0 3px currentColor);
+    pointer-events: none;
+  }
+
+  /* ------------------------------------------------------------------------
+     Nodes — hierarchy by size, halo and treatment; soft, not neon
+     ------------------------------------------------------------------------ */
+  .constellation .node {
+    cursor: pointer;
+    outline: none;
+    touch-action: none;
+    transition: opacity 0.6s ease;
+  }
+
+  .constellation .node__core {
+    fill: currentColor;
+    transition: filter 0.4s ease;
+  }
+
+  .constellation .node__halo {
+    fill: currentColor;
+    opacity: 0.08;
+    transition: opacity 0.4s ease;
+  }
+
+  /* Root: luminous, but quietly — intensity via --root-halo */
+  .constellation .node--root { color: var(--c-root); }
+  .constellation .node--root .node__core {
+    filter: drop-shadow(0 0 calc(14px * var(--root-halo)) currentColor);
+  }
+  .constellation .node--root .node__halo { opacity: calc(0.22 * var(--root-halo)); }
+
+  /* Threads: large, turquoise, faint warmth around them */
+  .constellation .node--research-thread { color: var(--c-thread); }
+  .constellation .node--research-thread .node__core { filter: drop-shadow(0 0 4px currentColor); }
+  .constellation .node--research-thread .node__halo { opacity: 0.1; }
+
+  /* Studies: solid pink */
+  .constellation .node--study { color: var(--c-study); }
+  .constellation .node--study .node__core { filter: drop-shadow(0 0 2px currentColor); }
+
+  /* Studio notes: smaller, gray green */
+  .constellation .node--note { color: var(--c-note); }
+  .constellation .node--note .node__halo { opacity: 0.06; }
+
+  /* References: outlined, translucent */
+  .constellation .node--reference { color: var(--c-reference); }
+  .constellation .node--reference .node__core {
+    fill: currentColor;
+    fill-opacity: 0.18;
+    stroke: currentColor;
+    stroke-opacity: 0.7;
+    stroke-width: 1;
+  }
+  .constellation .node--reference .node__halo { opacity: 0.04; }
+
+  /* Events: small white core inside a thin pink ring */
+  .constellation .node--event { color: var(--c-event); }
+  .constellation .node--event .node__core { filter: drop-shadow(0 0 2px currentColor); }
+  .constellation .node--event .node__ring {
+    fill: none;
+    stroke: var(--c-event-accent);
+    stroke-width: 1;
+    stroke-opacity: 0.85;
+  }
+  .constellation .node--event .node__halo { fill: var(--c-event-accent); opacity: 0.07; }
+
+  /* ------------------------------------------------------------------------
+     Labels — editorial, readable over anything
+     ------------------------------------------------------------------------ */
+  .constellation .node__label {
+    font-family: var(--font-body);
+    font-weight: var(--weight-body-light);
+    font-size: 12.5px;
+    fill: var(--c-label-muted);
+    dominant-baseline: middle;
+    paint-order: stroke fill;
+    stroke: var(--c-label-halo);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .constellation .node--root .node__label {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: 20px;
+    fill: var(--c-label);
+    letter-spacing: -0.01em;
+  }
+
+  .constellation .node--research-thread .node__label {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-medium);
+    font-size: 15px;
+    fill: var(--c-label);
+  }
+
+  .constellation .node--study .node__label,
+  .constellation .node--event .node__label {
+    fill: var(--c-label);
+  }
+
+  .constellation .node--note .node__label,
+  .constellation .node--reference .node__label {
+    font-size: 11.5px;
+  }
+
+  /* Small screens (class set by the script): tighter type. */
+  .constellation.is-small .node--root .node__label { font-size: 15px; }
+  .constellation.is-small .node--research-thread .node__label { font-size: 12.5px; }
+  .constellation.is-small .node__label { font-size: 11px; }
+
+  /* Visibility: root + threads (and pinned ids) always; content on hover/focus. */
+  .constellation .node.is-labelled .node__label,
+  .constellation .node.is-focus .node__label,
+  .constellation .node.is-neighbour .node__label,
+  .constellation .node:hover .node__label {
+    opacity: 1;
+  }
+
+  /* ------------------------------------------------------------------------
+     Hover / focus emphasis — everything unrelated recedes
+     ------------------------------------------------------------------------ */
+  .constellation svg.is-active .node:not(.is-focus):not(.is-neighbour) { opacity: 0.22; }
+  .constellation svg.is-active .link:not(.is-linked) path { opacity: 0.04; }
+  .constellation svg.is-active .link.is-linked .link__base { opacity: 0.7; stroke-width: 1; }
+
+  .constellation .node.is-focus .node__core { filter: drop-shadow(0 0 8px currentColor); }
+  .constellation .node.is-focus .node__halo { opacity: 0.22; }
+  .constellation .node.is-neighbour .node__halo { opacity: 0.16; }
+
+  .constellation svg.is-dragging .node { cursor: grabbing; }
+
+  /* ------------------------------------------------------------------------
+     Debug panel (development only)
+     ------------------------------------------------------------------------ */
+  .constellation-debug {
+    width: min(100%, 22rem);
+    margin-top: var(--space-3);
+    padding: 0.5rem 0.75rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-gray-green);
+    background: color-mix(in srgb, var(--color-deep-purple) 85%, black);
+    border: 1px solid var(--rule);
+  }
+
+  .constellation-debug summary { cursor: pointer; }
+  .constellation-debug__group {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--rule);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+  }
+  .constellation-debug label {
+    display: grid;
+    grid-template-columns: 1fr 3.5rem;
+    gap: 0 0.5rem;
+    margin-top: 0.4rem;
+  }
+  .constellation-debug input { grid-column: 1 / -1; width: 100%; }
+  .constellation-debug output { text-align: right; }
+  .constellation-debug button {
+    margin-top: 0.75rem;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 1px solid currentColor;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+  }
+</style>

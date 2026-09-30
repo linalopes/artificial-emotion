@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SoTA — Waves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --deep-purple: #22113E;
+    --gray-green: #CAD8D8;
+    --pink: #EA7DFF;
+    --turquoise: #08F2DB;
+    --bg: #FFFFFF;
+    --fg: #22113E;
+    --panel: rgba(255,255,255,0.86);
+    --rule: #CAD8D8;
+    --mono: "Courier Prime", "Courier New", ui-monospace, monospace;
+    --title: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #22113E; --fg: #FFFFFF; --panel: rgba(34,17,62,0.82); --rule: rgba(202,216,216,0.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #22113E; --fg: #FFFFFF; --panel: rgba(34,17,62,0.82); --rule: rgba(202,216,216,0.25);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--mono); transition: background .4s; }
+  canvas { position: fixed; inset: 0; display: block; }
+
+  #panel {
+    position: fixed; left: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 260px; max-width: calc(100vw - 32px);
+    background: var(--panel); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--rule); border-radius: 4px;
+    padding: 16px; font-size: 12px; z-index: 10;
+    transition: opacity .3s, transform .3s;
+  }
+  #panel.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+  #panel h1 { font-family: var(--title); font-weight: 300; font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  #panel .sub { opacity: .6; margin-bottom: 14px; }
+  .row { display: grid; grid-template-columns: 78px 1fr 34px; align-items: center; gap: 8px; margin: 8px 0; }
+  .row span:last-child { text-align: right; opacity: .7; }
+  input[type=range] { width: 100%; accent-color: var(--pink); }
+  .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; margin: 12px 0; }
+  .toggles label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--pink); }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  button {
+    font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent;
+    border: 1px solid var(--fg); border-radius: 4px; padding: 6px 10px; cursor: pointer;
+  }
+  button:hover { background: var(--pink); border-color: var(--pink); color: #22113E; }
+  button.accent { background: var(--turquoise); border-color: var(--turquoise); color: #22113E; }
+  button.accent:hover { background: var(--pink); border-color: var(--pink); }
+  .keys { margin-top: 12px; opacity: .55; line-height: 1.5; }
+  #show {
+    position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 9;
+    background: var(--panel); display: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="panel">
+  <h1>Tomorrow's Waves</h1>
+  <div class="sub">seed <span id="seedLabel"></span></div>
+
+  <div class="row"><span>speed</span><input id="speed" type="range" min="0" max="3" step="0.05" value="1"><span id="speed-v"></span></div>
+  <div class="row"><span>ribbons</span><input id="ribbons" type="range" min="1" max="8" step="1" value="5"><span id="ribbons-v"></span></div>
+  <div class="row"><span>lines</span><input id="lines" type="range" min="16" max="140" step="2" value="70"><span id="lines-v"></span></div>
+  <div class="row"><span>amplitude</span><input id="amp" type="range" min="0.2" max="2" step="0.05" value="1"><span id="amp-v"></span></div>
+  <div class="row"><span>width</span><input id="width" type="range" min="0.3" max="2" step="0.05" value="1"><span id="width-v"></span></div>
+  <div class="row"><span>twist</span><input id="twist" type="range" min="0" max="2.5" step="0.05" value="1"><span id="twist-v"></span></div>
+
+  <div class="toggles">
+    <label><input id="mesh" type="checkbox" checked> mesh</label>
+    <label><input id="threads" type="checkbox" checked> threads</label>
+    <label><input id="mouse" type="checkbox" checked> mouse</label>
+    <label><input id="dark" type="checkbox"> deep purple</label>
+  </div>
+
+  <div class="btns">
+    <button class="accent" id="newSeed">new seed</button>
+    <button id="pause">pause</button>
+    <button id="hide">hide</button>
+  </div>
+  <div class="keys">R new seed · SPACE pause<br>H hide panel · S save png</div>
+</div>
+<button id="show">controls</button>
+
+<script>
+// ─── Brand palette (SchoolAI brand kit) ─────────────────────────────
+const C = {
+  purple: [34, 17, 62],     // #22113E
+  gg:     [202, 216, 216],  // #CAD8D8
+  pink:   [234, 125, 255],  // #EA7DFF
+  turq:   [8, 242, 219],    // #08F2DB
+};
+// Neutral "gray" for the light background: deep purple washed toward gray-green
+const GRAY_LIGHT = [118, 118, 138];
+
+const params = { speed: 1, ribbons: 5, lines: 70, amp: 1, width: 1, twist: 1,
+                 mesh: true, threads: true, mouse: true, dark: false };
+
+const SAMPLES = 150;
+let ribbons = [], threads = [];
+let t = 0, seed, paused = false;
+let mx = 0, my = 0, mInf = 0, lastMove = -1e9;
+
+// scratch buffers
+const XS = new Float32Array(SAMPLES + 1), CS = new Float32Array(SAMPLES + 1),
+      WS = new Float32Array(SAMPLES + 1), CT = new Float32Array(SAMPLES + 1),
+      ST = new Float32Array(SAMPLES + 1);
+
+function setup() {
+  pixelDensity(Math.min(2, displayDensity()));
+  createCanvas(windowWidth, windowHeight);
+  seed = Math.floor(Math.random() * 1e6);
+  build();
+  bindUI();
+}
+
+function build() {
+  randomSeed(seed); noiseSeed(seed);
+  ribbons = [];
+  for (let i = 0; i < 8; i++) {
+    ribbons.push({
+      jit: random(-0.05, 0.05),
+      amp: random(0.08, 0.18),
+      f1: random(0.7, 1.6),
+      f2: random(0.8, 1.8),
+      ph: random(TAU),
+      wBase: random(0.035, 0.07),
+      wRange: random(0.05, 0.12),
+      tw: random(1.2, 3.2) * (random() < 0.5 ? -1 : 1),
+      tws: random(0.25, 0.6) * (random() < 0.5 ? -1 : 1),
+      off: random(1000),
+      colOff: random(1000),
+      sp: random(0.75, 1.25),
+      ramp: random() < 0.5 ? 0 : 1,   // which accent leads
+    });
+  }
+  // shuffle vertical order so accents don't stack predictably
+  ribbons = shuffle(ribbons);
+  threads = [];
+  for (let i = 0; i < 7; i++) {
+    threads.push({ base: random(0.05, 0.95), amp: random(0.1, 0.3), f: random(0.6, 1.6),
+                   ph: random(TAU), off: random(1000), sp: random(0.5, 1.2) });
+  }
+  document.getElementById('seedLabel').textContent = seed;
+}
+
+// ─── colour ramp along each ribbon ───────────────────────────────────
+function lerpC(a, b, f) { return [a[0] + (b[0]-a[0])*f, a[1] + (b[1]-a[1])*f, a[2] + (b[2]-a[2])*f]; }
+function rampColor(v, r) {
+  const gray = params.dark ? C.gg : GRAY_LIGHT;
+  const a1 = r.ramp ? C.turq : C.pink, a2 = r.ramp ? C.pink : C.turq;
+  const stops = [gray, a1, gray, a2, gray];
+  v = constrain(v, 0, 0.9999) * (stops.length - 1);
+  const i = Math.floor(v);
+  return lerpC(stops[i], stops[i + 1], v - i);
+}
+function gradient(ctx, r, tt, alpha) {
+  const g = ctx.createLinearGradient(0, 0, width, 0);
+  const n = 7;
+  for (let s = 0; s < n; s++) {
+    const v = map(noise(r.colOff + s * 0.55, tt * 0.06), 0.28, 0.72, 0, 1);
+    const c = rampColor(v, r);
+    g.addColorStop(s / (n - 1), `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${alpha})`);
+  }
+  return g;
+}
+
+// ─── draw ────────────────────────────────────────────────────────────
+function draw() {
+  if (!paused) t += deltaTime * 0.001 * params.speed;
+
+  // smoothed mouse influence
+  const moving = millis() - lastMove < 2500;
+  const target = params.mouse && moving ? 1 : 0;
+  mInf += (target - mInf) * 0.04;
+  mx += (mouseX - mx) * 0.08; my += (mouseY - my) * 0.08;
+
+  background(params.dark ? color(...C.purple) : 255);
+  const ctx = drawingContext;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  if (params.threads) drawThreads(ctx);
+  const n = params.ribbons;
+  for (let i = 0; i < n; i++) drawRibbon(ctx, ribbons[i], i, n);
+}
+
+function drawRibbon(ctx, r, idx, n) {
+  const W = width, H = height, tt = t * r.sp;
+  const base = ((idx + 0.5) / n + r.jit) * H;
+  const aScale = Math.min(1, 3 / n + 0.35);   // fewer ribbons → larger swing
+
+  for (let k = 0; k <= SAMPLES; k++) {
+    const u = k / SAMPLES;
+    const x = -0.08 * W + u * 1.16 * W;
+    let c = base + H * r.amp * params.amp * aScale * (
+      (noise(u * r.f1 + r.off, tt * 0.14) - 0.5) * 2.4 +
+      0.45 * Math.sin(u * TWO_PI * r.f2 + tt * 0.55 + r.ph));
+    if (mInf > 0.001) {
+      const dx = (x - mx) / (W * 0.16);
+      c += (my - c) * 0.3 * mInf * Math.exp(-dx * dx);
+    }
+    const w = H * params.width * (r.wBase + r.wRange * noise(u * 1.4 + r.off + 50, tt * 0.11));
+    const th = u * r.tw * params.twist * PI + tt * r.tws + noise(u * 0.9 + r.off + 99, tt * 0.09) * 2.2;
+    XS[k] = x; CS[k] = c; WS[k] = w; CT[k] = Math.cos(th); ST[k] = Math.sin(th);
+  }
+
+  const N = params.lines;
+  const dk = params.dark;
+  const bodyA = (dk ? 0.13 : 0.11) * Math.sqrt(70 / N);
+
+  // body lines — each stroked separately so alpha accumulates in the folds
+  ctx.lineWidth = 0.55;
+  ctx.strokeStyle = gradient(ctx, r, tt, bodyA.toFixed(3));
+  for (let i = 0; i < N; i++) {
+    const uu = -1 + 2 * i / (N - 1);
+    ctx.beginPath();
+    for (let k = 0; k <= SAMPLES; k++) {
+      const x = XS[k] + WS[k] * uu * ST[k] * 0.35;
+      const y = CS[k] + WS[k] * uu * CT[k];
+      k ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // cross mesh — the fine netting
+  if (params.mesh) {
+    ctx.lineWidth = 0.4;
+    ctx.strokeStyle = gradient(ctx, r, tt, dk ? 0.08 : 0.07);
+    ctx.beginPath();
+    for (let k = 0; k <= SAMPLES; k += 2) {
+      const ox = WS[k] * ST[k] * 0.35, oy = WS[k] * CT[k];
+      ctx.moveTo(XS[k] - ox, CS[k] - oy);
+      ctx.lineTo(XS[k] + ox, CS[k] + oy);
+    }
+    ctx.stroke();
+  }
+
+  // defining edges
+  ctx.lineWidth = 0.9;
+  ctx.strokeStyle = gradient(ctx, r, tt, dk ? 0.55 : 0.5);
+  for (const uu of [-1, 1]) {
+    ctx.beginPath();
+    for (let k = 0; k <= SAMPLES; k++) {
+      const x = XS[k] + WS[k] * uu * ST[k] * 0.35;
+      const y = CS[k] + WS[k] * uu * CT[k];
+      k ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+function drawThreads(ctx) {
+  const W = width, H = height;
+  const col = params.dark ? C.gg : C.purple;
+  ctx.lineWidth = 0.7;
+  ctx.strokeStyle = `rgba(${col[0]},${col[1]},${col[2]},${params.dark ? 0.35 : 0.28})`;
+  for (const th of threads) {
+    const tt = t * th.sp;
+    ctx.beginPath();
+    for (let k = 0; k <= 90; k++) {
+      const u = k / 90, x = -0.05 * W + u * 1.1 * W;
+      const y = th.base * H + H * th.amp * params.amp *
+        ((noise(u * th.f + th.off, tt * 0.12) - 0.5) * 2 + 0.4 * Math.sin(u * TWO_PI * th.f + tt * 0.4 + th.ph));
+      k ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+// ─── interaction ─────────────────────────────────────────────────────
+function mouseMoved() { lastMove = millis(); }
+function mouseDragged() { lastMove = millis(); }
+function touchMoved() { lastMove = millis(); return false; }
+function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+
+function keyPressed() {
+  if (document.activeElement && document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'range') return;
+  if (key === 'r' || key === 'R') newSeed();
+  else if (key === ' ') togglePause();
+  else if (key === 'h' || key === 'H') togglePanel();
+  else if (key === 's' || key === 'S') saveCanvas(`sota-waves-${seed}`, 'png');
+}
+
+function newSeed() { seed = Math.floor(Math.random() * 1e6); build(); }
+function togglePause() {
+  paused = !paused;
+  document.getElementById('pause').textContent = paused ? 'play' : 'pause';
+}
+function togglePanel() {
+  const p = document.getElementById('panel');
+  p.classList.toggle('hidden');
+  document.getElementById('show').style.display = p.classList.contains('hidden') ? 'block' : 'none';
+}
+
+function bindUI() {
+  for (const id of ['speed', 'ribbons', 'lines', 'amp', 'width', 'twist']) {
+    const el = document.getElementById(id), out = document.getElementById(id + '-v');
+    const upd = () => { params[id] = parseFloat(el.value); out.textContent = el.value; };
+    el.addEventListener('input', upd); upd();
+  }
+  for (const id of ['mesh', 'threads', 'mouse', 'dark']) {
+    const el = document.getElementById(id);
+    el.addEventListener('change', () => {
+      params[id] = el.checked;
+      if (id === 'dark') document.documentElement.setAttribute('data-theme', el.checked ? 'dark' : 'light');
+    });
+  }
+  document.getElementById('newSeed').onclick = newSeed;
+  document.getElementById('pause').onclick = togglePause;
+  document.getElementById('hide').onclick = togglePanel;
+  document.getElementById('show').onclick = togglePanel;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryList from '../../components/EntryList.astro';
+import {
+  countThreadContent,
+  getPublishedByThread,
+  THREADED_COLLECTIONS,
+  toListItem,
+} from '../../lib/content';
+import { researchPath } from '../../lib/paths';
+import { COLLECTION_LABELS, THREAD_LIST, type ThreadMeta } from '../../lib/vocabulary';
+
+export function getStaticPaths() {
+  return THREAD_LIST.map((thread) => ({ params: { thread: thread.id }, props: { thread } }));
+}
+
+interface Props {
+  thread: ThreadMeta;
+}
+
+const { thread } = Astro.props;
+const content = await getPublishedByThread(thread.id);
+const total = countThreadContent(content);
+
+// Only groups with at least one published entry are rendered.
+const groups = THREADED_COLLECTIONS.filter((c) => content[c].length > 0).map((c) => ({
+  collection: c,
+  label: COLLECTION_LABELS[c],
+  items: content[c].map(toListItem),
+}));
+---
+
+<BaseLayout title={thread.label} description={thread.description}>
+  <main class="container">
+    <article class="thread">
+      <header class="thread__header">
+        <a class="label" href={researchPath()}>Research</a>
+        <h1>{thread.label}</h1>
+        <p class="thread__description">{thread.description}</p>
+      </header>
+
+      {
+        total === 0 ? (
+          <p class="label">Nothing published in this thread yet.</p>
+        ) : (
+          groups.map((group) => (
+            <section class="group" aria-labelledby={`group-${group.collection}`}>
+              <h2 id={`group-${group.collection}`} class="label">
+                {group.label}
+              </h2>
+              <EntryList items={group.items} />
+            </section>
+          ))
+        )
+      }
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .thread {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .thread__header {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .thread__header .label {
+    text-decoration: none;
+  }
+
+  .thread__header h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .thread__description {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .group {
+    display: grid;
+    gap: var(--space-3);
+  }
+</style>

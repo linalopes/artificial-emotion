@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import { href } from '../lib/paths';
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: string;
+  /** Page surface. Light is the default; dark is for immersive moments. */
+  theme?: 'light' | 'dark' | 'soft';
+  /** Keep experimental pages out of search indexes. */
+  noindex?: boolean;
+}
+
+const siteName = 'Artificial Emotion';
+
+const {
+  title,
+  description = 'Research into movement, soft mechanisms, kinetic behavior and bodily signals.',
+  lang = 'en',
+  theme = 'light',
+  noindex = false,
+} = Astro.props;
+
+const themeColor = theme === 'dark' ? '#22113e' : theme === 'soft' ? '#cad8d8' : '#ffffff';
+
+const pageTitle = title ? `${title} — ${siteName}` : siteName;
+
+const favicon = href('/favicon.svg');
+
+// Space Grotesk 300/500 · Inter 300/600 · Courier Prime 400/700
+const googleFonts =
+  'https://fonts.googleapis.com/css2' +
+  '?family=Space+Grotesk:wght@300;500' +
+  '&family=Inter:wght@300;600' +
+  '&family=Courier+Prime:wght@400;700' +
+  '&display=swap';
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content={theme === 'dark' ? 'dark' : 'light'} />
+    <meta name="theme-color" content={themeColor} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={googleFonts} />
+  </head>
+  <body class={theme === 'light' ? undefined : `theme-${theme}`}>
+    <SiteHeader />
+    <slot />
+  </body>
+</html>

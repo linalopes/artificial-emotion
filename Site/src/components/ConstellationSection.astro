@@ -1,0 +1,67 @@
+---
+/**
+ * Immersive Deep Purple band that frames the research constellation on the
+ * light-first home page. Wraps the one ResearchConstellation component in
+ * production mode; owns only the section chrome, no graph logic.
+ */
+import ResearchConstellation from './ResearchConstellation.astro';
+
+interface Props {
+  /** Section title; also the accessible name of the graph. */
+  heading?: string;
+  description?: string;
+  /** id for in-page linking and aria-labelledby. */
+  id?: string;
+}
+
+const {
+  heading = 'Research Constellation',
+  description = 'A living map of studies, references, notes, events and research threads in circulation.',
+  id = 'constellation',
+} = Astro.props;
+
+const headingId = `${id}-heading`;
+---
+
+<section class="constellation-section theme-dark" id={id} aria-labelledby={headingId}>
+  <div class="constellation-section__inner">
+    <header class="constellation-section__header">
+      <h2 class="label" id={headingId}>{heading}</h2>
+      <p class="constellation-section__lede">{description}</p>
+    </header>
+
+    <ResearchConstellation labelledBy={headingId} />
+  </div>
+</section>
+
+<style>
+  .constellation-section {
+    /* Full-bleed band regardless of the parent's width. */
+    width: 100%;
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .constellation-section__inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .constellation-section__header {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .constellation-section__header .label {
+    color: var(--accent);
+  }
+
+  .constellation-section__lede {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    color: var(--fg);
+    max-width: 40ch;
+  }
+</style>

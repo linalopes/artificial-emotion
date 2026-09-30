@@ -1,0 +1,62 @@
+---
+/**
+ * Skeleton for a single content entry: type label, title, metadata,
+ * Markdown body (slot), related entries.
+ */
+import BaseLayout from './BaseLayout.astro';
+import MetaList, { type MetaItem } from '../components/MetaList.astro';
+import RelatedEntries from '../components/RelatedEntries.astro';
+import type { RelatedRef } from '../lib/content';
+import { collectionPath } from '../lib/paths';
+import { COLLECTION_LABELS, type CollectionName } from '../lib/vocabulary';
+
+interface Props {
+  collection: CollectionName;
+  id: string;
+  title: string;
+  meta: MetaItem[];
+  related: readonly RelatedRef[];
+}
+
+const { collection, id, title, meta, related } = Astro.props;
+---
+
+<BaseLayout title={title}>
+  <main class="container">
+    <article class="entry">
+      <header class="entry__header">
+        <a class="label" href={collectionPath(collection)}>{COLLECTION_LABELS[collection]}</a>
+        <h1>{title}</h1>
+      </header>
+
+      <MetaList items={meta} />
+
+      <div class="entry__body prose">
+        <slot />
+      </div>
+
+      <RelatedEntries refs={related} from={`${collection}/${id}`} />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .entry {
+    display: grid;
+    gap: var(--space-5);
+    max-width: var(--measure);
+  }
+
+  .entry__header {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .entry__header .label {
+    text-decoration: none;
+  }
+
+  .entry__header h1 {
+    font-size: var(--text-2xl);
+  }
+</style>

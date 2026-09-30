@@ -1,0 +1,287 @@
+/* ==========================================================================
+   Artificial Emotion — global stylesheet
+   Single source of truth for design tokens. Components should only consume
+   the semantic roles (--bg, --fg, --accent …), never the raw palette directly,
+   so the contrast rules below stay enforceable.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Raw palette — School of Tomorrow's AI visual identity
+   -------------------------------------------------------------------------- */
+:root {
+  --color-deep-purple: #22113e;
+  --color-gray-green: #cad8d8;
+  --color-pink: #ea7dff;
+  --color-turquoise: #08f2db;
+  --color-white: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   2. Typography
+   Space Grotesk 300/500 · Inter 300/600 · Courier Prime 400/700
+   Loaded via Google Fonts in BaseLayout.astro.
+   -------------------------------------------------------------------------- */
+:root {
+  --font-title: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Courier Prime', 'Courier New', monospace;
+
+  --weight-title-light: 300;
+  --weight-title-medium: 500;
+  --weight-body-light: 300;
+  --weight-body-bold: 600;
+  --weight-mono-regular: 400;
+  --weight-mono-bold: 700;
+
+  /* Fluid type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  --text-2xl: clamp(2.5rem, 1.5rem + 4vw, 5.5rem);
+
+  --leading-tight: 1.02;
+  --leading-snug: 1.3;
+  --leading-body: 1.6;
+
+  --tracking-title: -0.02em;
+  --tracking-label: 0.08em;
+}
+
+/* --------------------------------------------------------------------------
+   3. Spacing & layout
+   -------------------------------------------------------------------------- */
+:root {
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+  --space-7: 6rem;
+  --space-8: 10rem;
+
+  --measure: 60ch;                              /* comfortable reading width  */
+  --page-max: 72rem;                            /* max content width          */
+  --page-gutter: clamp(1.25rem, 5vw, 5rem);     /* horizontal page padding    */
+}
+
+/* --------------------------------------------------------------------------
+   4. Semantic roles
+   Each surface defines which text colours are allowed on it. Switch surface
+   by adding a .theme-* class to any container.
+
+   Allowed pairs:
+     on White       : Deep Purple only          — NEVER Pink as text
+     on Deep Purple : White (body), Pink (headlines/accent), Gray Green (body)
+     on Gray Green  : Deep Purple
+     on Pink        : Deep Purple
+
+   The site is light-first (paper-like research book). Deep Purple is reserved
+   for immersive moments: the constellation, selected headers/footers.
+   -------------------------------------------------------------------------- */
+
+/* Default surface: White. Accent resolves to Deep Purple, never Pink. */
+:root,
+.theme-light {
+  color-scheme: light;
+  --bg: var(--color-white);
+  --fg: var(--color-deep-purple);
+  --fg-muted: color-mix(in srgb, var(--color-deep-purple) 72%, var(--color-white));
+  --accent: var(--color-deep-purple);
+  --accent-alt: var(--color-deep-purple);
+  --rule: color-mix(in srgb, var(--color-deep-purple) 20%, transparent);
+  --selection-bg: var(--color-deep-purple);
+  --selection-fg: var(--color-white);
+}
+
+/* Immersive surface: Deep Purple */
+.theme-dark {
+  color-scheme: dark;
+  --bg: var(--color-deep-purple);
+  --fg: var(--color-white);
+  --fg-muted: var(--color-gray-green);
+  --accent: var(--color-pink);
+  --accent-alt: var(--color-turquoise);
+  --rule: color-mix(in srgb, var(--color-gray-green) 35%, transparent);
+  --selection-bg: var(--color-pink);
+  --selection-fg: var(--color-deep-purple);
+}
+
+/* Soft surface: Gray Green */
+.theme-soft {
+  color-scheme: light;
+  --bg: var(--color-gray-green);
+  --fg: var(--color-deep-purple);
+  --fg-muted: color-mix(in srgb, var(--color-deep-purple) 75%, var(--color-gray-green));
+  --accent: var(--color-deep-purple);
+  --accent-alt: var(--color-deep-purple);
+  --rule: color-mix(in srgb, var(--color-deep-purple) 25%, transparent);
+  --selection-bg: var(--color-deep-purple);
+  --selection-fg: var(--color-gray-green);
+}
+
+/* --------------------------------------------------------------------------
+   5. Reset & base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-weight: var(--weight-body-light);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Surfaces: any .theme-* container paints itself and its text */
+.theme-dark,
+.theme-light,
+.theme-soft {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: var(--weight-title-light);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-title);
+  text-wrap: balance;
+}
+
+p, li, blockquote {
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+strong, b {
+  font-weight: var(--weight-body-bold);
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--accent);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-mono-regular);
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-alt);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Utilities (small, deliberate set)
+   -------------------------------------------------------------------------- */
+
+/* Page content container: max width + gutters */
+.container {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-block: var(--space-6) var(--space-7);
+  padding-inline: var(--page-gutter);
+}
+
+/* Rendered Markdown bodies: vertical rhythm only, no decoration */
+.prose > * + * {
+  margin-top: var(--space-3);
+}
+
+.prose > h2,
+.prose > h3 {
+  margin-top: var(--space-5);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-title-medium);
+}
+
+.prose blockquote {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--rule);
+  color: var(--fg-muted);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.25em;
+}
+
+/* Small labels, metadata, mono accents */
+.label {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-mono-regular);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Respect reduced-motion preferences (relevant once p5/D3 arrive) */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

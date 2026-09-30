@@ -1,0 +1,33 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import EntryLayout from '../../layouts/EntryLayout.astro';
+import { formatDate, getPublished, isoDate } from '../../lib/content';
+import { THREAD_LABELS } from '../../lib/vocabulary';
+
+export async function getStaticPaths() {
+  const notes = await getPublished('notes');
+  return notes.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'notes'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+---
+
+<EntryLayout
+  collection="notes"
+  id={entry.id}
+  title={data.title}
+  related={data.related}
+  meta={[
+    { label: 'Date', value: formatDate(data.date), datetime: isoDate(data.date) },
+    { label: 'Threads', value: data.threads.map((t) => THREAD_LABELS[t]) },
+    { label: 'Tags', value: data.tags },
+  ]}
+>
+  <Content />
+</EntryLayout>

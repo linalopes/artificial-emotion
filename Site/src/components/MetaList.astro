@@ -1,0 +1,92 @@
+---
+/**
+ * Simple <dl> for entry metadata. Items with an empty value are skipped, so
+ * pages can pass every possible field and only what exists is shown.
+ */
+export interface MetaItem {
+  label: string;
+  value?: string | number | readonly string[] | null;
+  /** Render the value as a link. */
+  href?: string;
+  /** Render the value inside <time datetime="…">. */
+  datetime?: string;
+}
+
+interface Props {
+  items: MetaItem[];
+}
+
+const { items } = Astro.props;
+
+const visible = items.filter(
+  (item) =>
+    item.value !== undefined &&
+    item.value !== null &&
+    item.value !== '' &&
+    !(Array.isArray(item.value) && item.value.length === 0),
+);
+
+const isExternal = (url: string) => /^https?:\/\//.test(url);
+---
+
+{
+  visible.length > 0 && (
+    <dl class="meta">
+      {visible.map((item) => (
+        <div class="meta__row">
+          <dt class="label">{item.label}</dt>
+          <dd>
+            {Array.isArray(item.value) ? (
+              <ul class="meta__list">
+                {item.value.map((v) => (
+                  <li>{v}</li>
+                ))}
+              </ul>
+            ) : item.href ? (
+              <a
+                href={item.href}
+                rel={isExternal(item.href) ? 'noopener external' : undefined}
+              >
+                {item.value}
+              </a>
+            ) : item.datetime ? (
+              <time datetime={item.datetime}>{item.value}</time>
+            ) : (
+              item.value
+            )}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+<style>
+  .meta {
+    display: grid;
+    gap: var(--space-2) var(--space-5);
+    padding-block: var(--space-3);
+    border-block: 1px solid var(--rule);
+  }
+
+  @media (min-width: 40rem) {
+    .meta {
+      grid-template-columns: minmax(8rem, max-content) 1fr;
+    }
+    .meta__row {
+      display: contents;
+    }
+  }
+
+  .meta dd {
+    font-size: var(--text-sm);
+  }
+
+  .meta__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+  }
+</style>

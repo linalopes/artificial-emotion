@@ -1,0 +1,83 @@
+---
+/**
+ * Plain list of entries for collection index pages.
+ * Each item: a linked title plus a short line of metadata.
+ */
+export interface EntryListItem {
+  href: string;
+  title: string;
+  /** Short metadata fragments, joined with a separator. Empty strings are dropped. */
+  meta?: (string | undefined | null)[];
+  /** ISO date for <time>, if the first meta fragment is a date. */
+  datetime?: string;
+}
+
+interface Props {
+  items: EntryListItem[];
+  emptyMessage?: string;
+}
+
+const { items, emptyMessage = 'Nothing published yet.' } = Astro.props;
+---
+
+{
+  items.length === 0 ? (
+    <p class="label">{emptyMessage}</p>
+  ) : (
+    <ol class="entry-list">
+      {items.map((item) => {
+        const meta = (item.meta ?? []).filter((m): m is string => Boolean(m));
+        return (
+          <li class="entry-list__item">
+            <a class="entry-list__title" href={item.href}>
+              {item.title}
+            </a>
+            {meta.length > 0 && (
+              <p class="label entry-list__meta">
+                {meta.map((m, i) => (
+                  <>
+                    {i > 0 && <span aria-hidden="true"> · </span>}
+                    {i === 0 && item.datetime ? <time datetime={item.datetime}>{m}</time> : m}
+                  </>
+                ))}
+              </p>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  )
+}
+
+<style>
+  .entry-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .entry-list__item {
+    display: grid;
+    gap: var(--space-1);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--rule);
+  }
+
+  .entry-list__title {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: var(--text-xl);
+    line-height: var(--leading-snug);
+    text-decoration: none;
+  }
+
+  .entry-list__title:hover {
+    text-decoration: underline;
+  }
+
+  .entry-list__meta {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+</style>
