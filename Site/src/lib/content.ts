@@ -214,6 +214,18 @@ export function formatDate(date: Date): string {
   return dateFormatter.format(date);
 }
 
+const shortDateFormatter = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/** "15 Nov 2026" */
+export function formatDateShort(date: Date): string {
+  return shortDateFormatter.format(date);
+}
+
 /** "2026-11-15", for <time datetime> attributes. */
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);

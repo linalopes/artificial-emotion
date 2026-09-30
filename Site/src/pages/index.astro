@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ConstellationSection from '../components/ConstellationSection.astro';
+import CurrentPublic from '../components/CurrentPublic.astro';
 import GenerativeWaves from '../components/GenerativeWaves.astro';
+import LatestStudies from '../components/LatestStudies.astro';
 import { threadPath } from '../lib/paths';
 import type { ResearchThread } from '../lib/vocabulary';
 
@@ -103,6 +105,9 @@ const threads: {
         </ul>
       </div>
     </section>
+
+    <CurrentPublic />
+    <LatestStudies />
 
     <ConstellationSection />
 

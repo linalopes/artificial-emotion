@@ -1,0 +1,245 @@
+---
+import { getPublishedByDate } from '../lib/content';
+import { entryPath } from '../lib/paths';
+import { THREAD_LABELS } from '../lib/vocabulary';
+
+const published = await getPublishedByDate('studies');
+const total = published.length;
+const latest = published.slice(0, 3).map((study, index) => {
+  const number = total - index;
+  const threads = study.data.threads.map((id) => THREAD_LABELS[id]).join(', ');
+  const body = (study.body ?? '')
+    .replace(/^>.*$/gm, '')
+    .replace(/^#{1,6}\s+.*$/gm, '')
+    .replace(/[*_`]/g, '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join(' ');
+  const fromBody = body.replace(/\s+/g, ' ').trim();
+  const isPlaceholder = /^(placeholder\.?\s*)+$/i.test(fromBody);
+  const status = study.data.status;
+  const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+  const lede =
+    fromBody && !isPlaceholder
+      ? fromBody
+      : [statusLabel, threads].filter(Boolean).join(' · ');
+
+  return {
+    href: entryPath('studies', study.id),
+    title: study.data.title,
+    cover: study.data.cover,
+    lede,
+    label: `STUDY ${String(number).padStart(3, '0')}`,
+  };
+});
+---
+
+<section class="band" aria-labelledby="studies-heading">
+  <div class="band__inner">
+    <h2 class="band__heading" id="studies-heading">Latest Studies</h2>
+
+    {
+      latest.length === 0 ? (
+        <p class="label">No published studies yet.</p>
+      ) : (
+        <ul class="studies">
+          {latest.map((study) => (
+            <li>
+              <a class="ed-card" href={study.href}>
+                {study.cover ? (
+                  <img class="ed-card__media" src={study.cover} alt="" />
+                ) : (
+                  <span class="ed-card__media ed-card__media--ph" aria-hidden="true"></span>
+                )}
+                <span class="ed-card__body">
+                  <span class="ed-card__num">{study.label}</span>
+                  <span class="ed-card__title">{study.title}</span>
+                  <span class="ed-card__lede">{study.lede}</span>
+                  <span class="ed-card__go" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="12" height="12">
+                      <path
+                        d="M7 12h10M13 7l5 5-5 5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                    </svg>
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .band {
+    width: 100%;
+  }
+
+  .band__inner {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .band__heading {
+    font-size: clamp(1.65rem, 1.2rem + 1.4vw, 2.25rem);
+    letter-spacing: -0.03em;
+  }
+
+  .studies {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .studies > li {
+    display: grid;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .ed-card {
+    display: grid;
+    grid-template-columns: minmax(6.25rem, 0.38fr) minmax(0, 0.62fr);
+    min-height: 9.5rem;
+    min-width: 0;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    background: color-mix(in srgb, var(--color-white) 86%, transparent);
+    border: 1px solid var(--color-gray-green);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .ed-card:hover .ed-card__go {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+
+  .ed-card__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 9.5rem;
+    object-fit: cover;
+    align-self: stretch;
+  }
+
+  .ed-card__media--ph {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 48%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-pink) 10%, var(--color-white)) 100%
+      );
+  }
+
+  .studies > li:nth-child(2) .ed-card__media--ph {
+    background:
+      linear-gradient(
+        155deg,
+        color-mix(in srgb, var(--color-gray-green) 40%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
+  }
+
+  .studies > li:nth-child(3) .ed-card__media--ph {
+    background:
+      linear-gradient(
+        175deg,
+        color-mix(in srgb, var(--color-gray-green) 36%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-deep-purple) 8%, var(--color-white)) 100%
+      );
+  }
+
+  .ed-card__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1.7rem;
+    grid-template-rows: auto auto auto 1fr;
+    gap: 0.3rem 0.55rem;
+    padding: 0.8rem 0.85rem 0.75rem;
+    min-width: 0;
+  }
+
+  .ed-card__num {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--color-pink);
+  }
+
+  .ed-card__title {
+    grid-column: 1 / -1;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: var(--text-base);
+    letter-spacing: -0.015em;
+    line-height: var(--leading-snug);
+  }
+
+  .ed-card__lede {
+    grid-column: 1 / -1;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .ed-card__go {
+    grid-column: 2;
+    grid-row: 4;
+    align-self: end;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    margin-top: 0.45rem;
+    color: var(--fg-muted);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+  }
+
+  @media (max-width: 29.99rem) {
+    .ed-card {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+    }
+
+    .ed-card__media {
+      min-height: 8rem;
+      aspect-ratio: 16 / 10;
+      height: auto;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .studies {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 68.75rem) {
+    .studies {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
