@@ -2,30 +2,116 @@
 import { collectionPath, href, researchPath } from '../lib/paths';
 import { COLLECTIONS, COLLECTION_LABELS } from '../lib/vocabulary';
 
+interface Props {
+  /**
+   * "publication": slim Deep Purple bar used on the homepage.
+   * Internal pages keep the default light header.
+   */
+  variant?: 'default' | 'publication';
+}
+
+const { variant = 'default' } = Astro.props;
+const publication = variant === 'publication';
+
 const navItems = [
   { label: 'Research', path: researchPath() },
   ...COLLECTIONS.map((c) => ({ label: COLLECTION_LABELS[c], path: collectionPath(c) })),
+  ...(publication ? [{ label: 'Constellation', path: href('/#constellation') }] : []),
 ];
 
 const current = Astro.url.pathname;
-const isCurrent = (path: string) => current === path || current.startsWith(path);
+const isCurrent = (path: string) => {
+  if (path.includes('#')) return false;
+  return current === path || current.startsWith(path);
+};
 ---
 
-<header class="site-header">
-  <a class="site-header__title" href={href('/')}>Artificial Emotion</a>
-  <nav class="site-header__nav" aria-label="Main">
+<header class:list={['site-header', publication && 'site-header--publication']}>
+  <div class="site-header__inner">
+    <a class="site-header__title" href={href('/')}>Artificial Emotion</a>
+    <button
+      type="button"
+      class="site-header__menu"
+      aria-expanded="false"
+      aria-controls="site-nav"
+    >
+      Menu
+    </button>
+    <nav class="site-header__nav" id="site-nav" aria-label="Main">
+      {
+        navItems.map(({ label, path }) => (
+          <a href={path} aria-current={isCurrent(path) ? 'page' : undefined}>
+            {label}
+          </a>
+        ))
+      }
+    </nav>
     {
-      navItems.map(({ label, path }) => (
-        <a href={path} aria-current={isCurrent(path) ? 'page' : undefined}>
-          {label}
-        </a>
-      ))
+      publication && (
+        <button
+          type="button"
+          class="site-header__search"
+          aria-label="Search (coming later)"
+          disabled
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.4"></circle>
+            <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path>
+          </svg>
+        </button>
+      )
     }
-  </nav>
+  </div>
 </header>
+
+<script>
+  function bindHeaderMenu() {
+    const header = document.querySelector('.site-header');
+    const button = header?.querySelector('.site-header__menu');
+    const nav = header?.querySelector('.site-header__nav');
+    if (
+      !(header instanceof HTMLElement) ||
+      !(button instanceof HTMLButtonElement) ||
+      !(nav instanceof HTMLElement)
+    ) {
+      return;
+    }
+    if (header.dataset.menuBound === 'true') return;
+    header.dataset.menuBound = 'true';
+
+    const setOpen = (open: boolean) => {
+      button.setAttribute('aria-expanded', String(open));
+      button.textContent = open ? 'Close' : 'Menu';
+      header.classList.toggle('is-open', open);
+    };
+
+    button.addEventListener('click', () => {
+      setOpen(button.getAttribute('aria-expanded') !== 'true');
+    });
+
+    nav.addEventListener('click', (event) => {
+      if (event.target instanceof HTMLAnchorElement) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+
+    window.matchMedia('(min-width: 48rem)').addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+
+  bindHeaderMenu();
+</script>
 
 <style>
   .site-header {
+    width: 100%;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .site-header__inner {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -34,7 +120,6 @@ const isCurrent = (path: string) => current === path || current.startsWith(path)
     max-width: var(--page-max);
     margin-inline: auto;
     padding: var(--space-4) var(--page-gutter);
-    border-bottom: 1px solid var(--rule);
   }
 
   .site-header__title {
@@ -47,7 +132,7 @@ const isCurrent = (path: string) => current === path || current.startsWith(path)
 
   .site-header__nav {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: var(--space-4);
   }
 
@@ -58,6 +143,7 @@ const isCurrent = (path: string) => current === path || current.startsWith(path)
     text-transform: uppercase;
     text-decoration: none;
     color: var(--fg-muted);
+    white-space: nowrap;
   }
 
   .site-header__nav a:hover,
@@ -65,5 +151,178 @@ const isCurrent = (path: string) => current === path || current.startsWith(path)
     color: var(--fg);
     text-decoration: underline;
     text-underline-offset: 0.3em;
+  }
+
+  .site-header__menu {
+    display: none;
+    margin-left: auto;
+    padding: 0.15rem 0;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: 0.9375rem;
+    letter-spacing: 0.06em;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* Homepage publication bar — not used on internal pages. */
+  .site-header--publication {
+    background: var(--color-deep-purple);
+    color: var(--color-white);
+    border-bottom: 0;
+  }
+
+  .site-header--publication .site-header__inner {
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.65rem 1.5rem;
+    padding-block: 0.7rem;
+  }
+
+  .site-header--publication .site-header__title {
+    font-weight: var(--weight-title-light);
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+    color: var(--color-white);
+    white-space: nowrap;
+  }
+
+  .site-header--publication .site-header__nav {
+    margin-left: auto;
+    gap: 0.2rem 1.15rem;
+  }
+
+  .site-header--publication .site-header__nav a {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: color-mix(in srgb, var(--color-white) 82%, transparent);
+  }
+
+  .site-header--publication .site-header__nav a:hover,
+  .site-header--publication .site-header__nav a[aria-current='page'] {
+    color: var(--color-white);
+    text-decoration: none;
+  }
+
+  .site-header--publication .site-header__nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 0.28em;
+    text-decoration-thickness: 1px;
+  }
+
+  .site-header--publication :focus-visible {
+    outline-color: var(--color-white);
+  }
+
+  .site-header--publication .site-header__menu {
+    color: var(--color-white);
+  }
+
+  .site-header__search {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-left: 0.35rem;
+    padding: 0;
+    color: color-mix(in srgb, var(--color-white) 82%, transparent);
+    background: transparent;
+    border: 0;
+    cursor: default;
+  }
+
+  .site-header__search:disabled {
+    opacity: 1;
+  }
+
+  .site-header.is-open {
+    background: var(--color-deep-purple);
+    color: var(--color-white);
+    border-bottom: 0;
+  }
+
+  .site-header.is-open .site-header__title,
+  .site-header.is-open .site-header__menu {
+    color: var(--color-white);
+  }
+
+  @media (min-width: 48rem) {
+    .site-header__inner {
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+  }
+
+  @media (min-width: 48rem) and (max-width: 68.74rem) {
+    .site-header--publication .site-header__nav {
+      gap: 0.15rem 0.85rem;
+    }
+
+    .site-header--publication .site-header__nav a {
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (max-width: 63.99rem) {
+    .site-header__search {
+      display: none;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .site-header__inner,
+    .site-header--publication .site-header__inner {
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 1rem;
+      padding-block: 0.7rem;
+    }
+
+    .site-header__title {
+      order: 1;
+    }
+
+    .site-header__menu {
+      display: inline-flex;
+      align-items: center;
+      order: 2;
+    }
+
+    .site-header__nav {
+      display: none;
+      order: 3;
+    }
+
+    .site-header.is-open .site-header__nav {
+      display: grid;
+      flex-basis: 100%;
+      width: 100%;
+      margin: 0.35rem 0 0;
+      padding: 0.85rem 0 1.35rem;
+      gap: 1.05rem;
+      justify-items: start;
+    }
+
+    .site-header.is-open .site-header__nav a {
+      font-family: var(--font-title);
+      font-weight: var(--weight-title-light);
+      font-size: 1.35rem;
+      letter-spacing: -0.015em;
+      text-transform: none;
+      color: color-mix(in srgb, var(--color-white) 88%, transparent);
+      text-decoration: none;
+    }
+
+    .site-header.is-open .site-header__nav a:hover,
+    .site-header.is-open .site-header__nav a[aria-current='page'] {
+      color: var(--color-white);
+    }
   }
 </style>

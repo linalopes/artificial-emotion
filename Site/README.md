@@ -47,7 +47,7 @@ Site/
 
 | Route                | Source                             |
 | -------------------- | ---------------------------------- |
-| `/`                  | `src/pages/index.astro` — intro + constellation section |
+| `/`                  | `src/pages/index.astro` — Waves hero + constellation section |
 | `/research/`         | `src/pages/research/index.astro` — editorial overview of the three threads |
 | `/research/[thread]/`| `src/pages/research/[thread].astro` — one page per thread in `THREAD_LIST` |
 | `/lab/constellation/`| `src/pages/lab/constellation.astro` — constellation tuning page, not in nav, `noindex` |
@@ -179,26 +179,33 @@ and look (root halo intensity), plus a "log config" button. The panel is
 compiled out of production. Respects `prefers-reduced-motion` (graph settles
 and stops; no breathing or travelling pulses).
 
-## Tomorrow's Waves (lab)
+## Tomorrow's Waves
 
-p5.js 2.x, 2D canvas, on `/lab/waves/` only (no WEBGL). Port of the approved
-standalone sketch: seeded ribbons, body lines, optional cross mesh, defining
-edges, free threads, gradient colour ramps, and pointer influence. Palette is
-Deep Purple / Gray Green / Pink / Turquoise on White. Default production
-state: seed `330402`, speed `1`, ribbons `6`, lines `72`, amplitude `1.5`,
-width `1.7`, twist `0.75`, mesh/threads/mouse on, deep purple off.
+p5.js 2.x, 2D canvas (no WEBGL). Port of the approved standalone sketch:
+seeded ribbons, body lines, optional cross mesh, defining edges, free threads,
+gradient colour ramps, and pointer influence. Palette is Deep Purple / Gray
+Green / Pink / Turquoise on White. Default production state: seed `330402`,
+speed `1`, ribbons `6`, lines `72`, amplitude `1.5`, width `1.7`, twist
+`0.75`, mesh/threads/mouse on, deep purple off.
+
+Used as the homepage hero background (`mode="fill"`) and as a full-viewport
+lab at `/lab/waves/`. Portrait canvases scale ribbon *width* only so the
+field does not flood; seed, counts, and the algorithm stay the same.
 
 | Concern | File |
 | ------- | ---- |
-| Approved defaults (seed, sliders, toggles) | `src/lib/waves.config.ts` |
+| Approved defaults (seed, sliders, toggles) and compact width scale | `src/lib/waves.config.ts` |
 | Instance-mode p5 sketch + debug panel | `src/scripts/waves-client.ts` |
 | Figure, `block` / `fill` sizing modes, debug styles | `src/components/GenerativeWaves.astro` |
+| Homepage hero: full-bleed background behind the title | `src/pages/index.astro` |
 | Lab page: full-viewport canvas for visual review | `src/pages/lab/waves.astro` |
 
 In development, `/lab/waves/?debug` shows the HTML sketch's controls (compiled
-out of production). Respects `prefers-reduced-motion` (single static frame, no
-pointer). Animation pauses when the tab is hidden or the canvas is offscreen.
-p5 is bundled only into this page's script. The homepage is untouched.
+out of production; never mounted on the homepage). The canvas layer uses
+`pointer-events: none` and follows the pointer passively. Respects
+`prefers-reduced-motion` (single static frame, no pointer). Animation pauses
+when the tab is hidden or the canvas is offscreen. p5 is bundled only into
+pages that render the component.
 
 ## Deployment (later)
 

@@ -49,9 +49,19 @@ interface DebugUi {
   togglePanel: () => void;
 }
 
+/** Portrait canvases get a thinner ribbon so the field does not flood. */
+function widthScaleFor(width: number, height: number): number {
+  const { fullAspect, minAspect, minWidthScale } = WAVES_CONFIG.compact;
+  const aspect = height > 0 ? width / height : 1;
+  if (aspect >= fullAspect) return 1;
+  const t = Math.max(0, Math.min(1, (aspect - minAspect) / (fullAspect - minAspect)));
+  return minWidthScale + (1 - minWidthScale) * t;
+}
+
 export function mountWaves(container: HTMLElement): void {
   const params: WavesParams = structuredClone(WAVES_CONFIG.params);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const allowDebug = container.hasAttribute('data-waves-debug');
 
   let seed = WAVES_CONFIG.seed;
   let ribbons: Ribbon[] = [];
@@ -60,9 +70,12 @@ export function mountWaves(container: HTMLElement): void {
   let paused = reducedMotion;
   let mx = 0;
   let my = 0;
+  let pointerX = 0;
+  let pointerY = 0;
   let mInf = 0;
   let lastMove = -1e9;
   let visible = true;
+  let widthScale = 1;
   let debugUi: DebugUi | undefined;
 
   const SAMPLES = WAVES_CONFIG.samples;
@@ -183,7 +196,8 @@ export function mountWaves(container: HTMLElement): void {
           const dx = (x - mx) / (W * 0.16);
           c += (my - c) * 0.3 * mInf * Math.exp(-dx * dx);
         }
-        const w = H * params.width * (r.wBase + r.wRange * p.noise(u * 1.4 + r.off + 50, tt * 0.11));
+        const w =
+          H * params.width * widthScale * (r.wBase + r.wRange * p.noise(u * 1.4 + r.off + 50, tt * 0.11));
         const th =
           u * r.tw * params.twist * p.PI +
           tt * r.tws +
@@ -238,7 +252,18 @@ export function mountWaves(container: HTMLElement): void {
       }
     };
 
-    const markMove = () => {
+    const onPointerMove = (e: PointerEvent) => {
+      const rect = container.getBoundingClientRect();
+      if (
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom
+      ) {
+        return;
+      }
+      pointerX = e.clientX - rect.left;
+      pointerY = e.clientY - rect.top;
       lastMove = p.millis();
     };
 
@@ -263,8 +288,9 @@ export function mountWaves(container: HTMLElement): void {
     p.setup = () => {
       p.pixelDensity(Math.min(WAVES_CONFIG.maxPixelDensity, p.displayDensity()));
       p.createCanvas(container.clientWidth || 800, container.clientHeight || 500);
-      mx = p.width / 2;
-      my = p.height / 2;
+      widthScale = widthScaleFor(p.width, p.height);
+      mx = pointerX = p.width / 2;
+      my = pointerY = p.height / 2;
       build();
       if (reducedMotion) {
         paused = true;
@@ -278,8 +304,8 @@ export function mountWaves(container: HTMLElement): void {
       const moving = !reducedMotion && p.millis() - lastMove < 2500;
       const target = params.mouse && moving ? 1 : 0;
       mInf += (target - mInf) * 0.04;
-      mx += (p.mouseX - mx) * 0.08;
-      my += (p.mouseY - my) * 0.08;
+      mx += (pointerX - mx) * 0.08;
+      my += (pointerY - my) * 0.08;
 
       if (params.dark) p.background(C.purple[0], C.purple[1], C.purple[2]);
       else p.background(255);
@@ -292,14 +318,14 @@ export function mountWaves(container: HTMLElement): void {
       for (let i = 0; i < n; i++) drawRibbon(ctx, ribbons[i]!, i, n);
     };
 
-    p.mouseMoved = markMove;
-    p.mouseDragged = markMove;
-    container.addEventListener('pointermove', markMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
 
     const resize = () => {
       const w = container.clientWidth;
       const h = container.clientHeight;
-      if (!w || !h || (w === p.width && h === p.height)) return;
+      if (!w || !h) return;
+      widthScale = widthScaleFor(w, h);
+      if (w === p.width && h === p.height) return;
       p.resizeCanvas(w, h);
       if (reducedMotion || !p.isLooping()) p.redraw();
     };
@@ -311,7 +337,7 @@ export function mountWaves(container: HTMLElement): void {
     }).observe(container);
     document.addEventListener('visibilitychange', () => setRunning(visible && !document.hidden));
 
-    if (import.meta.env.DEV && new URLSearchParams(location.search).has('debug')) {
+    if (import.meta.env.DEV && allowDebug && new URLSearchParams(location.search).has('debug')) {
       debugUi = mountDebugPanel(container, params, {
         getSeed: () => seed,
         newSeed,

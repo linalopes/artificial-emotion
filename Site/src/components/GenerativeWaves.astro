@@ -15,15 +15,27 @@ interface Props {
    * "fill": stretches to its positioned parent, as a background layer.
    */
   mode?: 'block' | 'fill';
+  /**
+   * Lab only. Homepage must never pass this. Debug UI still requires
+   * development + `?debug`.
+   */
+  allowDebug?: boolean;
 }
 
 const {
   label = "Tomorrow's Waves: generative ribbons crossing the field",
   mode = 'block',
+  allowDebug = false,
 } = Astro.props;
 ---
 
-<figure class:list={['waves', `waves--${mode}`]} data-waves role="img" aria-label={label}>
+<figure
+  class:list={['waves', `waves--${mode}`]}
+  data-waves
+  data-waves-debug={allowDebug ? '' : undefined}
+  role="img"
+  aria-label={label}
+>
   <figcaption class="visually-hidden">{label}</figcaption>
 </figure>
 
@@ -39,7 +51,7 @@ const {
     margin: 0;
     overflow: hidden;
     background: var(--color-white);
-    touch-action: none;
+    pointer-events: none;
   }
 
   .waves--block {
@@ -64,6 +76,12 @@ const {
     display: block;
     width: 100% !important;
     height: 100% !important;
+    pointer-events: none;
+  }
+
+  .waves-debug,
+  .waves-debug__show {
+    pointer-events: auto;
   }
 
   .waves-debug {

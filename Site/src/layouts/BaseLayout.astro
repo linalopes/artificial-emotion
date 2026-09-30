@@ -9,6 +9,8 @@ interface Props {
   lang?: string;
   /** Page surface. Light is the default; dark is for immersive moments. */
   theme?: 'light' | 'dark' | 'soft';
+  /** Homepage uses the Deep Purple publication bar; other pages stay default. */
+  header?: 'default' | 'publication';
   /** Keep experimental pages out of search indexes. */
   noindex?: boolean;
 }
@@ -20,10 +22,12 @@ const {
   description = 'Research into movement, soft mechanisms, kinetic behavior and bodily signals.',
   lang = 'en',
   theme = 'light',
+  header = 'default',
   noindex = false,
 } = Astro.props;
 
-const themeColor = theme === 'dark' ? '#22113e' : theme === 'soft' ? '#cad8d8' : '#ffffff';
+const themeColor =
+  header === 'publication' || theme === 'dark' ? '#22113e' : theme === 'soft' ? '#cad8d8' : '#ffffff';
 
 const pageTitle = title ? `${title} — ${siteName}` : siteName;
 
@@ -58,7 +62,7 @@ const googleFonts =
     <link rel="stylesheet" href={googleFonts} />
   </head>
   <body class={theme === 'light' ? undefined : `theme-${theme}`}>
-    <SiteHeader />
+    <SiteHeader variant={header} />
     <slot />
   </body>
 </html>

@@ -23,6 +23,16 @@ export const WAVES_CONFIG = {
     mouse: true,
     dark: false,
   },
+  /**
+   * Ribbon width is authored against canvas height. In portrait heroes that
+   * overfills the field; scale width only (not seed, count, or algorithm).
+   * Landscape / desktop stays at 1. Aspect 0.5 (typical phone) → 0.58×.
+   */
+  compact: {
+    fullAspect: 1,
+    minAspect: 0.5,
+    minWidthScale: 0.58,
+  },
 };
 
 export type WavesParams = typeof WAVES_CONFIG.params;
