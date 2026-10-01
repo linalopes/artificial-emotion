@@ -28,9 +28,11 @@ const event = eventEntry && !eventEntry.data.draft ? eventEntry : undefined;
                   {formatDateShort(event.data.date)}
                 </time>
               </span>
-              <span class="ed-card__lede">
-                An open day of experiments, prototypes and conversations. All welcome.
-              </span>
+              {
+                event.data.lede && (
+                  <span class="ed-card__lede">{event.data.lede}</span>
+                )
+              }
               <span class="ed-card__go" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="12" height="12">
                   <path

@@ -1,7 +1,8 @@
 ---
-import { render, type CollectionEntry } from 'astro:content';
-import EntryLayout from '../../layouts/EntryLayout.astro';
-import { formatDate, getPublished, isoDate, youtubeUrl } from '../../lib/content';
+import type { CollectionEntry } from 'astro:content';
+import EventArticle from '../../components/EventArticle.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublished } from '../../lib/content';
 
 export async function getStaticPaths() {
   const events = await getPublished('events');
@@ -13,27 +14,11 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { data } = entry;
-const { Content } = await render(entry);
+const description = entry.data.lede;
 ---
 
-<EntryLayout
-  collection="events"
-  id={entry.id}
-  title={data.title}
-  related={data.related}
-  meta={[
-    { label: 'Date', value: formatDate(data.date), datetime: isoDate(data.date) },
-    data.end
-      ? { label: 'Until', value: formatDate(data.end), datetime: isoDate(data.end) }
-      : { label: 'Until' },
-    { label: 'Location', value: data.location },
-    { label: 'Status', value: data.status },
-    { label: 'RSVP', value: data.rsvp, href: data.rsvp },
-    data.youtube
-      ? { label: 'Video', value: 'Watch on YouTube', href: youtubeUrl(data.youtube) }
-      : { label: 'Video' },
-  ]}
->
-  <Content />
-</EntryLayout>
+<BaseLayout title={entry.data.title} description={description}>
+  <main>
+    <EventArticle entry={entry} />
+  </main>
+</BaseLayout>

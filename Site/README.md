@@ -89,12 +89,75 @@ apply everywhere:
 | `studies`    | title, date     | status (`seed` · experiment · prototype · integrated), threads, tags, materials, related, cover, youtube, draft |
 | `notes`      | title, date     | threads, tags, related, draft |
 | `references` | title           | creator, year, referenceType, url, threads, tags, related, image, draft |
-| `events`     | title, date     | end, location, status (`upcoming` · past), rsvp, cover, youtube, related, draft |
+| `events`     | title, date     | end, location, status (`upcoming` · past), lede, rsvp, cover, youtube, format, audience, organizedAt, partOf, whatToExpectIntro, whatToExpect, gallery, related, draft |
 
 Body headings are an editorial convention, not validated:
 Studies `## Question / ## Setup / ## Observation / ## Next` ·
 References `## Why it matters / ## Notes` ·
-Events `## About / ## What was shown / ## Documentation / ## Reflection`.
+Events `## About / ## Documentation / ## Reflection`.
+
+Empty `## Documentation` or `## Reflection` headings are not rendered.
+
+### Event media
+
+The repository stores **references** to media. Assets may live locally in
+`public/` or externally on a host such as Cloudinary. The site does not
+download or proxy remote files.
+
+**Local files** go in `public/images/events/<event-id>/`:
+
+```
+public/images/events/open-research-studio/
+  cover.webp
+  01.webp
+```
+
+**Cover** (`cover`) is a single image: a site-root path or an HTTPS URL.
+
+```yaml
+cover: /images/events/open-research-studio/cover.webp
+# or
+cover: https://res.cloudinary.com/example/image/upload/cover.webp
+```
+
+Leave `cover:` empty until a real image exists. The detail page then uses the
+designed cover placeholder.
+
+**Gallery** is optional. Empty `gallery: []` renders nothing.
+
+Local image:
+
+```yaml
+gallery:
+  - type: image
+    src: /images/events/example/01.webp
+    alt: Prototype on the workbench
+```
+
+External image and video:
+
+```yaml
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/example/image/upload/example.webp
+    alt: Prototype on the workbench
+    caption: First movement test
+  - type: video
+    src: https://res.cloudinary.com/example/video/upload/test.mp4
+    poster: https://res.cloudinary.com/example/image/upload/test-poster.webp
+    caption: Motion test
+```
+
+A bare path still works and is treated as an image:
+
+```yaml
+gallery:
+  - /images/events/example/01.webp
+```
+
+Image entries need `type`, `src`, and `alt` (`caption` optional). Video entries
+need `type` and `src` (`poster` and `caption` optional). Remote values must be
+`https://` URLs.
 
 To create an entry, copy the matching file from `content/_templates/` into the
 collection folder, rename it, and fill in the properties.

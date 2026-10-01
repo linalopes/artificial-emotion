@@ -76,6 +76,58 @@ export const relatedRef = z
 
 const related = withDefault(z.array(relatedRef), []);
 
+/** YAML list, or a single string that authors paste without `-` bullets. */
+const stringList = withDefault(
+  z.union([z.array(z.string()), z.string().transform((value) => [value])]),
+  [],
+);
+
+/** Optional string, YAML list, or empty Obsidian property (`key:`). */
+const optionalTextOrLines = optional(z.union([z.string(), z.array(z.string())]));
+
+/** Local site-root path or externally hosted HTTPS asset. Not downloaded at build time. */
+const mediaRef = z
+  .string()
+  .min(1)
+  .refine(
+    (value) => /^https:\/\//i.test(value.trim()) || value.trim().startsWith('/'),
+    'Use an HTTPS URL or a site-root path starting with /',
+  )
+  .transform((value) => value.trim());
+
+const galleryImage = z.object({
+  type: z.literal('image'),
+  src: mediaRef,
+  alt: z.string(),
+  caption: optional(z.string()),
+});
+
+const galleryVideo = z.object({
+  type: z.literal('video'),
+  src: mediaRef,
+  poster: optional(mediaRef),
+  caption: optional(z.string()),
+});
+
+/** Shorthand: a bare path/URL is an image. */
+const galleryItem = z.union([
+  mediaRef.transform((src) => ({
+    type: 'image' as const,
+    src,
+    alt: '',
+    caption: undefined,
+  })),
+  galleryImage,
+  galleryVideo,
+]);
+
+const gallery = z.preprocess((value) => {
+  const raw = unset(value);
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) return raw;
+  return raw.filter((item) => item !== null && item !== '');
+}, z.array(galleryItem).default([]));
+
 /* --------------------------------------------------------------------------
    Collections
    -------------------------------------------------------------------------- */
@@ -127,7 +179,7 @@ const references = defineCollection({
   }),
 });
 
-/** A public moment in the research. Body convention: About / What was shown / Documentation / Reflection. */
+/** A public moment in the research. Body convention: About / Documentation / Reflection. */
 const events = defineCollection({
   loader: markdownIn('events'),
   schema: z.object({
@@ -136,9 +188,17 @@ const events = defineCollection({
     end: optional(z.coerce.date()),
     location: optional(z.string()),
     status: withDefault(z.enum(EVENT_STATUSES), 'upcoming'),
+    lede: optional(z.string()),
     rsvp: optional(z.url()),
-    cover: optional(z.string()),
+    cover: optional(mediaRef),
     youtube: optional(z.string()),
+    format: optional(z.string()),
+    audience: optional(z.string()),
+    organizedAt: optionalTextOrLines,
+    partOf: optionalTextOrLines,
+    whatToExpectIntro: optional(z.string()),
+    whatToExpect: stringList,
+    gallery,
     related,
     draft,
   }),

@@ -10,6 +10,12 @@ export function href(path: string): string {
   return `${base}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
+/** Frontmatter media path: keep remote URLs, prefix site-relative ones with `base`. */
+export function mediaSrc(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
+  return href(path);
+}
+
 /** Canonical list page for a collection: /studies/ */
 export function collectionPath(collection: CollectionName): string {
   return href(`/${collection}/`);

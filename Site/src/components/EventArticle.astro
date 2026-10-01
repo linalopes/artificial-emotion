@@ -1,0 +1,779 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import GenerativeWaves from './GenerativeWaves.astro';
+import { formatDate, getPublishedByDate, isoDate, resolveRelated, youtubeUrl } from '../lib/content';
+import {
+  asFactLines,
+  hasMarkdownContent,
+  markdownToSafeHtml,
+  sectionByHeading,
+  splitMarkdownSections,
+} from '../lib/markdown';
+import { collectionPath, mediaSrc } from '../lib/paths';
+import { COLLECTION_LABELS_SINGULAR } from '../lib/vocabulary';
+
+interface Props {
+  entry: CollectionEntry<'events'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+
+const statusLabel = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+
+const locationParts = (data.location ?? '')
+  .split(',')
+  .map((part) => part.trim())
+  .filter(Boolean);
+const locationVenue = locationParts[0];
+const locationPlace = locationParts.slice(1).join(', ');
+
+const facts = [
+  { label: 'Format', lines: data.format ? [data.format] : [] },
+  { label: 'Audience', lines: data.audience ? [data.audience] : [] },
+  { label: 'Organized at', lines: asFactLines(data.organizedAt) },
+  { label: 'Part of', lines: asFactLines(data.partOf) },
+].filter((fact) => fact.lines.length > 0);
+
+const sections = splitMarkdownSections(entry.body ?? '');
+const preface = sections.find((section) => section.heading === null)?.body ?? '';
+const aboutSource = [sectionByHeading(sections, 'About'), preface].find(hasMarkdownContent) ?? '';
+const documentationSource = sectionByHeading(sections, 'Documentation');
+const reflectionSource = sectionByHeading(sections, 'Reflection');
+const aboutHtml = hasMarkdownContent(aboutSource) ? markdownToSafeHtml(aboutSource) : '';
+const documentationHtml = hasMarkdownContent(documentationSource)
+  ? markdownToSafeHtml(documentationSource)
+  : '';
+const reflectionHtml = hasMarkdownContent(reflectionSource)
+  ? markdownToSafeHtml(reflectionSource)
+  : '';
+
+const expectItems = data.whatToExpect.map((item) => item.trim()).filter(Boolean);
+const hasExpect = Boolean(data.whatToExpectIntro?.trim()) || expectItems.length > 0;
+const galleryItems = data.gallery.filter((item) => item.src.trim());
+const galleryLayout = galleryItems.length <= 3 ? String(galleryItems.length) : '3';
+const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
+
+const related = await resolveRelated(data.related, `events/${entry.id}`);
+const publishedStudies = await getPublishedByDate('studies');
+const relatedCards = related.map((item) => {
+  const study = item.collection === 'studies' ? publishedStudies.find((s) => s.id === item.id) : undefined;
+  const body = (study?.body ?? '')
+    .replace(/^>.*$/gm, '')
+    .replace(/^#{1,6}\s+.*$/gm, '')
+    .replace(/[*_`]/g, '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join(' ');
+  const fromBody = body.replace(/\s+/g, ' ').trim();
+  const isPlaceholder = /^(placeholder\.?\s*)+$/i.test(fromBody);
+
+  return {
+    href: item.href,
+    title: item.title,
+    cover: study?.data.cover?.trim() ? mediaSrc(study.data.cover.trim()) : undefined,
+    lede: fromBody && !isPlaceholder ? fromBody : undefined,
+    label: item.typeLabel.toUpperCase(),
+  };
+});
+---
+
+<article class="event">
+  <header class="event-hero">
+    <div class="event-hero__field" aria-hidden="true">
+      <GenerativeWaves mode="fill" />
+    </div>
+    <div class="event-hero__veil" aria-hidden="true"></div>
+
+    <div class="event-hero__stage">
+      <a class="event-hero__tag" href={collectionPath('events')}>{COLLECTION_LABELS_SINGULAR.events}</a>
+      <h1 class="event-hero__title">{data.title}</h1>
+      {data.lede && <p class="event-hero__lede">{data.lede}</p>}
+
+      <div class="event-meta">
+        <div class="event-meta__item">
+          <p class="event-meta__label">Date</p>
+          <p class="event-meta__value">
+            <time datetime={isoDate(data.date)}>{formatDate(data.date)}</time>
+            {
+              data.end && (
+                <>
+                  {' – '}
+                  <time datetime={isoDate(data.end)}>{formatDate(data.end)}</time>
+                </>
+              )
+            }
+          </p>
+        </div>
+        {
+          (locationVenue || locationPlace) && (
+            <div class="event-meta__item">
+              <p class="event-meta__label">Location</p>
+              <p class="event-meta__value">
+                {locationVenue && <span>{locationVenue}</span>}
+                {locationPlace && <span>{locationPlace}</span>}
+              </p>
+            </div>
+          )
+        }
+        <div class="event-meta__item">
+          <p class="event-meta__label">Status</p>
+          <p class="event-meta__value">{statusLabel}</p>
+        </div>
+        {
+          data.rsvp && (
+            <div class="event-meta__item">
+              <p class="event-meta__label">RSVP</p>
+              <p class="event-meta__value">
+                <a href={data.rsvp} target="_blank" rel="noopener noreferrer">
+                  Register
+                </a>
+              </p>
+            </div>
+          )
+        }
+        {
+          data.youtube?.trim() && (
+            <div class="event-meta__item">
+              <p class="event-meta__label">Video</p>
+              <p class="event-meta__value">
+                <a href={youtubeUrl(data.youtube.trim())} target="_blank" rel="noopener noreferrer">
+                  Watch on YouTube
+                </a>
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="event-shell">
+    <section class="event-about" aria-labelledby={aboutHtml ? 'event-about-heading' : undefined}>
+      {
+        data.cover ? (
+          <img class="event-about__media" src={coverSrc} alt="" />
+        ) : (
+          <span class="event-about__media event-about__media--ph" aria-hidden="true"></span>
+        )
+      }
+
+      {
+        (aboutHtml || facts.length > 0) && (
+          <div class="event-about__copy">
+            {
+              aboutHtml && (
+                <>
+                  <h2 id="event-about-heading">About</h2>
+                  <div class="event-about__prose" set:html={aboutHtml} />
+                </>
+              )
+            }
+
+            {
+              facts.length > 0 && (
+                <div class="event-facts">
+                  {facts.map((fact) => (
+                    <div class="event-facts__item">
+                      <p class="event-facts__label">{fact.label}</p>
+                      <p class="event-facts__value">
+                        {fact.lines.map((line) => (
+                          <span>{line}</span>
+                        ))}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )
+            }
+          </div>
+        )
+      }
+    </section>
+
+    {
+      hasExpect && (
+        <section class="event-expect" aria-labelledby="event-expect-heading">
+          <div class="event-expect__copy">
+            <h2 id="event-expect-heading">What to expect</h2>
+            {data.whatToExpectIntro?.trim() && <p>{data.whatToExpectIntro.trim()}</p>}
+            {expectItems.length > 0 && (
+              <ul>
+                {expectItems.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      galleryItems.length > 0 && (
+        <section class="event-gallery-section" aria-label="Gallery">
+          <ul class:list={['event-gallery', `event-gallery--${galleryLayout}`]}>
+            {
+              galleryItems.map((item) => (
+                <li>
+                  <figure>
+                    {item.type === 'image' ? (
+                      <img src={mediaSrc(item.src)} alt={item.alt} />
+                    ) : (
+                      <video
+                        src={mediaSrc(item.src)}
+                        poster={item.poster ? mediaSrc(item.poster) : undefined}
+                        controls
+                        playsinline
+                        preload="metadata"
+                        aria-label={item.caption || undefined}
+                      />
+                    )}
+                    {item.caption?.trim() && <figcaption>{item.caption.trim()}</figcaption>}
+                  </figure>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      documentationHtml && (
+        <section class="event-notes" aria-labelledby="event-documentation-heading">
+          <h2 id="event-documentation-heading">Documentation</h2>
+          <div class="event-about__prose" set:html={documentationHtml} />
+        </section>
+      )
+    }
+
+    {
+      reflectionHtml && (
+        <section class="event-notes" aria-labelledby="event-reflection-heading">
+          <h2 id="event-reflection-heading">Reflection</h2>
+          <div class="event-about__prose" set:html={reflectionHtml} />
+        </section>
+      )
+    }
+
+    {
+      relatedCards.length > 0 && (
+        <section class="event-related" aria-labelledby="event-related-heading">
+          <h2 id="event-related-heading">Related</h2>
+          <ul class="event-related__list">
+            {relatedCards.map((item) => (
+              <li>
+                <a class="related-card" href={item.href}>
+                  {item.cover ? (
+                    <img class="related-card__media" src={item.cover} alt="" />
+                  ) : (
+                    <span class="related-card__media related-card__media--ph" aria-hidden="true"></span>
+                  )}
+                  <span class="related-card__body">
+                    <span class="related-card__num">{item.label}</span>
+                    <span class="related-card__title">{item.title}</span>
+                    {item.lede && <span class="related-card__lede">{item.lede}</span>}
+                    <span class="related-card__go" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="12" height="12">
+                        <path
+                          d="M7 12h10M13 7l5 5-5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .event {
+    overflow-x: hidden;
+  }
+
+  .event-hero {
+    position: relative;
+    display: grid;
+    isolation: isolate;
+  }
+
+  .event-hero__field,
+  .event-hero__veil {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .event-hero__field {
+    z-index: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: min(28rem, 70%);
+  }
+
+  @media (min-width: 40rem) {
+    .event-hero__field {
+      left: 18%;
+      width: 92%;
+      height: 78%;
+    }
+  }
+
+  .event-hero__veil {
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(
+        90deg,
+        var(--color-white) 0%,
+        color-mix(in srgb, var(--color-white) 88%, transparent) 22%,
+        color-mix(in srgb, var(--color-white) 32%, transparent) 48%,
+        transparent 68%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-white) 18%, transparent) 0%,
+        transparent 22%,
+        color-mix(in srgb, var(--color-white) 55%, transparent) 72%,
+        var(--color-white) 100%
+      );
+  }
+
+  @media (max-width: 39.99rem) {
+    .event-hero__field {
+      height: 58%;
+    }
+
+    .event-hero__veil {
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--color-white) 78%, transparent) 0%,
+          color-mix(in srgb, var(--color-white) 48%, transparent) 26%,
+          color-mix(in srgb, var(--color-white) 36%, transparent) 48%,
+          color-mix(in srgb, var(--color-white) 82%, transparent) 78%,
+          var(--color-white) 100%
+        ),
+        radial-gradient(
+          ellipse 95% 58% at 12% 22%,
+          color-mix(in srgb, var(--color-white) 84%, transparent) 0%,
+          transparent 72%
+        );
+    }
+  }
+
+  .event-hero__stage {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--space-4);
+    width: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-5) var(--page-gutter) var(--space-6);
+  }
+
+  .event-hero__tag {
+    width: max-content;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--fg-muted);
+  }
+
+  .event-hero__title {
+    max-width: 14ch;
+    font-size: clamp(2.35rem, 6.4vw, 4.35rem);
+    line-height: 0.94;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+  }
+
+  .event-hero__lede {
+    max-width: 34ch;
+    font-size: clamp(1rem, 0.95rem + 0.35vw, 1.2rem);
+    line-height: var(--leading-snug);
+    color: var(--fg);
+  }
+
+  .event-meta {
+    display: grid;
+    gap: var(--space-4);
+    padding-top: var(--space-5);
+    margin-top: var(--space-2);
+    border-top: 1px solid var(--rule);
+  }
+
+  .event-meta__label,
+  .event-facts__label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .event-meta__value,
+  .event-facts__value {
+    display: grid;
+    margin-top: 0.35rem;
+    max-width: none;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  .event-meta__value span,
+  .event-facts__value span {
+    display: block;
+  }
+
+  @media (min-width: 40rem) {
+    .event-meta {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+  }
+
+  .event-shell {
+    display: grid;
+    gap: var(--space-7);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0 var(--page-gutter) var(--space-7);
+  }
+
+  .event-about,
+  .event-expect {
+    display: grid;
+    gap: var(--space-5);
+    min-width: 0;
+  }
+
+  .event-about__media {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    object-fit: cover;
+  }
+
+  .event-about__media {
+    min-height: 16rem;
+    aspect-ratio: 4 / 5;
+    background: color-mix(in srgb, var(--color-gray-green) 70%, var(--color-white));
+  }
+
+  .event-about__media--ph {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 78%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-pink) 10%, var(--color-white)) 52%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-gray-green)) 100%
+      );
+  }
+
+  .event-about__copy,
+  .event-expect__copy {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+    align-content: start;
+  }
+
+  .event-about__copy h2,
+  .event-expect__copy h2,
+  .event-notes h2,
+  .event-related h2 {
+    font-size: clamp(1.65rem, 1.2rem + 1.4vw, 2.25rem);
+    letter-spacing: -0.03em;
+  }
+
+  .event-about__prose {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 46ch;
+  }
+
+  .event-about__prose :global(p) {
+    max-width: none;
+  }
+
+  .event-facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: var(--space-2);
+    border-top: 1px solid var(--rule);
+  }
+
+  .event-facts__item {
+    min-width: 0;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .event-facts__item:nth-child(odd) {
+    padding-right: var(--space-3);
+  }
+
+  .event-facts__item:nth-child(even) {
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--rule);
+  }
+
+  .event-expect__copy p,
+  .event-expect__copy li {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--fg);
+  }
+
+  .event-expect__copy ul {
+    display: grid;
+    gap: 0.55rem;
+    list-style: none;
+    padding: 0;
+    margin: 0.25rem 0 0;
+  }
+
+  .event-expect__copy li {
+    position: relative;
+    padding-left: 1.15em;
+  }
+
+  .event-expect__copy li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 0.55em;
+    height: 1px;
+    background: var(--color-pink);
+  }
+
+  .event-gallery-section {
+    min-width: 0;
+  }
+
+  .event-gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .event-gallery > li {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .event-gallery figure {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .event-gallery img,
+  .event-gallery video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    background: color-mix(in srgb, var(--color-gray-green) 42%, var(--color-white));
+  }
+
+  .event-gallery--1 {
+    max-width: 38rem;
+  }
+
+  .event-gallery--1 img,
+  .event-gallery--1 video {
+    aspect-ratio: 16 / 10;
+  }
+
+  .event-gallery figcaption {
+    max-width: none;
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .event-notes {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .event-related {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .event-related__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .event-related__list > li {
+    max-width: none;
+  }
+
+  .related-card {
+    display: grid;
+    grid-template-columns: minmax(6.25rem, 9.5rem) minmax(0, 1fr);
+    max-width: 42rem;
+    min-height: 7.5rem;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .related-card:hover .related-card__go {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+
+  .related-card__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 7.5rem;
+    object-fit: cover;
+    align-self: stretch;
+  }
+
+  .related-card__media--ph {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 48%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-pink) 10%, var(--color-white)) 100%
+      );
+  }
+
+  .related-card__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1.7rem;
+    grid-template-rows: auto auto auto 1fr;
+    gap: 0.28rem 0.55rem;
+    padding: 0.85rem 0 0.75rem 1rem;
+    min-width: 0;
+  }
+
+  .related-card__num {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--color-pink);
+  }
+
+  .related-card__title {
+    grid-column: 1 / -1;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: var(--text-base);
+    letter-spacing: -0.015em;
+    line-height: var(--leading-snug);
+  }
+
+  .related-card__lede {
+    grid-column: 1 / -1;
+    max-width: 46ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .related-card__go {
+    grid-column: 2;
+    grid-row: 4;
+    align-self: end;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    margin-top: 0.35rem;
+    color: var(--fg-muted);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+  }
+
+  @media (min-width: 40rem) {
+    .event-gallery--2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .event-gallery--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 29.99rem) {
+    .event-facts {
+      grid-template-columns: 1fr;
+    }
+
+    .event-facts__item:nth-child(odd),
+    .event-facts__item:nth-child(even) {
+      padding-left: 0;
+      padding-right: 0;
+      border-left: 0;
+    }
+
+    .related-card {
+      grid-template-columns: 1fr;
+    }
+
+    .related-card__media {
+      min-height: 8rem;
+      aspect-ratio: 16 / 10;
+      height: auto;
+    }
+
+    .related-card__body {
+      padding-left: 0;
+    }
+  }
+
+  @media (min-width: 52rem) {
+    .event-about {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    .event-about__media {
+      min-height: 28rem;
+    }
+  }
+</style>
