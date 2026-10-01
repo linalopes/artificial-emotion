@@ -1,4 +1,5 @@
 ---
+import AboutSection from '../components/AboutSection.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ConstellationSection from '../components/ConstellationSection.astro';
 import CurrentPublic from '../components/CurrentPublic.astro';
@@ -108,13 +109,9 @@ const threads: {
 
     <CurrentPublic />
     <LatestStudies />
+    <AboutSection />
 
     <ConstellationSection />
-
-    <footer class="container colophon">
-      <hr />
-      <p class="label">Research site in development.</p>
-    </footer>
   </main>
 </BaseLayout>
 
@@ -125,9 +122,6 @@ const threads: {
     gap: var(--space-7);
   }
 
-  .page > .container {
-    width: 100%;
-  }
 
   .hero {
     position: relative;
@@ -469,9 +463,4 @@ const threads: {
     }
   }
 
-  .colophon {
-    display: grid;
-    gap: var(--space-3);
-    padding-block: 0 var(--space-6);
-  }
 </style>

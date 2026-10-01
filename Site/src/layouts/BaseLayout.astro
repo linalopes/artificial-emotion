@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { href } from '../lib/paths';
 
@@ -64,5 +65,6 @@ const googleFonts =
   <body class={theme === 'light' ? undefined : `theme-${theme}`}>
     <SiteHeader variant={header} />
     <slot />
+    <SiteFooter />
   </body>
 </html>

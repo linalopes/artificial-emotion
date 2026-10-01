@@ -1,0 +1,153 @@
+---
+const email = 'lilothink.science@gmail.com';
+const instagram = 'https://www.instagram.com/lilo.think/';
+const youtube = 'https://www.youtube.com/@lina_lopes';
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <p class="site-footer__name">Lina Lopes</p>
+
+    <ul class="site-footer__links">
+      <li>
+        <a href={`mailto:${email}`} aria-label="Email Lina Lopes">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+            <rect
+              x="3.5"
+              y="6"
+              width="17"
+              height="12"
+              rx="1.2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.4"></rect>
+            <path
+              d="M4 7.2 12 13l8-5.8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+          <span>{email}</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href={instagram}
+          aria-label="Lina Lopes on Instagram"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+            <rect
+              x="4"
+              y="4"
+              width="16"
+              height="16"
+              rx="4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.4"></rect>
+            <circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.4"
+            ></circle>
+            <circle cx="16.4" cy="7.6" r="0.8" fill="currentColor"></circle>
+          </svg>
+          <span class="visually-hidden">Instagram</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href={youtube}
+          aria-label="Lina Lopes on YouTube"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+            <rect
+              x="2.8"
+              y="6.5"
+              width="18.4"
+              height="11"
+              rx="2.4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.4"></rect>
+            <path d="M10.4 9.4v5.2L15.2 12 10.4 9.4z" fill="currentColor"></path>
+          </svg>
+          <span class="visually-hidden">YouTube</span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="site-footer__copy">© 2026</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    width: 100%;
+    background: var(--color-white);
+    color: var(--color-deep-purple);
+    border-top: 1px solid var(--color-gray-green);
+  }
+
+  .site-footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem 1.5rem;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 1.15rem var(--page-gutter) 1.35rem;
+  }
+
+  .site-footer__name {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: 0.95rem;
+    letter-spacing: -0.015em;
+  }
+
+  .site-footer__links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem 1.1rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: color-mix(in srgb, var(--color-deep-purple) 72%, var(--color-white));
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  .site-footer__links a:hover {
+    color: var(--color-deep-purple);
+  }
+
+  .site-footer__copy {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--color-deep-purple) 55%, var(--color-white));
+  }
+
+  @media (min-width: 48rem) {
+    .site-footer__inner {
+      flex-wrap: nowrap;
+      gap: 1.25rem 2rem;
+    }
+
+    .site-footer__links {
+      margin-left: auto;
+    }
+  }
+</style>
