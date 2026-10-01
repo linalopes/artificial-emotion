@@ -1,7 +1,7 @@
 /**
  * Small Markdown helpers for splitting an entry body into named H2 sections
  * and rendering those fragments to HTML. Used when a page needs to show
- * About / Documentation / Reflection independently, and skip empty headings.
+ * About / Program / Documentation / Reflection independently, and skip empty headings.
  */
 
 export interface MarkdownSection {
@@ -63,48 +63,98 @@ function inline(value: string): string {
     .replace(/`([^`]+)`/g, '<code>$1</code>');
 }
 
+type BlockKind = 'quote' | 'ul' | 'ol' | 'other';
+
+function lineKind(line: string): BlockKind {
+  const text = line.trim();
+  if (/^>/.test(text)) return 'quote';
+  if (/^[-*]\s+\S/.test(text)) return 'ul';
+  if (/^\d+\.\s+\S/.test(text)) return 'ol';
+  return 'other';
+}
+
+function renderQuote(lines: readonly string[]): string {
+  const paragraphs: string[][] = [[]];
+  for (const line of lines) {
+    const text = line.trim().replace(/^>\s?/, '');
+    if (text === '') {
+      if (paragraphs[paragraphs.length - 1].length > 0) paragraphs.push([]);
+      continue;
+    }
+    paragraphs[paragraphs.length - 1].push(text);
+  }
+
+  const html = paragraphs
+    .filter((paragraph) => paragraph.length > 0)
+    .map((paragraph) => `<p>${paragraph.map((line) => inline(line)).join('<br>')}</p>`)
+    .join('');
+
+  return html ? `<blockquote>${html}</blockquote>` : '';
+}
+
+function renderRun(kind: BlockKind, lines: readonly string[]): string {
+  if (kind === 'quote') return renderQuote(lines);
+
+  if (kind === 'ul') {
+    const items = lines.map((line) => `<li>${inline(line.trim().replace(/^[-*]\s+/, ''))}</li>`);
+    return `<ul>${items.join('')}</ul>`;
+  }
+
+  if (kind === 'ol') {
+    const items = lines.map((line) => `<li>${inline(line.trim().replace(/^\d+\.\s+/, ''))}</li>`);
+    return `<ol>${items.join('')}</ol>`;
+  }
+
+  const heading = /^(#{3,6})\s+(.+)$/.exec(lines[0].trim());
+  if (heading) {
+    const level = heading[1].length;
+    const rest = lines.slice(1).map((line) => inline(line.trim())).join('<br>');
+    return `<h${level}>${inline(heading[2])}</h${level}>${rest ? `<p>${rest}</p>` : ''}`;
+  }
+
+  const image = /^!\[([^\]]*)\]\((https?:[^)\s]+|\/[^)\s]+)\)$/.exec(lines[0].trim());
+  if (image && lines.length === 1) {
+    return `<img src="${escapeHtml(image[2])}" alt="${escapeHtml(image[1])}">`;
+  }
+
+  return `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
+}
+
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
- * Covers paragraphs, lists, links, emphasis and images — enough for event notes.
+ * Covers paragraphs, lists, blockquotes, links, emphasis and images.
  */
 export function markdownToSafeHtml(markdown: string): string {
-  const blocks = markdown.trim().split(/\n{2,}/);
-  return blocks
+  const normalized = markdown
+    .replace(/^\uFEFF/, '')
+    .trim()
+    .replace(/^[ \t]+$/gm, '');
+
+  return normalized
+    .split(/\n{2,}/)
     .map((block) => {
       const lines = block.split('\n').filter((line) => line.trim().length > 0);
       if (lines.length === 0) return '';
 
-      if (lines.every((line) => /^[-*]\s+\S/.test(line.trim()))) {
-        const items = lines.map((line) => `<li>${inline(line.trim().replace(/^[-*]\s+/, ''))}</li>`);
-        return `<ul>${items.join('')}</ul>`;
+      const runs: { kind: BlockKind; lines: string[] }[] = [];
+      for (const line of lines) {
+        const kind = lineKind(line);
+        const current = runs[runs.length - 1];
+        if (current && current.kind === kind) current.lines.push(line);
+        else runs.push({ kind, lines: [line] });
       }
 
-      if (lines.every((line) => /^\d+\.\s+\S/.test(line.trim()))) {
-        const items = lines.map((line) => `<li>${inline(line.trim().replace(/^\d+\.\s+/, ''))}</li>`);
-        return `<ol>${items.join('')}</ol>`;
-      }
-
-      const heading = /^(#{3,6})\s+(.+)$/.exec(lines[0].trim());
-      if (heading) {
-        const level = heading[1].length;
-        const rest = lines.slice(1).map((line) => inline(line.trim())).join('<br>');
-        return `<h${level}>${inline(heading[2])}</h${level}>${rest ? `<p>${rest}</p>` : ''}`;
-      }
-
-      const image = /^!\[([^\]]*)\]\((https?:[^)\s]+|\/[^)\s]+)\)$/.exec(lines[0].trim());
-      if (image && lines.length === 1) {
-        return `<img src="${escapeHtml(image[2])}" alt="${escapeHtml(image[1])}">`;
-      }
-
-      return `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
+      return runs.map((run) => renderRun(run.kind, run.lines)).join('');
     })
     .filter(Boolean)
     .join('');
 }
 
-/** Lines for compact fact fields that authors may write as a string or a YAML list. */
-export function asFactLines(value: string | readonly string[] | undefined): string[] {
-  if (value == null) return [];
-  const items = typeof value === 'string' ? value.split('\n') : [...value];
-  return items.map((item) => item.trim()).filter(Boolean);
+/** Pull list markup into a separate fragment so Program can sit in two columns. */
+export function splitHtmlLists(html: string): { introHtml: string; listHtml: string } {
+  const lists = html.match(/<(ul|ol)\b[\s\S]*?<\/\1>/gi) ?? [];
+  return {
+    introHtml: html.replace(/<(ul|ol)\b[\s\S]*?<\/\1>/gi, '').trim(),
+    listHtml: lists.join(''),
+  };
 }

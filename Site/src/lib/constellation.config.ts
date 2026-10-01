@@ -16,7 +16,7 @@ export type RelationType =
   | 'root-thread' // Artificial Emotion → research thread
   | 'content-thread' // content → thread listed in its `threads`
   | 'related' // content → content via `related`
-  | 'root-event'; // Artificial Emotion → event (events have no threads yet)
+  | 'root-event'; // Artificial Emotion → event with no threads
 
 export const CONSTELLATION_CONFIG = {
   /* ------------------------------------------------------------------------

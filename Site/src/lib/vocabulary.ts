@@ -75,6 +75,33 @@ export const THREAD_LABELS: Record<ResearchThread, string> = Object.fromEntries(
 export const STUDY_STATUSES = ['seed', 'experiment', 'prototype', 'integrated'] as const;
 export type StudyStatus = (typeof STUDY_STATUSES)[number];
 
-/** Whether an Event is still ahead or already happened. */
-export const EVENT_STATUSES = ['upcoming', 'past'] as const;
+/** Lifecycle of a public Event. */
+export const EVENT_STATUSES = ['upcoming', 'ongoing', 'past', 'cancelled'] as const;
 export type EventStatus = (typeof EVENT_STATUSES)[number];
+
+/** Semantic event category. Internal ids stay kebab-case in frontmatter. */
+export const EVENT_TYPES = [
+  'open-studio',
+  'workshop',
+  'exhibition',
+  'talk',
+  'presentation',
+  'screening',
+  'residency',
+  'other',
+] as const;
+export type EventType = (typeof EVENT_TYPES)[number];
+
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  'open-studio': 'Open studio',
+  workshop: 'Workshop',
+  exhibition: 'Exhibition',
+  talk: 'Talk',
+  presentation: 'Presentation',
+  screening: 'Screening',
+  residency: 'Residency',
+  other: 'Event',
+};
+
+/** Default IANA timezone for event clocks. */
+export const EVENT_TIMEZONE_DEFAULT = 'Europe/Zurich';

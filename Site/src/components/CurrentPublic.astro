@@ -1,7 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import { formatDateShort, isoDate } from '../lib/content';
-import { entryPath } from '../lib/paths';
+import { entryPath, mediaSrc } from '../lib/paths';
 
 const eventEntry = await getEntry('events', 'open-research-studio');
 const event = eventEntry && !eventEntry.data.draft ? eventEntry : undefined;
@@ -16,7 +16,7 @@ const event = eventEntry && !eventEntry.data.draft ? eventEntry : undefined;
         event && (
           <a class="ed-card" href={entryPath('events', event.id)}>
             {event.data.cover ? (
-              <img class="ed-card__media" src={event.data.cover} alt="" />
+              <img class="ed-card__media" src={mediaSrc(event.data.cover)} alt="" />
             ) : (
               <span class="ed-card__media ed-card__media--event" aria-hidden="true"></span>
             )}

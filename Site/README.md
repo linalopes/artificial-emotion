@@ -89,14 +89,60 @@ apply everywhere:
 | `studies`    | title, date     | status (`seed` · experiment · prototype · integrated), threads, tags, materials, related, cover, youtube, draft |
 | `notes`      | title, date     | threads, tags, related, draft |
 | `references` | title           | creator, year, referenceType, url, threads, tags, related, image, draft |
-| `events`     | title, date     | end, location, status (`upcoming` · past), lede, rsvp, cover, youtube, format, audience, organizedAt, partOf, whatToExpectIntro, whatToExpect, gallery, related, draft |
+| `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |
 
 Body headings are an editorial convention, not validated:
 Studies `## Question / ## Setup / ## Observation / ## Next` ·
 References `## Why it matters / ## Notes` ·
-Events `## About / ## Documentation / ## Reflection`.
+Events `## About / ## Program / ## Documentation / ## Reflection`.
 
-Empty `## Documentation` or `## Reflection` headings are not rendered.
+Empty event headings are not rendered.
+
+### Events
+
+**Properties** are structured data the site uses to sort, filter, relate, or render conditionally.
+
+**Body** is editorial narrative written naturally in Obsidian. Do not put About/Program copy in frontmatter.
+
+| Property    | Notes |
+| ----------- | ----- |
+| `date`      | Calendar date only, `YYYY-MM-DD`. |
+| `startTime` / `endTime` | Local clock as quoted `"HH:MM"` (24-hour). Quote them so YAML does not treat `14:00` as a number. Leave empty if unused. The page shows `14:00–18:00`, or only `14:00` if there is no end, or the date alone if neither time is set. |
+| `timezone`  | IANA timezone. Default `Europe/Zurich`. Not shown on ordinary local events. |
+| `eventType` | One of: `open-studio`, `workshop`, `exhibition`, `talk`, `presentation`, `screening`, `residency`, `other`. |
+| `status`    | `upcoming` (default), `ongoing`, `past`, `cancelled`. |
+| `lede`      | Short reusable summary for the hero, cards, and listings. |
+| `rsvp`      | Registration URL. |
+| `eventUrl`  | Official event page, if different from RSVP. |
+| `threads`   | Canonical ids: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. |
+| `cover` / `gallery` | Local site-root path (`/images/...`) or HTTPS (Cloudinary or other). |
+| `youtube`   | Primary documentation video, if any. |
+
+Copy `content/_templates/event-template.md` for each new event.
+
+```yaml
+title: Open Research Studio
+date: 2026-11-15
+startTime: "14:00"
+endTime: "18:00"
+timezone: Europe/Zurich
+eventType: open-studio
+status: upcoming
+location: School of Tomorrow’s AI, Wetzikon, Switzerland
+lede: An open day of experiments, prototypes and conversations. All welcome.
+rsvp: https://luma.com/piaavgin
+eventUrl:
+cover: https://res.cloudinary.com/example/image/upload/cover.webp
+gallery: []
+youtube:
+threads:
+  - soft-mechanisms
+tags:
+  - open-studio
+related:
+  - studies/breathing-textile
+draft: false
+```
 
 ### Event media
 

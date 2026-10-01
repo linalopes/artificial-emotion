@@ -10,7 +10,7 @@
  *   content-thread  content → thread, for every id in its `threads`
  *   related         content → content, from `related` (published targets only,
  *                   de-duplicated so A↔B is one link)
- *   root-event      Artificial Emotion → event, until events have threads
+ *   root-event      Artificial Emotion → event with no threads
  */
 import type { CollectionEntry } from 'astro:content';
 import { getPublished } from './content';
@@ -121,7 +121,7 @@ export async function buildConstellation(): Promise<ConstellationGraph> {
       if (nodeIds.has(target)) addLink(id, target, 'related'); // drafts/missing are skipped
     }
 
-    if (entry.collection === 'events') {
+    if (entry.collection === 'events' && !('threads' in entry.data && entry.data.threads.length > 0)) {
       addLink(ROOT_ID, id, 'root-event');
     }
   }

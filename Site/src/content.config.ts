@@ -4,6 +4,8 @@ import { z } from 'astro/zod';
 import {
   COLLECTIONS,
   EVENT_STATUSES,
+  EVENT_TIMEZONE_DEFAULT,
+  EVENT_TYPES,
   RESEARCH_THREADS,
   STUDY_STATUSES,
   type CollectionName,
@@ -76,14 +78,21 @@ export const relatedRef = z
 
 const related = withDefault(z.array(relatedRef), []);
 
-/** YAML list, or a single string that authors paste without `-` bullets. */
-const stringList = withDefault(
-  z.union([z.array(z.string()), z.string().transform((value) => [value])]),
-  [],
-);
-
-/** Optional string, YAML list, or empty Obsidian property (`key:`). */
-const optionalTextOrLines = optional(z.union([z.string(), z.array(z.string())]));
+/**
+ * Clock time as "HH:MM". Quoted strings are preferred in YAML.
+ * Unquoted `14:00` may arrive as YAML sexagesimal minutes (840); coerce those.
+ */
+const clockTime = z.preprocess((value) => {
+  const raw = unset(value);
+  if (raw === undefined) return undefined;
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    const total = Math.round(raw);
+    const hours = Math.floor(total / 60);
+    const minutes = ((total % 60) + 60) % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  }
+  return typeof raw === 'string' ? raw.trim() : raw;
+}, z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use 24-hour HH:MM, e.g. "14:00"'));
 
 /** Local site-root path or externally hosted HTTPS asset. Not downloaded at build time. */
 const mediaRef = z
@@ -179,26 +188,26 @@ const references = defineCollection({
   }),
 });
 
-/** A public moment in the research. Body convention: About / Documentation / Reflection. */
+/** A public moment in the research. Body convention: About / Program / Documentation / Reflection. */
 const events = defineCollection({
   loader: markdownIn('events'),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    end: optional(z.coerce.date()),
-    location: optional(z.string()),
+    startTime: optional(clockTime),
+    endTime: optional(clockTime),
+    timezone: withDefault(z.string(), EVENT_TIMEZONE_DEFAULT),
+    eventType: optional(z.enum(EVENT_TYPES)),
     status: withDefault(z.enum(EVENT_STATUSES), 'upcoming'),
+    location: optional(z.string()),
     lede: optional(z.string()),
     rsvp: optional(z.url()),
+    eventUrl: optional(z.url()),
     cover: optional(mediaRef),
-    youtube: optional(z.string()),
-    format: optional(z.string()),
-    audience: optional(z.string()),
-    organizedAt: optionalTextOrLines,
-    partOf: optionalTextOrLines,
-    whatToExpectIntro: optional(z.string()),
-    whatToExpect: stringList,
     gallery,
+    youtube: optional(z.string()),
+    threads,
+    tags,
     related,
     draft,
   }),

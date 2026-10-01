@@ -8,6 +8,7 @@ import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { entryPath } from './paths';
 import {
   COLLECTION_LABELS_SINGULAR,
+  EVENT_TYPE_LABELS,
   THREAD_LABELS,
   type CollectionName,
   type ResearchThread,
@@ -37,18 +38,18 @@ export async function getPublishedByDate<C extends DatedCollection>(
 /* --------------------------------------------------------------------------
    Research threads
    A thread page is a curated view over existing entries: anything published
-   whose `threads` contains the thread id. Only collections whose schema has a
-   `threads` field take part (events currently do not).
+   whose `threads` contains the thread id.
    -------------------------------------------------------------------------- */
 
 /** Collections whose schema includes `threads`. */
-export const THREADED_COLLECTIONS = ['studies', 'notes', 'references'] as const;
+export const THREADED_COLLECTIONS = ['studies', 'notes', 'references', 'events'] as const;
 export type ThreadedCollection = (typeof THREADED_COLLECTIONS)[number];
 
 export interface ThreadContent {
   studies: CollectionEntry<'studies'>[];
   notes: CollectionEntry<'notes'>[];
   references: CollectionEntry<'references'>[];
+  events: CollectionEntry<'events'>[];
 }
 
 /** Published entries tagged with a thread, grouped by collection and sorted. */
@@ -56,16 +57,18 @@ export async function getPublishedByThread(thread: ResearchThread): Promise<Thre
   const inThread = <T extends { data: { threads: readonly ResearchThread[] } }>(entries: T[]) =>
     entries.filter((entry) => entry.data.threads.includes(thread));
 
-  const [studies, notes, references] = await Promise.all([
+  const [studies, notes, references, events] = await Promise.all([
     getPublishedByDate('studies'),
     getPublishedByDate('notes'),
     getPublished('references'),
+    getPublishedByDate('events'),
   ]);
 
   return {
     studies: inThread(studies),
     notes: inThread(notes),
     references: sortByTitle(inThread(references)),
+    events: inThread(events),
   };
 }
 
@@ -192,7 +195,13 @@ export function toListItem(entry: CollectionEntry<CollectionName>): ListItem {
         href,
         title: data.title,
         datetime: isoDate(data.date),
-        meta: [formatDate(data.date), data.location, data.status],
+        meta: [
+          formatDate(data.date),
+          formatEventTime(data.startTime, data.endTime),
+          data.location,
+          data.eventType ? EVENT_TYPE_LABELS[data.eventType] : undefined,
+          data.status,
+        ],
       };
     }
   }
@@ -229,6 +238,13 @@ export function formatDateShort(date: Date): string {
 /** "2026-11-15", for <time datetime> attributes. */
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
+}
+
+/** "14:00–18:00", "14:00", or undefined. */
+export function formatEventTime(start?: string, end?: string): string | undefined {
+  if (start && end) return `${start}–${end}`;
+  if (start) return start;
+  return undefined;
 }
 
 /** Accepts a full YouTube URL or a bare video id. */

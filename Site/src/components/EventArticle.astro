@@ -1,16 +1,23 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import GenerativeWaves from './GenerativeWaves.astro';
-import { formatDate, getPublishedByDate, isoDate, resolveRelated, youtubeUrl } from '../lib/content';
 import {
-  asFactLines,
+  formatDate,
+  formatEventTime,
+  getPublishedByDate,
+  isoDate,
+  resolveRelated,
+  youtubeUrl,
+} from '../lib/content';
+import {
   hasMarkdownContent,
   markdownToSafeHtml,
   sectionByHeading,
+  splitHtmlLists,
   splitMarkdownSections,
 } from '../lib/markdown';
 import { collectionPath, mediaSrc } from '../lib/paths';
-import { COLLECTION_LABELS_SINGULAR } from '../lib/vocabulary';
+import { COLLECTION_LABELS_SINGULAR, EVENT_TYPE_LABELS } from '../lib/vocabulary';
 
 interface Props {
   entry: CollectionEntry<'events'>;
@@ -20,6 +27,10 @@ const { entry } = Astro.props;
 const { data } = entry;
 
 const statusLabel = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+const typeLabel = data.eventType
+  ? EVENT_TYPE_LABELS[data.eventType]
+  : COLLECTION_LABELS_SINGULAR.events;
+const eventTime = formatEventTime(data.startTime, data.endTime);
 
 const locationParts = (data.location ?? '')
   .split(',')
@@ -28,19 +39,15 @@ const locationParts = (data.location ?? '')
 const locationVenue = locationParts[0];
 const locationPlace = locationParts.slice(1).join(', ');
 
-const facts = [
-  { label: 'Format', lines: data.format ? [data.format] : [] },
-  { label: 'Audience', lines: data.audience ? [data.audience] : [] },
-  { label: 'Organized at', lines: asFactLines(data.organizedAt) },
-  { label: 'Part of', lines: asFactLines(data.partOf) },
-].filter((fact) => fact.lines.length > 0);
-
 const sections = splitMarkdownSections(entry.body ?? '');
 const preface = sections.find((section) => section.heading === null)?.body ?? '';
 const aboutSource = [sectionByHeading(sections, 'About'), preface].find(hasMarkdownContent) ?? '';
+const programSource = sectionByHeading(sections, 'Program');
 const documentationSource = sectionByHeading(sections, 'Documentation');
 const reflectionSource = sectionByHeading(sections, 'Reflection');
 const aboutHtml = hasMarkdownContent(aboutSource) ? markdownToSafeHtml(aboutSource) : '';
+const programHtml = hasMarkdownContent(programSource) ? markdownToSafeHtml(programSource) : '';
+const { introHtml: programIntroHtml, listHtml: programListHtml } = splitHtmlLists(programHtml);
 const documentationHtml = hasMarkdownContent(documentationSource)
   ? markdownToSafeHtml(documentationSource)
   : '';
@@ -48,8 +55,6 @@ const reflectionHtml = hasMarkdownContent(reflectionSource)
   ? markdownToSafeHtml(reflectionSource)
   : '';
 
-const expectItems = data.whatToExpect.map((item) => item.trim()).filter(Boolean);
-const hasExpect = Boolean(data.whatToExpectIntro?.trim()) || expectItems.length > 0;
 const galleryItems = data.gallery.filter((item) => item.src.trim());
 const galleryLayout = galleryItems.length <= 3 ? String(galleryItems.length) : '3';
 const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
@@ -87,7 +92,7 @@ const relatedCards = related.map((item) => {
     <div class="event-hero__veil" aria-hidden="true"></div>
 
     <div class="event-hero__stage">
-      <a class="event-hero__tag" href={collectionPath('events')}>{COLLECTION_LABELS_SINGULAR.events}</a>
+      <a class="event-hero__tag" href={collectionPath('events')}>{typeLabel}</a>
       <h1 class="event-hero__title">{data.title}</h1>
       {data.lede && <p class="event-hero__lede">{data.lede}</p>}
 
@@ -96,16 +101,16 @@ const relatedCards = related.map((item) => {
           <p class="event-meta__label">Date</p>
           <p class="event-meta__value">
             <time datetime={isoDate(data.date)}>{formatDate(data.date)}</time>
-            {
-              data.end && (
-                <>
-                  {' – '}
-                  <time datetime={isoDate(data.end)}>{formatDate(data.end)}</time>
-                </>
-              )
-            }
           </p>
         </div>
+        {
+          eventTime && (
+            <div class="event-meta__item">
+              <p class="event-meta__label">Time</p>
+              <p class="event-meta__value">{eventTime}</p>
+            </div>
+          )
+        }
         {
           (locationVenue || locationPlace) && (
             <div class="event-meta__item">
@@ -128,6 +133,18 @@ const relatedCards = related.map((item) => {
               <p class="event-meta__value">
                 <a href={data.rsvp} target="_blank" rel="noopener noreferrer">
                   Register
+                </a>
+              </p>
+            </div>
+          )
+        }
+        {
+          data.eventUrl && (
+            <div class="event-meta__item">
+              <p class="event-meta__label">Event</p>
+              <p class="event-meta__value">
+                <a href={data.eventUrl} target="_blank" rel="noopener noreferrer">
+                  Official page
                 </a>
               </p>
             </div>
@@ -160,52 +177,44 @@ const relatedCards = related.map((item) => {
       }
 
       {
-        (aboutHtml || facts.length > 0) && (
+        aboutHtml && (
           <div class="event-about__copy">
-            {
-              aboutHtml && (
-                <>
-                  <h2 id="event-about-heading">About</h2>
-                  <div class="event-about__prose" set:html={aboutHtml} />
-                </>
-              )
-            }
-
-            {
-              facts.length > 0 && (
-                <div class="event-facts">
-                  {facts.map((fact) => (
-                    <div class="event-facts__item">
-                      <p class="event-facts__label">{fact.label}</p>
-                      <p class="event-facts__value">
-                        {fact.lines.map((line) => (
-                          <span>{line}</span>
-                        ))}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )
-            }
+            <h2 id="event-about-heading">About</h2>
+            <div class="event-about__prose" set:html={aboutHtml} />
           </div>
         )
       }
     </section>
 
     {
-      hasExpect && (
-        <section class="event-expect" aria-labelledby="event-expect-heading">
-          <div class="event-expect__copy">
-            <h2 id="event-expect-heading">What to expect</h2>
-            {data.whatToExpectIntro?.trim() && <p>{data.whatToExpectIntro.trim()}</p>}
-            {expectItems.length > 0 && (
-              <ul>
-                {expectItems.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            )}
+      programHtml && (
+        <section
+          class:list={['event-program', programListHtml && 'event-program--split']}
+          aria-labelledby="event-program-heading"
+        >
+          <div class="event-program__intro">
+            <h2 id="event-program-heading">Program</h2>
+            {programIntroHtml && <div class="event-about__prose" set:html={programIntroHtml} />}
           </div>
+          {programListHtml && <div class="event-program__list" set:html={programListHtml} />}
+        </section>
+      )
+    }
+
+    {
+      documentationHtml && (
+        <section class="event-notes" aria-labelledby="event-documentation-heading">
+          <h2 id="event-documentation-heading">Documentation</h2>
+          <div class="event-about__prose" set:html={documentationHtml} />
+        </section>
+      )
+    }
+
+    {
+      reflectionHtml && (
+        <section class="event-notes" aria-labelledby="event-reflection-heading">
+          <h2 id="event-reflection-heading">Reflection</h2>
+          <div class="event-about__prose" set:html={reflectionHtml} />
         </section>
       )
     }
@@ -236,24 +245,6 @@ const relatedCards = related.map((item) => {
               ))
             }
           </ul>
-        </section>
-      )
-    }
-
-    {
-      documentationHtml && (
-        <section class="event-notes" aria-labelledby="event-documentation-heading">
-          <h2 id="event-documentation-heading">Documentation</h2>
-          <div class="event-about__prose" set:html={documentationHtml} />
-        </section>
-      )
-    }
-
-    {
-      reflectionHtml && (
-        <section class="event-notes" aria-labelledby="event-reflection-heading">
-          <h2 id="event-reflection-heading">Reflection</h2>
-          <div class="event-about__prose" set:html={reflectionHtml} />
         </section>
       )
     }
@@ -417,8 +408,7 @@ const relatedCards = related.map((item) => {
     border-top: 1px solid var(--rule);
   }
 
-  .event-meta__label,
-  .event-facts__label {
+  .event-meta__label {
     font-family: var(--font-mono);
     font-size: 0.7rem;
     letter-spacing: 0.12em;
@@ -426,8 +416,7 @@ const relatedCards = related.map((item) => {
     color: var(--fg-muted);
   }
 
-  .event-meta__value,
-  .event-facts__value {
+  .event-meta__value {
     display: grid;
     margin-top: 0.35rem;
     max-width: none;
@@ -435,8 +424,7 @@ const relatedCards = related.map((item) => {
     line-height: var(--leading-snug);
   }
 
-  .event-meta__value span,
-  .event-facts__value span {
+  .event-meta__value span {
     display: block;
   }
 
@@ -456,7 +444,7 @@ const relatedCards = related.map((item) => {
   }
 
   .event-about,
-  .event-expect {
+  .event-program {
     display: grid;
     gap: var(--space-5);
     min-width: 0;
@@ -486,7 +474,8 @@ const relatedCards = related.map((item) => {
   }
 
   .event-about__copy,
-  .event-expect__copy {
+  .event-program__intro,
+  .event-program__list {
     display: grid;
     gap: var(--space-4);
     min-width: 0;
@@ -494,7 +483,7 @@ const relatedCards = related.map((item) => {
   }
 
   .event-about__copy h2,
-  .event-expect__copy h2,
+  .event-program__intro h2,
   .event-notes h2,
   .event-related h2 {
     font-size: clamp(1.65rem, 1.2rem + 1.4vw, 2.25rem);
@@ -511,50 +500,72 @@ const relatedCards = related.map((item) => {
     max-width: none;
   }
 
-  .event-facts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-top: var(--space-2);
-    border-top: 1px solid var(--rule);
+  .event-about__prose :global(blockquote),
+  .event-program :global(blockquote) {
+    margin-block: var(--space-4);
+    padding: 0.2em 0 0.2em 1.05em;
+    border: 0;
+    border-left: 1px solid var(--color-pink);
+    max-width: none;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.22rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    quotes: none;
   }
 
-  .event-facts__item {
-    min-width: 0;
-    padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--rule);
+  .event-about__prose :global(blockquote)::before,
+  .event-about__prose :global(blockquote)::after,
+  .event-program :global(blockquote)::before,
+  .event-program :global(blockquote)::after {
+    content: none;
   }
 
-  .event-facts__item:nth-child(odd) {
-    padding-right: var(--space-3);
+  .event-about__prose :global(blockquote p),
+  .event-program :global(blockquote p),
+  .event-program__intro .event-about__prose :global(blockquote p) {
+    max-width: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
   }
 
-  .event-facts__item:nth-child(even) {
-    padding-left: var(--space-3);
-    border-left: 1px solid var(--rule);
+  .event-about__prose :global(blockquote p + p),
+  .event-program :global(blockquote p + p) {
+    margin-top: 0.65em;
   }
 
-  .event-expect__copy p,
-  .event-expect__copy li {
+  .event-program__intro .event-about__prose :global(p) {
     max-width: 42ch;
     font-size: var(--text-sm);
     line-height: var(--leading-body);
     color: var(--fg);
   }
 
-  .event-expect__copy ul {
-    display: grid;
-    gap: 0.55rem;
-    list-style: none;
-    padding: 0;
-    margin: 0.25rem 0 0;
+  .event-program__list :global(li) {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--fg);
   }
 
-  .event-expect__copy li {
+  .event-program__list :global(ul),
+  .event-program__list :global(ol) {
+    display: grid;
+    gap: 0.7rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .event-program__list :global(li) {
     position: relative;
     padding-left: 1.15em;
   }
 
-  .event-expect__copy li::before {
+  .event-program__list :global(li)::before {
     content: '';
     position: absolute;
     left: 0;
@@ -562,6 +573,21 @@ const relatedCards = related.map((item) => {
     width: 0.55em;
     height: 1px;
     background: var(--color-pink);
+  }
+
+  @media (min-width: 40rem) {
+    .event-program--split {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      column-gap: var(--space-6);
+      row-gap: var(--space-5);
+      align-items: start;
+    }
+  }
+
+  @media (min-width: 52rem) {
+    .event-program--split {
+      column-gap: var(--space-7);
+    }
   }
 
   .event-gallery-section {
@@ -739,17 +765,6 @@ const relatedCards = related.map((item) => {
   }
 
   @media (max-width: 29.99rem) {
-    .event-facts {
-      grid-template-columns: 1fr;
-    }
-
-    .event-facts__item:nth-child(odd),
-    .event-facts__item:nth-child(even) {
-      padding-left: 0;
-      padding-right: 0;
-      border-left: 0;
-    }
-
     .related-card {
       grid-template-columns: 1fr;
     }
