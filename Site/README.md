@@ -172,38 +172,36 @@ is Soft Mechanisms, Kinetic Studies, Heartbeat & Biosignals.
 
 ### Research Thread media
 
-Research Threads can build a gallery in three ways. The existing gallery
-layout is unchanged.
-
-**A. Manual gallery** — curated items in Markdown, same shape as Events/Notes:
-
-```yaml
-gallery:
-  - type: image
-    src: https://res.cloudinary.com/example/image/upload/example.webp
-    alt: Prototype on the workbench
-    caption: First movement test
-  - type: video
-    src: https://res.cloudinary.com/example/video/upload/test.mp4
-    poster: https://res.cloudinary.com/example/image/upload/test-poster.webp
-    caption: Motion test
-```
-
-**B. Cloudinary folder** — list every supported image and video in a folder
-at build time:
+Research Threads can build a gallery from a Cloudinary folder. Markdown
+declares only the folder. Captions and alt text come from Cloudinary
+asset metadata at build time — not from per-image Markdown entries.
 
 ```yaml
-galleryFolder: artificial-emotion/kinetic
+galleryFolder: artificial-emotion/kinetic-studies
 gallery: []
 ```
 
-**C. Both** — folder assets load first (oldest upload first), then any
-manual items that are not already in the folder. If the same asset is
-declared in both, it is shown once; manual `alt`, `caption`, and `poster`
-win when provided.
+**Cloudinary metadata mapping** (same Admin API listing response, with
+`context=true` and `metadata=true`):
+
+| Site field | Cloudinary source (first match) |
+| --- | --- |
+| `caption` | Contextual `caption` or `title` (Media Library **Title (caption)**), then structured metadata with those keys. `display_name` only if it is not a filename. |
+| `alt` | Contextual `alt`, `alt_text`, or `description` (Media Library **Description (alt)**), then structured metadata with those keys. |
+
+Filenames, `public_id`, and empty metadata never become captions. Missing
+caption → no figcaption. Missing alt → `alt=""`.
+
+Folder assets load first (oldest upload first). Optional `gallery:` items
+are extras that are **not** already in the folder. If the same asset appears
+in both, the Cloudinary file and its metadata win.
 
 `galleryFolder` is Research Threads only. Notes, Studies, References and
 Events keep a manual `gallery` (or no gallery).
+
+Add captions in Cloudinary (Media Library Title/Description, or any
+contextual `caption` / `alt` keys). Rebuild the site after uploads or
+metadata edits.
 
 Folder listing uses the Cloudinary Admin API during `astro build` / `astro
 dev`. The page receives public delivery URLs only. Required environment

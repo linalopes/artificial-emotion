@@ -14,6 +14,7 @@ process:
   - Behaviour
   - Perception
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1790935058/IMG_6102.webp
+galleryFolder: artificial-emotion/kinetic-studies
 gallery: []
 tags:
   - kinetic-art

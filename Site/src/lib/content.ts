@@ -5,7 +5,12 @@
  * in one place.
  */
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
-import { getCloudinaryFolderMedia, mergeGallerySources, normalizeGalleryFolder } from './cloudinary';
+import {
+  getCloudinaryFolderMedia,
+  mergeGallerySources,
+  normalizeGalleryFolder,
+  type GalleryItem,
+} from './cloudinary';
 import { entryPath } from './paths';
 import {
   COLLECTIONS,
@@ -109,7 +114,7 @@ export async function getResearchThread(id: ResearchThread): Promise<CollectionE
  */
 export async function resolveResearchGallery(
   entry: CollectionEntry<'research'>,
-): Promise<CollectionEntry<'research'>['data']['gallery']> {
+): Promise<GalleryItem[]> {
   const folder = entry.data.galleryFolder
     ? normalizeGalleryFolder(entry.data.galleryFolder)
     : undefined;

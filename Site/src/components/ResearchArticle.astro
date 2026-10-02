@@ -1,7 +1,9 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import type { GalleryItem } from '../lib/cloudinary';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import ResearchGallery from './ResearchGallery.astro';
 import {
   countThreadContent,
   formatDate,
@@ -26,7 +28,7 @@ import {
 interface Props {
   thread: ResearchThread;
   entry: CollectionEntry<'research'>;
-  gallery?: CollectionEntry<'research'>['data']['gallery'];
+  gallery?: GalleryItem[];
 }
 
 interface ThreadCard {
@@ -51,7 +53,6 @@ const process = data.process.map((item) => item.trim()).filter(Boolean);
 const tags = data.tags.map((item) => item.trim()).filter(Boolean);
 const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
 const galleryItems = (gallery ?? data.gallery).filter((item) => item.src.trim());
-const galleryCount = galleryItems.length <= 3 ? String(galleryItems.length) : 'many';
 
 const body = entry.body ?? '';
 const emptySections: MarkdownSection[] = [];
@@ -233,33 +234,7 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
         ))
       }
 
-      {
-        galleryItems.length > 0 && (
-          <section class="research-gallery" aria-label="Gallery">
-            <ul class:list={['research-gallery__list', `research-gallery__list--${galleryCount}`]}>
-              {galleryItems.map((item) => (
-                <li>
-                  <figure>
-                    {item.type === 'image' ? (
-                      <img src={mediaSrc(item.src)} alt={item.alt} />
-                    ) : (
-                      <video
-                        src={mediaSrc(item.src)}
-                        poster={item.poster ? mediaSrc(item.poster) : undefined}
-                        controls
-                        playsinline
-                        preload="metadata"
-                        aria-label={item.caption || undefined}
-                      ></video>
-                    )}
-                    {item.caption?.trim() && <figcaption>{item.caption.trim()}</figcaption>}
-                  </figure>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )
-      }
+      {galleryItems.length > 0 && <ResearchGallery items={galleryItems} />}
 
       {
         restSections.map((section) => (
@@ -594,50 +569,6 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
     max-width: none;
   }
 
-  .research-gallery {
-    position: relative;
-    min-width: 0;
-    padding-block: var(--space-4);
-    background: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-white) 20%, transparent) 0%,
-      var(--color-white) 16%,
-      var(--color-white) 84%,
-      color-mix(in srgb, var(--color-white) 20%, transparent) 100%
-    );
-  }
-
-  .research-gallery__list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: var(--space-4);
-  }
-
-  .research-gallery figure {
-    margin: 0;
-    display: grid;
-    gap: var(--space-2);
-  }
-
-  .research-gallery img,
-  .research-gallery video {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: 40rem;
-    object-fit: contain;
-    background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
-  }
-
-  .research-gallery figcaption {
-    max-width: none;
-    font-size: var(--text-xs);
-    line-height: var(--leading-snug);
-    color: var(--fg-muted);
-  }
-
   .research-related {
     display: grid;
     gap: var(--space-6);
@@ -839,15 +770,6 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
 
     .research-block :global(*:not(h2)) {
       grid-column: 2;
-    }
-
-    .research-gallery__list--2 {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .research-gallery__list--3,
-    .research-gallery__list--many {
-      grid-template-columns: 1fr 1fr;
     }
   }
 

@@ -15,6 +15,7 @@ export type GalleryItem =
       src: string;
       poster?: string;
       caption?: string;
+      alt?: string;
     };
 
 type CloudinaryCredentials = {
@@ -33,6 +34,11 @@ type CloudinaryResource = {
   created_at?: string;
   asset_folder?: string;
   folder?: string;
+  display_name?: string;
+  original_filename?: string;
+  filename?: string;
+  context?: unknown;
+  metadata?: unknown;
 };
 
 type CloudinaryListResponse = {
@@ -77,6 +83,15 @@ const SKIP_IMAGE_FORMATS = new Set([
 ]);
 
 const VIDEO_FORMATS = new Set(['mp4', 'webm', 'mov', 'm4v', 'ogv', 'mkv']);
+
+const LIST_METADATA = {
+  context: 'true',
+  metadata: 'true',
+};
+
+const CAPTION_KEYS = ['caption', 'title', 'caption_text'];
+const ALT_KEYS = ['alt', 'alt_text', 'alttext', 'description'];
+const POSTER_KEYS = ['poster', 'poster_url', 'thumbnail'];
 
 let folderModePromise: Promise<FolderMode> | undefined;
 
@@ -225,13 +240,115 @@ function isSupportedResource(resource: CloudinaryResource): boolean {
   return false;
 }
 
+function asTrimmedString(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed || undefined;
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return String(value);
+  }
+  if (value && typeof value === 'object' && 'value' in value) {
+    return asTrimmedString((value as { value: unknown }).value);
+  }
+  return undefined;
+}
+
+function lowerKeyedStrings(source: unknown): Record<string, string> {
+  if (!source || typeof source !== 'object' || Array.isArray(source)) return {};
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(source as Record<string, unknown>)) {
+    const text = asTrimmedString(value);
+    if (text) out[key.trim().toLowerCase()] = text;
+  }
+  return out;
+}
+
+function contextFields(resource: CloudinaryResource): Record<string, string> {
+  const context = resource.context;
+  if (!context || typeof context !== 'object' || Array.isArray(context)) return {};
+  const record = context as Record<string, unknown>;
+  const custom = record.custom;
+  return {
+    ...lowerKeyedStrings(context),
+    ...lowerKeyedStrings(custom),
+  };
+}
+
+function structuredFields(resource: CloudinaryResource): Record<string, string> {
+  return lowerKeyedStrings(resource.metadata);
+}
+
+function firstField(fields: Record<string, string>, keys: string[]): string | undefined {
+  for (const key of keys) {
+    if (fields[key]) return fields[key];
+  }
+  return undefined;
+}
+
+function isFilenameLike(value: string, resource: CloudinaryResource): boolean {
+  const publicId = (resource.public_id ?? '').trim();
+  const original = (resource.original_filename ?? resource.filename ?? '').trim();
+  const publicBase = publicId.split('/').pop() ?? '';
+  if (value === publicId || value === original || value === publicBase) return true;
+  if (/\.(webp|jpe?g|png|gif|avif|mp4|webm|mov|m4v|ogv|mkv|svg)$/i.test(value)) return true;
+  if (/^IMG[_-]?\d+/i.test(value)) return true;
+  return false;
+}
+
+function pickCaption(resource: CloudinaryResource): string | undefined {
+  const context = contextFields(resource);
+  const structured = structuredFields(resource);
+  const fromContext = firstField(context, CAPTION_KEYS);
+  if (fromContext) return fromContext;
+  const fromStructured = firstField(structured, CAPTION_KEYS);
+  if (fromStructured) return fromStructured;
+  const displayName = asTrimmedString(resource.display_name);
+  if (displayName && !isFilenameLike(displayName, resource)) return displayName;
+  return undefined;
+}
+
+function pickAlt(resource: CloudinaryResource): string {
+  const context = contextFields(resource);
+  const structured = structuredFields(resource);
+  return firstField(context, ALT_KEYS) || firstField(structured, ALT_KEYS) || '';
+}
+
+function derivedVideoPoster(src: string): string | undefined {
+  try {
+    const url = new URL(src);
+    if (!url.hostname.includes('cloudinary.com')) return undefined;
+    if (!url.pathname.includes('/video/upload/')) return undefined;
+    url.pathname = url.pathname
+      .replace('/video/upload/', '/video/upload/so_0/')
+      .replace(/\.[a-z0-9]+$/i, '.jpg');
+    return url.toString();
+  } catch {
+    return undefined;
+  }
+}
+
+function pickPoster(resource: CloudinaryResource, src: string): string | undefined {
+  const fromContext = firstField(contextFields(resource), POSTER_KEYS);
+  if (fromContext) return fromContext;
+  return derivedVideoPoster(src);
+}
+
 function toGalleryItem(resource: CloudinaryResource): GalleryItem | undefined {
   const src = resource.secure_url?.trim();
   if (!src) return undefined;
+  const caption = pickCaption(resource);
+  const alt = pickAlt(resource);
   if (resource.resource_type === 'video') {
-    return { type: 'video', src, poster: undefined, caption: undefined };
+    return {
+      type: 'video',
+      src,
+      poster: pickPoster(resource, src),
+      caption,
+      alt: alt || undefined,
+    };
   }
-  return { type: 'image', src, alt: '', caption: undefined };
+  return { type: 'image', src, alt, caption };
 }
 
 function createdAtMs(resource: CloudinaryResource): number {
@@ -283,6 +400,7 @@ async function listFolderResources(
     return listPages(credentials, 'resources/by_asset_folder', {
       asset_folder: folder,
       max_results: String(MAX_RESULTS),
+      ...LIST_METADATA,
     });
   }
 
@@ -290,10 +408,12 @@ async function listFolderResources(
     listPages(credentials, 'resources/image/upload', {
       prefix: `${folder}/`,
       max_results: String(MAX_RESULTS),
+      ...LIST_METADATA,
     }),
     listPages(credentials, 'resources/video/upload', {
       prefix: `${folder}/`,
       max_results: String(MAX_RESULTS),
+      ...LIST_METADATA,
     }),
   ]);
 
@@ -345,31 +465,9 @@ export function mediaIdentity(src: string): string {
   }
 }
 
-function overlayManualMetadata(base: GalleryItem, manual: GalleryItem): GalleryItem {
-  const caption = manual.caption?.trim() ? manual.caption : base.caption;
-
-  if (base.type === 'image' && manual.type === 'image') {
-    return {
-      ...base,
-      alt: manual.alt.trim() ? manual.alt : base.alt,
-      caption,
-    };
-  }
-
-  if (base.type === 'video' && manual.type === 'video') {
-    return {
-      ...base,
-      poster: manual.poster?.trim() ? manual.poster : base.poster,
-      caption,
-    };
-  }
-
-  return { ...base, caption };
-}
-
 /**
  * Folder assets first (already ordered), then unique manual extras.
- * Duplicate identity keeps the folder item and applies provided manual metadata.
+ * Duplicate identity keeps the Cloudinary folder item — media, caption, alt.
  */
 export function mergeGallerySources(
   folderItems: GalleryItem[],
@@ -381,13 +479,9 @@ export function mergeGallerySources(
   for (const manual of manualItems) {
     if (!manual.src.trim()) continue;
     const id = mediaIdentity(manual.src);
-    const existing = indexById.get(id);
-    if (existing === undefined) {
-      indexById.set(id, merged.length);
-      merged.push({ ...manual });
-      continue;
-    }
-    merged[existing] = overlayManualMetadata(merged[existing], manual);
+    if (indexById.has(id)) continue;
+    indexById.set(id, merged.length);
+    merged.push({ ...manual });
   }
 
   return merged;
