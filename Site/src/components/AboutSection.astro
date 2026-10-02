@@ -2,30 +2,51 @@
 const supporters = [
   {
     id: 'ift',
-    lines: ['Institute for Future Technologies (IFT)', 'De Vinci Higher Education'],
+    href: 'https://ift.devinci.fr/',
+    src: 'https://res.cloudinary.com/da1flkgyb/image/upload/v1790922478/Institutefortechnologies.svg',
+    alt: 'Institute for Future Technologies, De Vinci Higher Education',
+    name: 'Institute for Future Technologies (IFT)',
+    secondary: 'De Vinci Higher Education',
+    scale: 'wordmark',
   },
   {
     id: 'sotai',
-    lines: ['School of Tomorrow’s AI'],
+    href: 'https://schooloftomorrows.ai',
+    src: 'https://res.cloudinary.com/da1flkgyb/image/upload/v1790922604/sota-mark-bg-transparent.svg',
+    alt: 'School of Tomorrow’s AI',
+    name: 'School of Tomorrow’s AI',
   },
 ];
 ---
 
 <section class="about" id="about" aria-labelledby="about-heading">
   <div class="about__inner">
-    <h2 class="about__heading" id="about-heading">About Artificial Emotion</h2>
+    <figure class="about__portrait">
+      <img
+        src="https://res.cloudinary.com/da1flkgyb/image/upload/v1790923133/lina.webp"
+        alt="Lina Lopes"
+      />
+      <figcaption class="about__author">
+        <span class="about__author-name">Lina Lopes</span>
+        <span class="about__author-role">Artist, creative technologist, researcher</span>
+      </figcaption>
+    </figure>
 
-    <div class="about__copy">
-      <p>
-        Artificial Emotion is an ongoing artistic research project by Lina Lopes, currently being
-        developed as part of an artist residency at the Institute for Future Technologies (IFT), De
-        Vinci Higher Education, Paris.
-      </p>
-      <p>
-        The research explores movement, soft mechanisms, sensing and bodily signals as ways of
-        producing expressive mechanical behavior. It develops through kinetic prototypes, material
-        studies, physiological sensing experiments, fabrication tests and public research formats.
-      </p>
+    <div class="about__editorial">
+      <h2 class="about__heading" id="about-heading">About Artificial Emotion</h2>
+
+      <div class="about__copy">
+        <p>
+          Artificial Emotion is an ongoing artistic research project by Lina Lopes, currently being
+          developed as part of an artist residency at the Institute for Future Technologies (IFT), De
+          Vinci Higher Education, Paris.
+        </p>
+        <p>
+          The research explores movement, soft mechanisms, sensing and bodily signals as ways of
+          producing expressive mechanical behavior. It develops through kinetic prototypes, material
+          studies, physiological sensing experiments, fabrication tests and public research formats.
+        </p>
+      </div>
     </div>
 
     <div class="about__support">
@@ -34,12 +55,22 @@ const supporters = [
         {
           supporters.map((item) => (
             <li class="support__item">
-              <span class="support__logo" data-support-logo={item.id} aria-hidden="true"></span>
-              <span class="support__name">
-                {item.lines.map((line) => (
-                  <span class="support__line">{line}</span>
-                ))}
-              </span>
+              <a
+                class="support__link"
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  class:list={['support__logo', item.scale && `support__logo--${item.scale}`]}
+                  src={item.src}
+                  alt={item.alt}
+                />
+                <span class="support__name" aria-hidden="true">
+                  <span class="support__line">{item.name}</span>
+                  {item.secondary && <span class="support__line">{item.secondary}</span>}
+                </span>
+              </a>
             </li>
           ))
         }
@@ -60,6 +91,48 @@ const supporters = [
     max-width: var(--page-max);
     margin-inline: auto;
     padding: var(--space-6) var(--page-gutter);
+  }
+
+  .about__portrait {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    min-width: 0;
+  }
+
+  .about__portrait img {
+    display: block;
+    width: 100%;
+    max-width: 21.25rem;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    background: color-mix(in srgb, var(--color-gray-green) 42%, var(--color-white));
+  }
+
+  .about__author {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .about__author-name {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: var(--text-sm);
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+
+  .about__author-role {
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .about__editorial {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+    align-content: start;
   }
 
   .about__heading {
@@ -97,76 +170,141 @@ const supporters = [
     list-style: none;
     padding: 0;
     margin: 0;
-    display: grid;
-    gap: var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5) var(--space-6);
   }
 
   .support__item {
-    display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: 0.85rem;
-    align-items: center;
+    min-width: 0;
     max-width: none;
+  }
+
+  .support__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .support__link:hover,
+  .support__link:focus-visible {
+    color: inherit;
+  }
+
+  .support__link:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 4px;
+  }
+
+  .support__link:hover .support__name,
+  .support__link:focus-visible .support__name {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--color-link);
   }
 
   .support__logo {
     display: block;
-    width: 4.5rem;
-    height: 3rem;
-    background: color-mix(in srgb, var(--color-gray-green) 38%, var(--color-white));
-    border: 1px solid var(--color-gray-green);
-    border-radius: 2px;
+    flex: 0 0 auto;
+    width: auto;
+    height: 4.75rem;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .support__logo--wordmark {
+    height: 8rem;
   }
 
   .support__name {
     display: grid;
-    gap: 0.15rem;
+    gap: 0.2rem;
+    min-width: 0;
     font-family: var(--font-title);
     font-weight: var(--weight-title-light);
     font-size: var(--text-sm);
     letter-spacing: -0.01em;
     line-height: var(--leading-snug);
+    color: var(--fg);
   }
 
   .support__line {
     display: block;
   }
 
-  @media (min-width: 48rem) {
+  @media (max-width: 21.99rem) {
+    .support__link {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .support {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (min-width: 40rem) {
     .about__inner {
-      grid-template-columns: minmax(12rem, 0.34fr) minmax(0, 0.66fr);
+      grid-template-columns: minmax(15rem, 17.5rem) minmax(0, 1fr);
       align-items: start;
-      column-gap: var(--space-6);
-      row-gap: var(--space-6);
-      padding-block: var(--space-7) var(--space-6);
+      column-gap: var(--space-5);
     }
 
-    .about__heading {
+    .about__portrait {
       grid-column: 1;
       grid-row: 1;
     }
 
-    .about__copy {
+    .about__portrait img {
+      max-width: none;
+    }
+
+    .about__editorial {
       grid-column: 2;
       grid-row: 1;
     }
 
     .about__support {
-      grid-column: 2;
+      grid-column: 1 / -1;
       grid-row: 2;
     }
 
-    .support {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-4) var(--space-5);
+    .support__logo {
+      height: 5.5rem;
+    }
+
+    .support__logo--wordmark {
+      height: 9.5rem;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .about__inner {
+      grid-template-columns: minmax(16.25rem, 20rem) minmax(0, 1fr);
+      column-gap: var(--space-6);
+      row-gap: var(--space-6);
+      padding-block: var(--space-7) var(--space-6);
+    }
+
+    .support__logo {
+      height: 6.5rem;
+    }
+
+    .support__logo--wordmark {
+      height: 11rem;
     }
   }
 
   @media (min-width: 68.75rem) {
-    .about__inner {
-      grid-template-columns: minmax(14rem, 0.3fr) minmax(0, 0.7fr);
-    }
-
     .about__copy {
       max-width: 52ch;
     }
