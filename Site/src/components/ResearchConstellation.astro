@@ -66,7 +66,7 @@ const graph = await buildConstellation();
     overflow: hidden;
 
     /* Set by the script from config.look; 0–1. */
-    --root-halo: 0.45;
+    --root-halo: 0.56;
 
     /* Node/link colours below reference these. */
     --c-root: var(--color-white);
@@ -109,19 +109,20 @@ const graph = await buildConstellation();
     opacity: 0.2;
   }
 
+  /* Membership: turquoise, quiet, stable. Related: pink, a little more present. */
   .constellation .link--root-thread { color: var(--c-thread); }
-  .constellation .link--root-thread .link__base { opacity: 0.14; }
+  .constellation .link--root-thread .link__base { opacity: 0.13; }
   .constellation .link--content-thread { color: var(--c-thread); }
-  .constellation .link--content-thread .link__base { opacity: 0.22; }
-  .constellation .link--related { color: var(--c-note); }
-  .constellation .link--related .link__base { opacity: 0.18; }
+  .constellation .link--content-thread .link__base { opacity: 0.16; }
+  .constellation .link--related { color: var(--c-study); }
+  .constellation .link--related .link__base { opacity: 0.3; stroke-width: 0.95; }
   .constellation .link--root-event { color: var(--c-event); }
   .constellation .link--root-event .link__base { opacity: 0.1; }
 
   /* Signal travelling along a `related` link (positioned by the script). */
   .constellation .link__pulse {
-    fill: var(--color-white);
-    filter: drop-shadow(0 0 3px currentColor);
+    fill: var(--color-pink);
+    filter: drop-shadow(0 0 3px var(--color-pink));
     pointer-events: none;
   }
 
@@ -131,8 +132,14 @@ const graph = await buildConstellation();
   .constellation .node {
     cursor: pointer;
     outline: none;
+    text-decoration: none;
     touch-action: none;
     transition: opacity 0.6s ease;
+  }
+
+  .constellation .node:hover,
+  .constellation .node:focus-visible {
+    text-decoration: none;
   }
 
   .constellation .node__core {
@@ -142,7 +149,7 @@ const graph = await buildConstellation();
 
   .constellation .node__halo {
     fill: currentColor;
-    opacity: 0.08;
+    opacity: 0.12;
     transition: opacity 0.4s ease;
   }
 
@@ -156,37 +163,39 @@ const graph = await buildConstellation();
   /* Threads: large, turquoise, faint warmth around them */
   .constellation .node--research-thread { color: var(--c-thread); }
   .constellation .node--research-thread .node__core { filter: drop-shadow(0 0 4px currentColor); }
-  .constellation .node--research-thread .node__halo { opacity: 0.1; }
+  .constellation .node--research-thread .node__halo { opacity: 0.12; }
 
   /* Studies: solid pink */
   .constellation .node--study { color: var(--c-study); }
-  .constellation .node--study .node__core { filter: drop-shadow(0 0 2px currentColor); }
+  .constellation .node--study .node__core { filter: drop-shadow(0 0 3px currentColor); }
+  .constellation .node--study .node__halo { opacity: 0.14; }
 
   /* Studio notes: smaller, gray green */
   .constellation .node--note { color: var(--c-note); }
-  .constellation .node--note .node__halo { opacity: 0.06; }
+  .constellation .node--note .node__core { filter: drop-shadow(0 0 2px currentColor); }
+  .constellation .node--note .node__halo { opacity: 0.12; }
 
   /* References: outlined, translucent */
   .constellation .node--reference { color: var(--c-reference); }
   .constellation .node--reference .node__core {
     fill: currentColor;
-    fill-opacity: 0.18;
+    fill-opacity: 0.28;
     stroke: currentColor;
-    stroke-opacity: 0.7;
-    stroke-width: 1;
+    stroke-opacity: 0.88;
+    stroke-width: 1.25;
   }
-  .constellation .node--reference .node__halo { opacity: 0.04; }
+  .constellation .node--reference .node__halo { opacity: 0.1; }
 
   /* Events: small white core inside a thin pink ring */
   .constellation .node--event { color: var(--c-event); }
-  .constellation .node--event .node__core { filter: drop-shadow(0 0 2px currentColor); }
+  .constellation .node--event .node__core { filter: drop-shadow(0 0 3px currentColor); }
   .constellation .node--event .node__ring {
     fill: none;
     stroke: var(--c-event-accent);
-    stroke-width: 1;
-    stroke-opacity: 0.85;
+    stroke-width: 1.15;
+    stroke-opacity: 0.9;
   }
-  .constellation .node--event .node__halo { fill: var(--c-event-accent); opacity: 0.07; }
+  .constellation .node--event .node__halo { fill: var(--c-event-accent); opacity: 0.12; }
 
   /* ------------------------------------------------------------------------
      Labels — editorial, readable over anything
@@ -208,10 +217,12 @@ const graph = await buildConstellation();
 
   .constellation .node--root .node__label {
     font-family: var(--font-title);
-    font-weight: var(--weight-title-light);
-    font-size: 20px;
+    font-weight: var(--weight-title-medium);
+    font-size: 21.5px;
     fill: var(--c-label);
     letter-spacing: -0.01em;
+    stroke-width: 5px;
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c-label) 35%, transparent));
   }
 
   .constellation .node--research-thread .node__label {
@@ -232,30 +243,55 @@ const graph = await buildConstellation();
   }
 
   /* Small screens (class set by the script): tighter type. */
-  .constellation.is-small .node--root .node__label { font-size: 15px; }
+  .constellation.is-small .node--root .node__label { font-size: 16.5px; }
   .constellation.is-small .node--research-thread .node__label { font-size: 12.5px; }
   .constellation.is-small .node__label { font-size: 11px; }
 
-  /* Visibility: root + threads (and pinned ids) always; content on hover/focus. */
+  /* Visibility: root + threads (and pinned ids) always; content on hover/focus only. */
   .constellation .node.is-labelled .node__label,
   .constellation .node.is-focus .node__label,
-  .constellation .node.is-neighbour .node__label,
   .constellation .node:hover .node__label {
     opacity: 1;
   }
 
-  /* ------------------------------------------------------------------------
-     Hover / focus emphasis — everything unrelated recedes
-     ------------------------------------------------------------------------ */
-  .constellation svg.is-active .node:not(.is-focus):not(.is-neighbour) { opacity: 0.22; }
-  .constellation svg.is-active .link:not(.is-linked) path { opacity: 0.04; }
-  .constellation svg.is-active .link.is-linked .link__base { opacity: 0.7; stroke-width: 1; }
+  .constellation .node.is-focus .node__label,
+  .constellation .node:hover .node__label {
+    fill: var(--c-label);
+  }
 
-  .constellation .node.is-focus .node__core { filter: drop-shadow(0 0 8px currentColor); }
-  .constellation .node.is-focus .node__halo { opacity: 0.22; }
-  .constellation .node.is-neighbour .node__halo { opacity: 0.16; }
+  /* ------------------------------------------------------------------------
+     Hover / focus — soft emphasis, graph stays continuous
+     ------------------------------------------------------------------------ */
+  .constellation svg.is-active .node:not(.is-focus):not(.is-neighbour) { opacity: 0.52; }
+  .constellation svg.is-active .link:not(.is-linked) path { opacity: 0.1; }
+  .constellation svg.is-active .link--root-thread.is-linked .link__base,
+  .constellation svg.is-active .link--content-thread.is-linked .link__base,
+  .constellation svg.is-active .link--root-event.is-linked .link__base {
+    opacity: 0.4;
+    stroke-width: 0.9;
+  }
+  .constellation svg.is-active .link--related.is-linked .link__base {
+    opacity: 0.72;
+    stroke-width: 1.2;
+  }
+
+  .constellation .node.is-focus .node__core { filter: drop-shadow(0 0 7px currentColor); }
+  .constellation .node.is-focus .node__halo { opacity: 0.24; }
+  .constellation .node.is-neighbour .node__halo { opacity: 0.18; }
+  .constellation .node:focus-visible .node__halo { opacity: 0.26; }
 
   .constellation svg.is-dragging .node { cursor: grabbing; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .constellation .link__pulse { display: none; }
+    .constellation .node,
+    .constellation .node__core,
+    .constellation .node__halo,
+    .constellation .node__label,
+    .constellation .link path {
+      transition: none;
+    }
+  }
 
   /* ------------------------------------------------------------------------
      Debug panel (development only)

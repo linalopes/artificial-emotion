@@ -133,6 +133,8 @@ export function mountConstellation(container: HTMLElement): void {
   /**
    * Region target for a node: threads → their own home; content → the mean
    * of its threads' homes (pushed slightly outward when it has one thread).
+   * Multi-thread content shares a centroid, so it is given a small phase
+   * offset — a field around the mean, not a stack on the same point.
    */
   const targetOf = (n: SimNode, t: number) => {
     if (!n.threadIds?.length) return null;
@@ -145,7 +147,23 @@ export function mountConstellation(container: HTMLElement): void {
       y += h.y;
     }
     const k = (n.threadIds.length === 1 ? config.composition.contentRegionSpread : 1) / n.threadIds.length;
-    return { x: x * k, y: y * k };
+    x *= k;
+    y *= k;
+    if (n.threadIds.length > 1) {
+      const field = Math.min(ringX(), ringY()) * (n.threadIds.length === 2 ? 0.22 : 0.2);
+      x += Math.cos(n.phase) * field;
+      y += Math.sin(n.phase) * field;
+    }
+    return { x, y };
+  };
+
+  /** Threads hold the triangle; single-thread content orbits; multi-thread is looser. */
+  const regionStrengthOf = (n: ConstellationNode) => {
+    if (n.type === 'research-thread') return config.composition.threadRegionStrength;
+    if (!n.threadIds?.length) return 0;
+    return n.threadIds.length === 1
+      ? config.composition.contentRegionStrength
+      : config.composition.contentRegionStrength * 0.5;
   };
 
   /* ---- data ------------------------------------------------------------- */
@@ -156,12 +174,7 @@ export function mountConstellation(container: HTMLElement): void {
       x: 0,
       y: 0,
       phase: (i * 2.399) % (Math.PI * 2), // golden-angle spread
-      regionStrength:
-        n.type === 'research-thread'
-          ? config.composition.threadRegionStrength
-          : n.threadIds?.length
-            ? config.composition.contentRegionStrength
-            : 0,
+      regionStrength: regionStrengthOf(n),
     };
     // Seed near the intended composition so the opening is calm, not a burst.
     const target = targetOf(node, 0);
@@ -169,8 +182,8 @@ export function mountConstellation(container: HTMLElement): void {
       node.x = 0;
       node.y = 0;
     } else if (target) {
-      node.x = target.x + (Math.random() - 0.5) * 60;
-      node.y = target.y + (Math.random() - 0.5) * 60;
+      node.x = target.x + (Math.random() - 0.5) * 80;
+      node.y = target.y + (Math.random() - 0.5) * 80;
     } else {
       const a = Math.random() * Math.PI * 2;
       node.x = Math.cos(a) * ringX() * 0.6;
@@ -283,23 +296,29 @@ export function mountConstellation(container: HTMLElement): void {
 
   const applyForces = () => {
     const f = config.forces;
-    const c = config.composition;
     const studyR = config.size.radius.study * scale;
-    for (const n of nodes) {
-      n.regionStrength =
-        n.type === 'research-thread'
-          ? c.threadRegionStrength
-          : n.threadIds?.length
-            ? c.contentRegionStrength
-            : 0;
-    }
+    for (const n of nodes) n.regionStrength = regionStrengthOf(n);
+    const asSim = (v: SimLink['source']) => (typeof v === 'object' ? (v as SimNode) : byId.get(v as string));
     linkForce
       .distance((l) => f.linkDistance[l.relationType] * f.linkDistanceScale * scale)
-      .strength((l) => f.linkStrength[l.relationType]);
+      .strength((l) => {
+        const base = f.linkStrength[l.relationType];
+        if (l.relationType !== 'content-thread') return base;
+        const s = asSim(l.source);
+        const t = asSim(l.target);
+        const content = s?.type === 'research-thread' ? t : s;
+        const n = content?.threadIds?.length ?? 1;
+        return n > 1 ? base / n : base;
+      });
     charge
       .strength((d) => f.chargeStrength * scale * clamp(d.r / studyR, 0.6, 3))
       .distanceMax(f.chargeDistanceMax * scale);
-    collide.radius((d) => d.r + f.collidePadding * scale).strength(f.collideStrength);
+    collide
+      .radius((d) => {
+        const labelClearance = d.type === 'root' ? 34 * scale : d.type === 'research-thread' ? 10 * scale : 0;
+        return d.r + f.collidePadding * scale + labelClearance;
+      })
+      .strength(f.collideStrength);
     center.strength(f.centerStrength);
     anchorX.strength((d) => (d.type === 'root' ? f.rootAnchorStrength : 0));
     anchorY.strength((d) => (d.type === 'root' ? f.rootAnchorStrength : 0));
@@ -337,7 +356,8 @@ export function mountConstellation(container: HTMLElement): void {
     const hw = width / 2;
     const hh = height / 2;
     for (const n of nodes) {
-      const pad = n.r + 6;
+      const labelled = n.type === 'root' || n.type === 'research-thread';
+      const pad = n.r + (labelled ? (small ? 26 : 18) : 8);
       n.x = clamp(n.x, -hw + pad, hw - pad);
       n.y = clamp(n.y, -hh + pad, hh - pad);
     }
@@ -370,7 +390,7 @@ export function mountConstellation(container: HTMLElement): void {
     nodeSel
       .select<SVGTextElement>('text')
       .attr('x', (d) => (below(d) ? belowX(d) : labelSide(d) * (d.r + 8)))
-      .attr('y', (d) => (below(d) ? d.r + (d.type === 'root' ? 18 : 14) : 0))
+      .attr('y', (d) => (below(d) ? d.r + (d.type === 'root' ? 20 : 14) : 0))
       .attr('text-anchor', (d) => (below(d) ? 'middle' : labelSide(d) > 0 ? 'start' : 'end'));
 
     linkSel.each(function (l) {

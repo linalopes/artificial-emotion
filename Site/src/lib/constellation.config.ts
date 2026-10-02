@@ -29,7 +29,8 @@ export const CONSTELLATION_CONFIG = {
      * 70–80 % of the figure width on desktop.
      */
     graphScale: 0.38,
-    graphScaleSmall: 0.34,
+    /** Slightly smaller on narrow screens so thread labels keep air and the graph does not overflow. */
+    graphScaleSmall: 0.31,
     /** Home angle (degrees, 0 = right, clockwise) of each thread — ~120° apart. */
     threadAngles: {
       'soft-mechanisms': -90,
@@ -43,9 +44,9 @@ export const CONSTELLATION_CONFIG = {
      * should "tend toward" a region, not be pinned. Multi-thread content
      * naturally ends up between its attractors.
      */
-    contentRegionStrength: 0.06,
-    /** Single-thread content targets this multiple of its thread's home (>1 = outward). */
-    contentRegionSpread: 1.2,
+    contentRegionStrength: 0.055,
+    /** Single-thread content targets this multiple of its thread's home (>1 = outward orbit). */
+    contentRegionSpread: 1.42,
     /** How far thread homes sway around their angle, in radians. */
     regionDrift: 0.06,
   },
@@ -57,31 +58,34 @@ export const CONSTELLATION_CONFIG = {
     /** Rest length of each link type, in px (× linkDistanceScale). */
     linkDistance: {
       'root-thread': 240,
-      'content-thread': 90,
-      related: 80,
+      'content-thread': 124,
+      related: 112,
       'root-event': 160,
     } satisfies Record<RelationType, number>,
     linkDistanceScale: 1,
     /** How rigidly a link holds its rest length (0–1). Low for root-thread: regions decide. */
     linkStrength: {
       'root-thread': 0.2,
-      'content-thread': 0.5,
-      related: 0.35,
+      'content-thread': 0.36,
+      related: 0.2,
       'root-event': 0.3,
     } satisfies Record<RelationType, number>,
 
     /** Repulsion for a study-sized node; larger nodes repel proportionally more. */
-    chargeStrength: -200,
-    chargeDistanceMax: 480,
+    chargeStrength: -320,
+    chargeDistanceMax: 560,
 
     /** Gentle pull of everything toward the centre. */
-    centerStrength: 0.03,
+    centerStrength: 0.018,
     /** Root node is anchored to the centre with this strength. */
     rootAnchorStrength: 0.6,
 
-    /** Extra empty space kept around every node (added to its radius). */
-    collidePadding: 14,
-    collideStrength: 0.8,
+    /**
+     * Extra empty space kept around every node (added to its radius).
+     * Sized so ~30–75 nodes can sit in the triangle without collapsing.
+     */
+    collidePadding: 22,
+    collideStrength: 0.85,
   },
 
   /* ------------------------------------------------------------------------
@@ -93,14 +97,14 @@ export const CONSTELLATION_CONFIG = {
     /** How fast the initial layout settles (d3 default 0.0228). */
     alphaDecay: 0.03,
     /** Damping; higher = calmer (d3 default 0.4). */
-    velocityDecay: 0.5,
+    velocityDecay: 0.55,
     /** Positional drift nudge applied every tick, in px. */
-    amplitude: 0.05,
+    amplitude: 0.04,
     /** Drift rate, radians per second (0.35 ≈ one cycle per 18 s). */
     speed: 0.35,
 
-    /** Node breathing: radius varies by ± this fraction (0.03 = ±3 %). */
-    breathAmplitude: 0.03,
+    /** Node breathing: radius varies by ± this fraction. */
+    breathAmplitude: 0.035,
     /** Breathing rate, radians per second (0.8 ≈ one breath per 8 s). */
     breathSpeed: 0.8,
   },
@@ -122,7 +126,7 @@ export const CONSTELLATION_CONFIG = {
      ------------------------------------------------------------------------ */
   look: {
     /** 0–1. Scales the root halo opacity and glow blur. */
-    rootHaloIntensity: 0.45,
+    rootHaloIntensity: 0.56,
   },
 
   /* ------------------------------------------------------------------------
@@ -131,21 +135,21 @@ export const CONSTELLATION_CONFIG = {
   size: {
     /** Core radius per node type, px. */
     radius: {
-      root: 20,
+      root: 21,
       'research-thread': 14,
-      study: 8.5,
-      event: 7,
-      note: 5.5,
-      reference: 5,
+      study: 10,
+      event: 8.2,
+      note: 7,
+      reference: 6.5,
     } satisfies Record<NodeType, number>,
     /** Halo radius as a multiple of the core radius. */
-    haloScale: 2.2,
+    haloScale: 2.45,
     /** Event outer ring radius as a multiple of the core radius. */
     eventRingScale: 1.7,
     /** Below this container width the graph is treated as "small screen". */
     mobileBreakpoint: 640,
     /** Radii, distances and charges are multiplied by this on small screens. */
-    mobileScale: 0.7,
+    mobileScale: 0.64,
   },
 
   /* ------------------------------------------------------------------------
