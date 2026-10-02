@@ -1,5 +1,6 @@
 ---
 title: Jean Tinguely
+date: 2026-09-30
 creator: Jean Tinguely
 year: 
 referenceType: artist

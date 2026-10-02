@@ -23,6 +23,7 @@ import {
   COLLECTIONS,
   RESEARCH_THREADS,
   THREAD_LABELS,
+  researchLogicalId,
   type CollectionName,
   type ResearchThread,
 } from './vocabulary';
@@ -84,7 +85,9 @@ export async function buildConstellation(): Promise<ConstellationGraph> {
 
   // 2. Research threads + root-thread links (canonical ids, even if still draft)
   const researchEntries = await getResearchThreads();
-  const researchTitle = new Map(researchEntries.map((entry) => [entry.id, entry.data.title]));
+  const researchTitle = new Map(
+    researchEntries.map((entry) => [researchLogicalId(entry.id), entry.data.title]),
+  );
 
   for (const id of RESEARCH_THREADS) {
     nodes.push({

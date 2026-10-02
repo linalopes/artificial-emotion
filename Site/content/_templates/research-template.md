@@ -1,6 +1,7 @@
 ---
 title:
 subtitle:
+date:
 
 lede:
 

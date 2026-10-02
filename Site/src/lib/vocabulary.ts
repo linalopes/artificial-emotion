@@ -44,7 +44,7 @@ export const COLLECTION_LABELS_SINGULAR: Record<CollectionName, string> = {
  * `content/research/soft-mechanisms.md` → `/research/soft-mechanisms/`
  * ↔ `threads: [soft-mechanisms]`.
  *
- * Editorial title, subtitle, lede, questions, process, cover, gallery and
+ * Editorial title, subtitle, date, lede, questions, process, cover, gallery and
  * tags live in the Markdown file. Do not duplicate that copy here.
  */
 export const RESEARCH_THREADS = [
@@ -63,6 +63,15 @@ export const THREAD_LABELS: Record<ResearchThread, string> = {
 
 export function isResearchThread(value: string): value is ResearchThread {
   return (RESEARCH_THREADS as readonly string[]).includes(value);
+}
+
+/**
+ * Reduce an Astro research `entry.id` (or file path) to the canonical thread id.
+ * Glob loaders normally yield `soft-mechanisms`; some states include `.md`
+ * or a folder prefix.
+ */
+export function researchLogicalId(id: string): string {
+  return id.replace(/\\/g, '/').replace(/\.md$/i, '').split('/').pop() ?? id;
 }
 
 /**

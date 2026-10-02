@@ -115,6 +115,7 @@ export async function buildSearchIndex(): Promise<SearchRecord[]> {
         metadata: [
           asText(entry.data.creator),
           entry.data.year !== undefined ? String(entry.data.year) : '',
+          entry.data.date.toISOString().slice(0, 10),
         ],
       }),
     ),

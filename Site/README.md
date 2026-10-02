@@ -102,6 +102,7 @@ Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 - Anything whose file or folder name starts with `_` is ignored by Astro (`content/_templates/` is never loaded).
 - Empty properties (`cover:`) count as "not set". Lists may be omitted entirely.
 - `draft` defaults to `true`; set `draft: false` to publish.
+- Every authored Markdown entry carries a `date`. Meaning depends on the collection (see Date below).
 - `threads` accepts only: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. This is how a Study, Note, Reference or Event attaches to a Research Thread. Do not list those entries inside the research Markdown.
 - `related` uses `collection/id` among the four primary collections only, e.g. `notes/when-does-movement-look-hesitant`. Research Threads are not `related` targets. Targets do not have to exist yet.
 - Media fields accept a local site-root path (`/images/...`) or an HTTPS URL (Cloudinary or other). The site does not download remote files.
@@ -110,9 +111,9 @@ Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 | ------------ | --------------- | ------------------- |
 | `studies`    | title, date     | status (`seed` · experiment · prototype · integrated), threads, tags, materials, related, cover, youtube, draft |
 | `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
-| `references` | title           | creator, year, referenceType, url, threads, tags, related, image, draft |
+| `references` | title, date     | creator, year, referenceType, url, threads, tags, related, image, draft. `year` is the chronology of the referenced work, not the notebook date. |
 | `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |
-| `research`   | title           | subtitle, lede, questions, process, cover, gallery, tags, draft. No `date`, `status`, `threads`, or `related`. Filename must be the canonical thread id. |
+| `research`   | title, date     | subtitle, lede, questions, process, cover, gallery, tags, draft. No `status`, `threads`, or `related`. Filename must be the canonical thread id. |
 
 Suggested Note `type` values (any string is accepted):
 `person` · `institution` · `place` · `tool` · `software` · `material` · `concept` · `process` · `collaboration` · `other`.
@@ -149,11 +150,43 @@ threads:
 
 That entry then appears on the Soft Mechanisms page. Do not list Studies,
 Notes, References or Events inside the research Markdown. Title, subtitle,
-lede, questions, process, cover, gallery and tags are edited in the file;
+date, lede, questions, process, cover, gallery and tags are edited in the file;
 `src/lib/vocabulary.ts` keeps only the ids and fallback labels.
+
+`date` is when the Research Thread entry was authored in the notebook. It is
+not the research start date, completion date, or an event date. The body may
+state a concentrated research period (for example January–June 2027) or a
+public presentation (June/July 2027); those remain editorial, not metadata.
+
+The page does not treat this date like an Event date. It stays available to
+the system and is not shown beside the title.
 
 Copy `content/_templates/research-template.md`. Canonical order on `/research/`
 is Soft Mechanisms, Kinetic Studies, Heartbeat & Biosignals.
+
+### Date
+
+Every authored Markdown entry in the Artificial Emotion research garden carries
+a `date`.
+
+| Collection | Meaning of `date` |
+| ---------- | ----------------- |
+| **Studies** | Date of the study entry / research record |
+| **Notes** | Date the Note entered the notebook |
+| **References** | Date the Reference entered the notebook |
+| **Research Threads** | Date the Research Thread entry entered the notebook |
+| **Events** | Calendar date of the Event |
+
+Reference-specific chronology stays in `year`. Example:
+
+```yaml
+title: Jean Tinguely
+date: 2026-09-30
+year: 1960
+```
+
+means 1960 is the period of the referenced work, and 2026-09-30 is when it was
+registered in Artificial Emotion. Do not replace `year` with `date`.
 
 ### Note examples (do not publish as-is)
 

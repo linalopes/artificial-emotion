@@ -1,5 +1,6 @@
 ---
 title:
+date:
 creator:
 year:
 referenceType:

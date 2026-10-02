@@ -4,7 +4,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import {
   countThreadContent,
+  formatDate,
   getPublishedByThread,
+  isoDate,
   THREADED_COLLECTIONS,
 } from '../lib/content';
 import {
@@ -17,14 +19,13 @@ import { entryPath, mediaSrc, researchPath } from '../lib/paths';
 import {
   COLLECTION_LABELS,
   EVENT_TYPE_LABELS,
-  THREAD_LABELS,
   type CollectionName,
   type ResearchThread,
 } from '../lib/vocabulary';
 
 interface Props {
   thread: ResearchThread;
-  entry?: CollectionEntry<'research'>;
+  entry: CollectionEntry<'research'>;
 }
 
 interface ThreadCard {
@@ -39,19 +40,19 @@ interface ThreadCard {
 const CONTAIN_COVER_TYPES = new Set(['institution', 'tool', 'software']);
 
 const { thread, entry } = Astro.props;
-const data = entry?.data;
+const data = entry.data;
 
-const title = data?.title.trim() || THREAD_LABELS[thread];
-const subtitle = data?.subtitle?.trim() || undefined;
-const lede = data?.lede?.trim() || undefined;
-const questions = (data?.questions ?? []).map((item) => item.trim()).filter(Boolean);
-const process = (data?.process ?? []).map((item) => item.trim()).filter(Boolean);
-const tags = (data?.tags ?? []).map((item) => item.trim()).filter(Boolean);
-const coverSrc = data?.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
-const galleryItems = (data?.gallery ?? []).filter((item) => item.src.trim());
+const title = data.title.trim();
+const subtitle = data.subtitle?.trim() || undefined;
+const lede = data.lede?.trim() || undefined;
+const questions = data.questions.map((item) => item.trim()).filter(Boolean);
+const process = data.process.map((item) => item.trim()).filter(Boolean);
+const tags = data.tags.map((item) => item.trim()).filter(Boolean);
+const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
+const galleryItems = data.gallery.filter((item) => item.src.trim());
 const galleryCount = galleryItems.length <= 3 ? String(galleryItems.length) : 'many';
 
-const body = entry?.body ?? '';
+const body = entry.body ?? '';
 const emptySections: MarkdownSection[] = [];
 const { intro, rest } = hasMarkdownContent(body)
   ? splitIntroAndRest(body)
@@ -147,6 +148,13 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
         <h1 class="research-hero__title">{title}</h1>
         {subtitle && <p class="research-hero__subtitle">{subtitle}</p>}
         {lede && <p class="research-hero__lede">{lede}</p>}
+        {
+          data?.date && (
+            <time class="visually-hidden" datetime={isoDate(data.date)}>
+              {formatDate(data.date)}
+            </time>
+          )
+        }
       </div>
     </header>
 

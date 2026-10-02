@@ -13,6 +13,7 @@ import {
   RESEARCH_THREADS,
   THREAD_LABELS,
   isResearchThread,
+  researchLogicalId,
   type CollectionName,
   type ResearchThread,
 } from './vocabulary';
@@ -46,6 +47,35 @@ export async function getPublishedByDate<C extends DatedCollection>(
    from each entry's `threads: [<id>]`.
    -------------------------------------------------------------------------- */
 
+const researchMarkdownPath = (id: ResearchThread) => `content/research/${id}.md`;
+
+function missingResearchEntryError(id: ResearchThread): Error {
+  return new Error(`Research entry "${id}" could not be loaded from ${researchMarkdownPath(id)}`);
+}
+
+function asResearchThreadId(id: string): ResearchThread | undefined {
+  const logical = researchLogicalId(id);
+  return isResearchThread(logical) ? logical : undefined;
+}
+
+async function loadResearchEntryMap(): Promise<Map<ResearchThread, CollectionEntry<'research'>>> {
+  const entries = await getCollection('research');
+  const byId = new Map<ResearchThread, CollectionEntry<'research'>>();
+
+  for (const entry of entries) {
+    const id = asResearchThreadId(entry.id) ?? asResearchThreadId(entry.filePath ?? '');
+    if (!id) {
+      console.warn(
+        `[content] ignoring research file "${entry.id}"; filename must be a canonical thread id`,
+      );
+      continue;
+    }
+    byId.set(id, entry);
+  }
+
+  return byId;
+}
+
 /** Published Research Thread Markdown, in canonical id order. */
 export async function getPublishedResearchThreads(): Promise<CollectionEntry<'research'>[]> {
   return (await getResearchThreads()).filter((entry) => !entry.data.draft);
@@ -53,24 +83,23 @@ export async function getPublishedResearchThreads(): Promise<CollectionEntry<'re
 
 /** All Research Thread Markdown files, including drafts, in canonical id order. */
 export async function getResearchThreads(): Promise<CollectionEntry<'research'>[]> {
-  const entries = await getCollection('research');
-  const extra = entries.filter((entry) => !isResearchThread(entry.id));
-  for (const entry of extra) {
-    console.warn(`[content] ignoring research file "${entry.id}.md"; filename must be a canonical thread id`);
-  }
-
-  const byId = new Map(entries.filter((entry) => isResearchThread(entry.id)).map((entry) => [entry.id, entry]));
-  return RESEARCH_THREADS.flatMap((id) => {
+  const byId = await loadResearchEntryMap();
+  return RESEARCH_THREADS.map((id) => {
     const entry = byId.get(id);
-    return entry ? [entry] : [];
+    if (!entry) throw missingResearchEntryError(id);
+    return entry;
   });
 }
 
-export async function getResearchThread(
-  id: ResearchThread,
-): Promise<CollectionEntry<'research'> | undefined> {
-  const entry = await getEntry('research', id);
-  return entry ?? undefined;
+export async function getResearchThread(id: ResearchThread): Promise<CollectionEntry<'research'>> {
+  for (const key of [id, `${id}.md`]) {
+    const direct = await getEntry('research', key);
+    if (direct && asResearchThreadId(direct.id) === id) return direct;
+  }
+
+  const entry = (await loadResearchEntryMap()).get(id);
+  if (!entry) throw missingResearchEntryError(id);
+  return entry;
 }
 
 /* --------------------------------------------------------------------------

@@ -52,6 +52,12 @@ const threads = withDefault(z.array(threadSchema), []);
 
 const tags = withDefault(z.array(z.string()), []);
 
+/**
+ * Ordered sequence of research stages. Shared field so Studies can adopt
+ * the same model later. Empty means the page renders no diagram.
+ */
+export const processSchema = withDefault(z.array(z.string()), []);
+
 /** Entries are private until explicitly published with `draft: false`. */
 const draft = withDefault(z.boolean(), true);
 
@@ -187,11 +193,17 @@ const notes = defineCollection({
   }),
 });
 
-/** An external source that informed the research. Not a Note. Body explains why it matters to Artificial Emotion. */
+/**
+ * An external source that informed the research. Not a Note.
+ * `date` is when this entry entered the Artificial Emotion notebook.
+ * `year` is the chronology of the referenced work and must not be reused
+ * as the notebook date.
+ */
 const references = defineCollection({
   loader: markdownIn('references'),
   schema: z.object({
     title: z.string(),
+    date: z.coerce.date(),
     creator: optional(z.string()),
     year: optional(z.union([z.number().int(), z.string()])),
     referenceType: optional(z.string()),
@@ -233,15 +245,25 @@ const events = defineCollection({
  * Editorial source for a canonical Research Thread.
  * Not a Study, Note, Reference or Event. Filename must be the thread id.
  * Membership of other entries is declared on those entries via `threads`.
+ * `date` is when this thread entry was authored in the notebook, not the
+ * start or end of the research itself.
  */
 const research = defineCollection({
-  loader: markdownIn(RESEARCH_COLLECTION),
+  loader: glob({
+    base: `./content/${RESEARCH_COLLECTION}`,
+    pattern: ['**/*.md', '!**/_*', '!**/_*/**'],
+    generateId: ({ entry }) => {
+      const logical = entry.replace(/\\/g, '/').replace(/\.md$/i, '').split('/').pop();
+      return logical || entry;
+    },
+  }),
   schema: z.object({
     title: z.string(),
     subtitle: optional(z.string()),
+    date: z.coerce.date(),
     lede: optional(z.string()),
     questions: withDefault(z.array(z.string()), []),
-    process: withDefault(z.array(z.string()), []),
+    process: processSchema,
     cover: optional(mediaRef),
     gallery,
     tags,

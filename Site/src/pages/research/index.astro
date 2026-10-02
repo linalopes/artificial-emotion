@@ -2,19 +2,22 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPublishedResearchThreads } from '../../lib/content';
 import { mediaSrc, threadPath } from '../../lib/paths';
-import { isResearchThread, THREAD_LABELS } from '../../lib/vocabulary';
+import { isResearchThread, researchLogicalId } from '../../lib/vocabulary';
 
 const title = 'Research';
-const threads = (await getPublishedResearchThreads()).map((entry) => {
-  const id = isResearchThread(entry.id) ? entry.id : undefined;
+const threads = (await getPublishedResearchThreads()).flatMap((entry) => {
+  const id = researchLogicalId(entry.id);
+  if (!isResearchThread(id)) return [];
   const { data } = entry;
-  return {
-    href: id ? threadPath(id) : entry.id,
-    title: data.title.trim() || (id ? THREAD_LABELS[id] : entry.id),
-    subtitle: data.subtitle?.trim() || undefined,
-    lede: data.lede?.trim() || undefined,
-    cover: data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined,
-  };
+  return [
+    {
+      href: threadPath(id),
+      title: data.title.trim(),
+      subtitle: data.subtitle?.trim() || undefined,
+      lede: data.lede?.trim() || undefined,
+      cover: data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined,
+    },
+  ];
 });
 ---
 
