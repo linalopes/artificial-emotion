@@ -1,0 +1,836 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GenerativeWaves from './GenerativeWaves.astro';
+import {
+  countThreadContent,
+  getPublishedByThread,
+  THREADED_COLLECTIONS,
+} from '../lib/content';
+import {
+  hasMarkdownContent,
+  markdownSectionToHtml,
+  splitIntroAndRest,
+  type MarkdownSection,
+} from '../lib/markdown';
+import { entryPath, mediaSrc, researchPath } from '../lib/paths';
+import {
+  COLLECTION_LABELS,
+  EVENT_TYPE_LABELS,
+  THREAD_LABELS,
+  type CollectionName,
+  type ResearchThread,
+} from '../lib/vocabulary';
+
+interface Props {
+  thread: ResearchThread;
+  entry?: CollectionEntry<'research'>;
+}
+
+interface ThreadCard {
+  href: string;
+  title: string;
+  cover?: string;
+  coverFit: 'cover' | 'contain';
+  kicker?: string;
+  summary?: string;
+}
+
+const CONTAIN_COVER_TYPES = new Set(['institution', 'tool', 'software']);
+
+const { thread, entry } = Astro.props;
+const data = entry?.data;
+
+const title = data?.title.trim() || THREAD_LABELS[thread];
+const subtitle = data?.subtitle?.trim() || undefined;
+const lede = data?.lede?.trim() || undefined;
+const questions = (data?.questions ?? []).map((item) => item.trim()).filter(Boolean);
+const process = (data?.process ?? []).map((item) => item.trim()).filter(Boolean);
+const tags = (data?.tags ?? []).map((item) => item.trim()).filter(Boolean);
+const coverSrc = data?.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
+const galleryItems = (data?.gallery ?? []).filter((item) => item.src.trim());
+const galleryCount = galleryItems.length <= 3 ? String(galleryItems.length) : 'many';
+
+const body = entry?.body ?? '';
+const emptySections: MarkdownSection[] = [];
+const { intro, rest } = hasMarkdownContent(body)
+  ? splitIntroAndRest(body)
+  : { intro: emptySections, rest: emptySections };
+
+const withHtml = (sections: typeof intro) =>
+  sections
+    .map((section) => ({
+      heading: section.heading,
+      html: markdownSectionToHtml(section),
+    }))
+    .filter((section) => hasMarkdownContent(section.html.replace(/<[^>]+>/g, ' ')));
+
+const introSections = withHtml(intro);
+const restSections = withHtml(rest);
+
+const content = await getPublishedByThread(thread);
+const total = countThreadContent(content);
+
+const toCard = (item: CollectionEntry<CollectionName>): ThreadCard => {
+  const href = entryPath(item.collection, item.id);
+  switch (item.collection) {
+    case 'studies': {
+      const { data: study } = item;
+      return {
+        href,
+        title: study.title,
+        cover: study.cover?.trim() ? mediaSrc(study.cover.trim()) : undefined,
+        coverFit: 'cover',
+        kicker: study.status,
+      };
+    }
+    case 'notes': {
+      const { data: note } = item;
+      const type = note.type?.trim().toLowerCase() || undefined;
+      return {
+        href,
+        title: note.title,
+        cover: note.cover?.trim() ? mediaSrc(note.cover.trim()) : undefined,
+        coverFit: type && CONTAIN_COVER_TYPES.has(type) ? 'contain' : 'cover',
+        kicker: note.type?.trim().replace(/-/g, ' ') || undefined,
+        summary: note.lede?.trim() || undefined,
+      };
+    }
+    case 'references': {
+      const { data: reference } = item;
+      const byline = [reference.creator?.trim(), reference.year !== undefined ? String(reference.year) : undefined]
+        .filter(Boolean)
+        .join(', ');
+      return {
+        href,
+        title: reference.title,
+        cover: reference.image?.trim() ? mediaSrc(reference.image.trim()) : undefined,
+        coverFit: 'cover',
+        kicker: reference.referenceType?.trim().replace(/-/g, ' ') || undefined,
+        summary: byline || undefined,
+      };
+    }
+    case 'events': {
+      const { data: event } = item;
+      return {
+        href,
+        title: event.title,
+        cover: event.cover?.trim() ? mediaSrc(event.cover.trim()) : undefined,
+        coverFit: 'cover',
+        kicker: event.eventType ? EVENT_TYPE_LABELS[event.eventType] : undefined,
+        summary: event.lede?.trim() || undefined,
+      };
+    }
+  }
+};
+
+const groups = THREADED_COLLECTIONS.filter((collection) => content[collection].length > 0).map(
+  (collection) => ({
+    collection,
+    label: COLLECTION_LABELS[collection],
+    items: content[collection].map(toCard),
+  }),
+);
+
+const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2' : 'many';
+---
+
+<BaseLayout title={title} description={lede}>
+  <article class="research">
+    <header class="research-hero">
+      <div class="research-hero__field" aria-hidden="true">
+        <GenerativeWaves mode="fill" label="" />
+      </div>
+      <div class="research-hero__veil" aria-hidden="true"></div>
+      <div class="research-hero__stage">
+        <a class="research-hero__kicker label" href={researchPath()}>Research thread</a>
+        <h1 class="research-hero__title">{title}</h1>
+        {subtitle && <p class="research-hero__subtitle">{subtitle}</p>}
+        {lede && <p class="research-hero__lede">{lede}</p>}
+      </div>
+    </header>
+
+    {
+      questions.length > 0 && (
+        <section class="research-qs theme-dark" aria-labelledby="research-qs-heading">
+          <div class="research-qs__inner">
+            <h2 id="research-qs-heading" class="research-qs__label">Research questions</h2>
+            <ol class="research-qs__list" data-count={questionCount}>
+              {questions.map((question, index) => (
+                <li>
+                  <span class="research-qs__n">Q{index + 1}</span>
+                  <p>{question}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      )
+    }
+
+    <div class="research-shell">
+      {
+        process.length > 0 && (
+          <section class="research-process" aria-labelledby="research-process-heading">
+            <h2 id="research-process-heading" class="label">Process</h2>
+            <ol class="research-process__chain">
+              {process.map((step, index) => (
+                <li>
+                  <span class="research-process__step">{step}</span>
+                  {index < process.length - 1 && (
+                    <span class="research-process__arrow" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path
+                          d="M7 12h10M13 7l5 5-5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      }
+
+      {
+        coverSrc && (
+          <figure class="research-cover">
+            <img src={coverSrc} alt="" />
+          </figure>
+        )
+      }
+
+      {
+        tags.length > 0 && (
+          <ul class="research-tags" aria-label="Tags">
+            {tags.map((tag) => (
+              <li>{tag.replace(/-/g, ' ')}</li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        introSections.map((section) => (
+          <section
+            class:list={['research-block', 'prose', section.heading && 'research-block--headed']}
+            set:html={section.html}
+          />
+        ))
+      }
+
+      {
+        galleryItems.length > 0 && (
+          <section class="research-gallery" aria-label="Gallery">
+            <ul class:list={['research-gallery__list', `research-gallery__list--${galleryCount}`]}>
+              {galleryItems.map((item) => (
+                <li>
+                  <figure>
+                    {item.type === 'image' ? (
+                      <img src={mediaSrc(item.src)} alt={item.alt} />
+                    ) : (
+                      <video
+                        src={mediaSrc(item.src)}
+                        poster={item.poster ? mediaSrc(item.poster) : undefined}
+                        controls
+                        playsinline
+                        preload="metadata"
+                        aria-label={item.caption || undefined}
+                      ></video>
+                    )}
+                    {item.caption?.trim() && <figcaption>{item.caption.trim()}</figcaption>}
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        restSections.map((section) => (
+          <section
+            class:list={['research-block', 'prose', section.heading && 'research-block--headed']}
+            set:html={section.html}
+          />
+        ))
+      }
+
+      {
+        total === 0 ? (
+          <p class="label">Nothing published in this thread yet.</p>
+        ) : (
+          groups.map((group) => (
+            <section class="research-index-group" aria-labelledby={`research-group-${group.collection}`}>
+              <h2 id={`research-group-${group.collection}`} class="label">
+                {group.label}
+              </h2>
+              <ol class="research-index-group__list">
+                {group.items.map((item) => (
+                  <li>
+                    <a class="thread-card" href={item.href}>
+                      {item.cover ? (
+                        <img
+                          class:list={[
+                            'thread-card__media',
+                            item.coverFit === 'contain' && 'thread-card__media--contain',
+                          ]}
+                          src={item.cover}
+                          alt=""
+                        />
+                      ) : (
+                        <span class="thread-card__media thread-card__media--ph" aria-hidden="true"></span>
+                      )}
+                      <span class="thread-card__body">
+                        {item.kicker && <span class="thread-card__kicker">{item.kicker}</span>}
+                        <span class="thread-card__name">{item.title}</span>
+                        {item.summary && <span class="thread-card__summary">{item.summary}</span>}
+                        <span class="thread-card__foot">
+                          <span class="thread-card__go" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="12" height="12">
+                              <path
+                                d="M7 12h10M13 7l5 5-5 5"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                            </svg>
+                          </span>
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        )
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .research {
+    display: grid;
+  }
+
+  .research-hero {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-6) var(--page-gutter) var(--space-5);
+  }
+
+  .research-hero__field,
+  .research-hero__veil {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .research-hero__field {
+    z-index: 0;
+    top: -18%;
+    right: -8%;
+    width: min(52vw, 34rem);
+    height: 128%;
+    opacity: 0.42;
+    mask-image:
+      linear-gradient(to left, #000 12%, transparent 88%),
+      linear-gradient(to bottom, #000 42%, transparent 100%);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      linear-gradient(to left, #000 12%, transparent 88%),
+      linear-gradient(to bottom, #000 42%, transparent 100%);
+    -webkit-mask-composite: source-in;
+  }
+
+  .research-hero__veil {
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(
+        102deg,
+        var(--color-white) 0%,
+        var(--color-white) 36%,
+        color-mix(in srgb, var(--color-white) 88%, transparent) 58%,
+        color-mix(in srgb, var(--color-white) 22%, transparent) 100%
+      ),
+      linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(in srgb, var(--color-white) 28%, transparent) 78%,
+        var(--color-white) 100%
+      );
+  }
+
+  .research-hero__stage {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--space-3);
+    max-width: 44rem;
+  }
+
+  .research-hero__kicker {
+    width: max-content;
+    text-decoration: none;
+  }
+
+  .research-hero__title {
+    font-size: clamp(2.35rem, 1.4rem + 3.2vw, 4.4rem);
+    font-weight: var(--weight-title-light);
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+  }
+
+  .research-hero__subtitle {
+    max-width: 36ch;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.15rem, 1rem + 0.55vw, 1.5rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg-muted);
+  }
+
+  .research-hero__lede {
+    max-width: 46ch;
+    margin-top: var(--space-2);
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.2rem, 1.05rem + 0.65vw, 1.55rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+
+  .research-qs {
+    background: var(--bg);
+    color: var(--fg);
+    padding: var(--space-6) var(--page-gutter);
+  }
+
+  .research-qs__inner {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--page-max);
+    margin-inline: auto;
+  }
+
+  .research-qs__label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: var(--weight-mono-regular);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-turquoise);
+  }
+
+  .research-qs__list {
+    display: grid;
+    gap: var(--space-5);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .research-qs__list > li {
+    display: grid;
+    gap: var(--space-3);
+    max-width: none;
+  }
+
+  .research-qs__n {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--color-pink);
+  }
+
+  .research-qs__list p {
+    max-width: none;
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.2rem, 1.05rem + 0.7vw, 1.65rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.025em;
+    color: var(--color-white);
+  }
+
+  .research-shell {
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-6) var(--page-gutter) var(--space-7);
+  }
+
+  .research-process {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .research-process__chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem 0.35rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .research-process__chain > li {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .research-process__step {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.15rem, 1rem + 0.7vw, 1.55rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--fg);
+  }
+
+  .research-process__arrow {
+    display: inline-flex;
+    color: var(--color-turquoise);
+    flex: 0 0 auto;
+  }
+
+  .research-cover {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .research-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 42rem;
+    object-fit: contain;
+    background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
+  }
+
+  .research-tags {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.85rem;
+  }
+
+  .research-tags li {
+    max-width: none;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+  }
+
+  .research-block {
+    display: grid;
+    gap: var(--space-3);
+    min-width: 0;
+  }
+
+  .research-block :global(h2) {
+    margin: 0;
+    font-size: clamp(1.45rem, 1.15rem + 1vw, 2rem);
+    font-weight: var(--weight-title-light);
+    letter-spacing: -0.03em;
+    line-height: var(--leading-snug);
+  }
+
+  .research-block :global(h3) {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: var(--weight-title-medium);
+    letter-spacing: -0.015em;
+  }
+
+  .research-block :global(p),
+  .research-block :global(li) {
+    max-width: 46ch;
+  }
+
+  .research-block :global(blockquote) {
+    margin-block: var(--space-4);
+    padding: 0.15em 0 0.15em 1.05em;
+    border-left: 1px solid var(--color-pink);
+    max-width: 36rem;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.03em;
+    color: var(--fg);
+    quotes: none;
+  }
+
+  .research-block :global(blockquote)::before,
+  .research-block :global(blockquote)::after {
+    content: none;
+  }
+
+  .research-block :global(blockquote p) {
+    max-width: none;
+  }
+
+  .research-gallery {
+    min-width: 0;
+  }
+
+  .research-gallery__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .research-gallery figure {
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .research-gallery img,
+  .research-gallery video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 40rem;
+    object-fit: contain;
+    background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
+  }
+
+  .research-gallery figcaption {
+    max-width: none;
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .research-index-group {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  .research-index-group__list {
+    display: grid;
+    gap: var(--space-4);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .research-index-group__list > li {
+    max-width: none;
+  }
+
+  .thread-card {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, 0.32fr) minmax(0, 0.68fr);
+    min-height: 10.5rem;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    background: color-mix(in srgb, var(--color-white) 86%, transparent);
+    border: 1px solid var(--color-gray-green);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .thread-card:hover,
+  .thread-card:focus-visible {
+    color: inherit;
+  }
+
+  .thread-card:focus-visible {
+    outline: 2px solid var(--color-pink);
+    outline-offset: 3px;
+  }
+
+  .thread-card__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 10.5rem;
+    object-fit: cover;
+    align-self: stretch;
+  }
+
+  .thread-card__media--contain {
+    object-fit: contain;
+    box-sizing: border-box;
+    padding: 1rem;
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 55%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
+  }
+
+  .thread-card__media--ph {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 55%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
+  }
+
+  .thread-card__body {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.35rem;
+    padding: 0.9rem 1rem 0.8rem;
+    min-width: 0;
+  }
+
+  .thread-card__kicker {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-link);
+  }
+
+  .thread-card__name {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.4rem);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-snug);
+    color: var(--fg);
+  }
+
+  .thread-card__name::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.08em;
+    width: 100%;
+    height: 1px;
+    background: var(--color-pink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.32s ease;
+  }
+
+  .thread-card:hover .thread-card__name::after,
+  .thread-card:focus-visible .thread-card__name::after {
+    transform: scaleX(1);
+  }
+
+  .thread-card__summary {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .thread-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 0.55rem;
+  }
+
+  .thread-card__go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.45rem;
+    height: 1.45rem;
+    color: var(--fg-muted);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    transition:
+      border-color 0.28s ease,
+      color 0.28s ease;
+  }
+
+  .thread-card:hover .thread-card__go,
+  .thread-card:focus-visible .thread-card__go {
+    border-color: var(--color-pink);
+    color: var(--color-pink);
+  }
+
+  @media (min-width: 48rem) {
+    .research-qs__list[data-count='2'],
+    .research-qs__list[data-count='many'] {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .research-block--headed {
+      grid-template-columns: minmax(12rem, 17rem) minmax(0, 1fr);
+      column-gap: var(--space-6);
+      align-items: start;
+    }
+
+    .research-block :global(h2) {
+      grid-column: 1;
+    }
+
+    .research-block :global(*:not(h2)) {
+      grid-column: 2;
+    }
+
+    .research-gallery__list--2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .research-gallery__list--3,
+    .research-gallery__list--many {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .research-process__chain {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .research-process__arrow {
+      transform: rotate(90deg);
+    }
+
+    .thread-card {
+      grid-template-columns: 1fr;
+    }
+
+    .thread-card__media {
+      min-height: 10rem;
+      aspect-ratio: 16 / 10;
+      height: auto;
+    }
+  }
+</style>

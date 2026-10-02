@@ -6,9 +6,11 @@ import {
   EVENT_STATUSES,
   EVENT_TIMEZONE_DEFAULT,
   EVENT_TYPES,
+  RESEARCH_COLLECTION,
   RESEARCH_THREADS,
   STUDY_STATUSES,
   type CollectionName,
+  type ResearchCollectionName,
 } from './lib/vocabulary';
 
 /* --------------------------------------------------------------------------
@@ -17,7 +19,7 @@ import {
    Anything whose name starts with "_" is never loaded: /content/_templates,
    private scratch files, etc.
    -------------------------------------------------------------------------- */
-const markdownIn = (folder: CollectionName) =>
+const markdownIn = (folder: CollectionName | ResearchCollectionName) =>
   glob({
     base: `./content/${folder}`,
     pattern: ['**/*.md', '!**/_*', '!**/_*/**'],
@@ -56,9 +58,10 @@ const draft = withDefault(z.boolean(), true);
 /**
  * Cross-collection link written in frontmatter as "collection/id",
  * e.g. "notes/when-does-movement-look-hesitant".
- * Transformed into Astro's { collection, id } reference shape so pages can
- * pass it straight to getEntry() / getEntries(). Existence is not checked at
- * build time, so linking to a not-yet-written entry never breaks the build.
+ * Only the four primary collections are valid targets. Research Threads
+ * are reached through `threads: [soft-mechanisms]`, not `related`.
+ * Existence is not checked at build time, so linking to a not-yet-written
+ * entry never breaks the build.
  */
 const relatedPattern = new RegExp(`^(${COLLECTIONS.join('|')})/[^\\s/]\\S*$`);
 
@@ -226,4 +229,24 @@ const events = defineCollection({
   }),
 });
 
-export const collections = { studies, notes, references, events };
+/**
+ * Editorial source for a canonical Research Thread.
+ * Not a Study, Note, Reference or Event. Filename must be the thread id.
+ * Membership of other entries is declared on those entries via `threads`.
+ */
+const research = defineCollection({
+  loader: markdownIn(RESEARCH_COLLECTION),
+  schema: z.object({
+    title: z.string(),
+    subtitle: optional(z.string()),
+    lede: optional(z.string()),
+    questions: withDefault(z.array(z.string()), []),
+    process: withDefault(z.array(z.string()), []),
+    cover: optional(mediaRef),
+    gallery,
+    tags,
+    draft,
+  }),
+});
+
+export const collections = { studies, notes, references, events, research };

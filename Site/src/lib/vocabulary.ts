@@ -5,9 +5,20 @@
  * Keep this file free of Astro imports so it can be used anywhere.
  */
 
-/** The four Markdown collections under /content. */
+/**
+ * The four primary content collections. These are the only valid targets
+ * for `related` and the only entries aggregated by a Research Thread's
+ * `threads:` membership.
+ *
+ * Research Threads are a conceptual layer above this list. Their editorial
+ * Markdown lives in `content/research/` but is not a fifth primary collection.
+ */
 export const COLLECTIONS = ['studies', 'notes', 'references', 'events'] as const;
 export type CollectionName = (typeof COLLECTIONS)[number];
+
+/** Markdown folder for Research Thread editorial source. Not a primary collection. */
+export const RESEARCH_COLLECTION = 'research' as const;
+export type ResearchCollectionName = typeof RESEARCH_COLLECTION;
 
 /** Public-facing labels. Internal names stay as-is (e.g. `notes` → "Studio Notes"). */
 export const COLLECTION_LABELS: Record<CollectionName, string> = {
@@ -25,7 +36,17 @@ export const COLLECTION_LABELS_SINGULAR: Record<CollectionName, string> = {
   events: 'Event',
 };
 
-/** Canonical research thread identifiers. Use exactly these in frontmatter. */
+/**
+ * Canonical Research Thread identifiers, in display order:
+ * 1. Soft Mechanisms  2. Kinetic Studies  3. Heartbeat & Biosignals
+ *
+ * Filename, URL, and `threads:` membership all use this id:
+ * `content/research/soft-mechanisms.md` → `/research/soft-mechanisms/`
+ * ↔ `threads: [soft-mechanisms]`.
+ *
+ * Editorial title, subtitle, lede, questions, process, cover, gallery and
+ * tags live in the Markdown file. Do not duplicate that copy here.
+ */
 export const RESEARCH_THREADS = [
   'soft-mechanisms',
   'kinetic-studies',
@@ -33,43 +54,16 @@ export const RESEARCH_THREADS = [
 ] as const;
 export type ResearchThread = (typeof RESEARCH_THREADS)[number];
 
-export interface ThreadMeta {
-  id: ResearchThread;
-  /** Public label. */
-  label: string;
-  /** One-sentence description shown on /research/ and the thread page. */
-  description: string;
-}
-
-/** Public metadata for each thread. Edit wording here; ids stay canonical. */
-export const THREADS: Record<ResearchThread, ThreadMeta> = {
-  'soft-mechanisms': {
-    id: 'soft-mechanisms',
-    label: 'Soft Mechanisms',
-    description:
-      'Research into compliant structures, textiles, tension, deformation and mechanisms that behave through softness rather than rigid articulation.',
-  },
-  'kinetic-studies': {
-    id: 'kinetic-studies',
-    label: 'Kinetic Studies',
-    description:
-      'Research into movement, rhythm, balance, repetition, suspension and the expressive behavior of mechanical systems.',
-  },
-  'heartbeat-biosignals': {
-    id: 'heartbeat-biosignals',
-    label: 'Heartbeat & Biosignals',
-    description:
-      'Research into pulse, sensing, amplification and the translation of bodily signals into mechanical or visual behavior.',
-  },
+/** Fallback titles if a Research Thread Markdown file is missing. */
+export const THREAD_LABELS: Record<ResearchThread, string> = {
+  'soft-mechanisms': 'Soft Mechanisms',
+  'kinetic-studies': 'Kinetic Studies',
+  'heartbeat-biosignals': 'Heartbeat & Biosignals',
 };
 
-/** Threads in canonical display order. */
-export const THREAD_LIST: readonly ThreadMeta[] = RESEARCH_THREADS.map((id) => THREADS[id]);
-
-/** Convenience: id → public label. */
-export const THREAD_LABELS: Record<ResearchThread, string> = Object.fromEntries(
-  RESEARCH_THREADS.map((id) => [id, THREADS[id].label]),
-) as Record<ResearchThread, string>;
+export function isResearchThread(value: string): value is ResearchThread {
+  return (RESEARCH_THREADS as readonly string[]).includes(value);
+}
 
 /**
  * Suggested Note `type` values. Notes stay one collection; this is a

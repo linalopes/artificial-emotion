@@ -16,12 +16,13 @@
  * They are never promoted to `related` edges.
  */
 import type { CollectionEntry } from 'astro:content';
-import { getPublished } from './content';
+import { getPublished, getResearchThreads } from './content';
 import type { NodeType, RelationType } from './constellation.config';
 import { entryPath, href, threadPath } from './paths';
 import {
   COLLECTIONS,
-  THREAD_LIST,
+  RESEARCH_THREADS,
+  THREAD_LABELS,
   type CollectionName,
   type ResearchThread,
 } from './vocabulary';
@@ -81,16 +82,19 @@ export async function buildConstellation(): Promise<ConstellationGraph> {
   // 1. Root
   nodes.push({ id: ROOT_ID, label: 'Artificial Emotion', type: 'root', href: href('/') });
 
-  // 2. Research threads + root-thread links
-  for (const thread of THREAD_LIST) {
+  // 2. Research threads + root-thread links (canonical ids, even if still draft)
+  const researchEntries = await getResearchThreads();
+  const researchTitle = new Map(researchEntries.map((entry) => [entry.id, entry.data.title]));
+
+  for (const id of RESEARCH_THREADS) {
     nodes.push({
-      id: threadNodeId(thread.id),
-      label: thread.label,
+      id: threadNodeId(id),
+      label: researchTitle.get(id) ?? THREAD_LABELS[id],
       type: 'research-thread',
-      href: threadPath(thread.id),
-      threadIds: [thread.id],
+      href: threadPath(id),
+      threadIds: [id],
     });
-    addLink(ROOT_ID, threadNodeId(thread.id), 'root-thread');
+    addLink(ROOT_ID, threadNodeId(id), 'root-thread');
   }
 
   // 3. Published content nodes

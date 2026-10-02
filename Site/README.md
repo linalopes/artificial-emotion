@@ -27,12 +27,13 @@ Site/
 │   ├── studies/             documented experiments / prototypes
 │   ├── notes/               generic knowledge objects (people, places, tools, …)
 │   ├── references/          external sources that informed the research
-│   └── events/              public moments in the research
+│   ├── events/              public moments in the research
+│   └── research/            editorial source for the three Research Threads
 ├── public/                  copied verbatim to dist/ (favicon, etc.)
 └── src/
     ├── content.config.ts    collection schemas + glob loaders for content/*
     ├── lib/
-    │   ├── vocabulary.ts    threads, statuses, collection names + public labels
+    │   ├── vocabulary.ts    canonical thread ids, statuses, primary collection labels
     │   ├── content.ts       published-only fetching, related + backlinks, formatting
     │   ├── search.ts        build-time search records (no UI yet)
     │   └── paths.ts         base-aware URL helpers (href, collectionPath, entryPath)
@@ -49,8 +50,8 @@ Site/
 | Route                | Source                             |
 | -------------------- | ---------------------------------- |
 | `/`                  | `src/pages/index.astro` — Waves hero + constellation section |
-| `/research/`         | `src/pages/research/index.astro` — editorial overview of the three threads |
-| `/research/[thread]/`| `src/pages/research/[thread].astro` — one page per thread in `THREAD_LIST` |
+| `/research/`         | `src/pages/research/index.astro` — Events/Studio Notes-style listing of published threads |
+| `/research/[thread]/`| `src/pages/research/[thread].astro` — one page per canonical thread id |
 | `/lab/constellation/`| `src/pages/lab/constellation.astro` — constellation tuning page, not in nav, `noindex` |
 | `/lab/waves/`        | `src/pages/lab/waves.astro` — p5.js Tomorrow's Waves prototype, not in nav, `noindex` |
 | `/lab/tissue/`       | redirects to `/lab/waves/` (previous generative-textile lab URL) |
@@ -63,10 +64,10 @@ Site/
 | `/events/`           | `src/pages/events/index.astro`     |
 | `/events/[id]/`      | `src/pages/events/[id].astro`      |
 
-Only entries with `draft: false` get pages. Research thread pages are curated
-views over existing entries (anything published whose `threads` contains the
-thread id); they have no Markdown files of their own. Thread labels and
-descriptions live in `src/lib/vocabulary.ts` (`THREADS`).
+Only primary-collection entries with `draft: false` get listing and detail
+pages. Research Thread pages always exist for the three canonical ids so
+homepage links stay stable; unpublished thread Markdown is omitted from
+`/research/` until `draft: false`.
 
 Generated folders (`node_modules/`, `dist/`, `.astro/`) are git-ignored. Consider
 adding them to Obsidian → Settings → Files and links → Excluded files.
@@ -75,8 +76,9 @@ adding them to Obsidian → Settings → Files and links → Excluded files.
 
 Artificial Emotion is an ongoing artistic research project, a digital artist
 notebook, a public archive, and a digital garden. The content model stays
-simple: four Markdown collections plus research threads. There are no
-separate collections for people, institutions, places, tools, or materials.
+simple: four primary Markdown collections plus Research Threads as a
+conceptual layer above them. There are no separate collections for people,
+institutions, places, tools, or materials.
 
 | Kind | Meaning |
 | ---- | ------- |
@@ -84,7 +86,7 @@ separate collections for people, institutions, places, tools, or materials.
 | **Reference** | An external source that informed the research (artist, artwork, paper, book, project, technology, historical work). |
 | **Note** | The generic knowledge object: person, institution, place, tool, software, material, concept, process, collaboration, observation, or other context. |
 | **Event** | A public moment in the research, with structured date/time/location data. |
-| **Thread** | A major research cluster. Canonical ids: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. Not a Markdown collection. |
+| **Thread** | A major research cluster above the four primary collections. Canonical ids: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. Editorial source lives in `content/research/<id>.md`. Not a fifth primary collection and not a valid `related` target. |
 | **Tag** | A lightweight characteristic or theme (`acrylic`, `3d-printing`, `paris`). Not a page. A tag may later become a Note if editorial content accumulates. |
 | **Related** | An explicit relationship declared by the artist. Strong semantic edge. Example: Prototype B was developed from Prototype A. |
 | **Backlink** | The automatic reverse of `related`. If A lists B, B can show A under Referenced by. Never written by hand. |
@@ -95,13 +97,13 @@ Shared tags do **not** mean two entries are related.
 
 Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 
-- The **filename is the stable slug / URL**. `content/notes/institute-for-future-technologies.md` → `/notes/institute-for-future-technologies/`. The title may change; the URL does not. Name files in kebab-case. Do not derive URLs from titles.
+- The **filename is the stable slug / URL**. `content/notes/institute-for-future-technologies.md` → `/notes/institute-for-future-technologies/`. `content/research/soft-mechanisms.md` → `/research/soft-mechanisms/`. The title may change; the URL does not. Name files in kebab-case. Do not derive URLs from titles.
 - Frontmatter is structured data. The Markdown body is narrative.
 - Anything whose file or folder name starts with `_` is ignored by Astro (`content/_templates/` is never loaded).
 - Empty properties (`cover:`) count as "not set". Lists may be omitted entirely.
 - `draft` defaults to `true`; set `draft: false` to publish.
-- `threads` accepts only: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`.
-- `related` uses `collection/id`, e.g. `notes/when-does-movement-look-hesitant`. Targets do not have to exist yet.
+- `threads` accepts only: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. This is how a Study, Note, Reference or Event attaches to a Research Thread. Do not list those entries inside the research Markdown.
+- `related` uses `collection/id` among the four primary collections only, e.g. `notes/when-does-movement-look-hesitant`. Research Threads are not `related` targets. Targets do not have to exist yet.
 - Media fields accept a local site-root path (`/images/...`) or an HTTPS URL (Cloudinary or other). The site does not download remote files.
 
 | Collection   | Required        | Optional / defaults |
@@ -110,6 +112,7 @@ Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 | `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
 | `references` | title           | creator, year, referenceType, url, threads, tags, related, image, draft |
 | `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |
+| `research`   | title           | subtitle, lede, questions, process, cover, gallery, tags, draft. No `date`, `status`, `threads`, or `related`. Filename must be the canonical thread id. |
 
 Suggested Note `type` values (any string is accepted):
 `person` · `institution` · `place` · `tool` · `software` · `material` · `concept` · `process` · `collaboration` · `other`.
@@ -124,6 +127,33 @@ Empty event headings are not rendered.
 
 Copy the matching file from `content/_templates/` into the collection folder,
 rename it to the kebab-case slug, and fill in the properties.
+
+### Research Threads
+
+Research Threads are a conceptual layer above Studies, Notes, References and
+Events. They are authored as three Markdown files:
+
+```
+content/research/soft-mechanisms.md      → /research/soft-mechanisms/
+content/research/kinetic-studies.md      → /research/kinetic-studies/
+content/research/heartbeat-biosignals.md → /research/heartbeat-biosignals/
+```
+
+The filename **is** the canonical thread id. The same id is used in other
+entries:
+
+```yaml
+threads:
+  - soft-mechanisms
+```
+
+That entry then appears on the Soft Mechanisms page. Do not list Studies,
+Notes, References or Events inside the research Markdown. Title, subtitle,
+lede, questions, process, cover, gallery and tags are edited in the file;
+`src/lib/vocabulary.ts` keeps only the ids and fallback labels.
+
+Copy `content/_templates/research-template.md`. Canonical order on `/research/`
+is Soft Mechanisms, Kinetic Studies, Heartbeat & Biosignals.
 
 ### Note examples (do not publish as-is)
 

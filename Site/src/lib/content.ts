@@ -10,7 +10,9 @@ import {
   COLLECTIONS,
   COLLECTION_LABELS_SINGULAR,
   EVENT_TYPE_LABELS,
+  RESEARCH_THREADS,
   THREAD_LABELS,
+  isResearchThread,
   type CollectionName,
   type ResearchThread,
 } from './vocabulary';
@@ -38,8 +40,43 @@ export async function getPublishedByDate<C extends DatedCollection>(
 
 /* --------------------------------------------------------------------------
    Research threads
-   A thread page is a curated view over existing entries: anything published
-   whose `threads` contains the thread id.
+   A Research Thread is a conceptual layer above the four primary collections.
+   Editorial copy lives in `content/research/<id>.md`. Associated Studies,
+   Notes, References and Events are never listed there: they are derived
+   from each entry's `threads: [<id>]`.
+   -------------------------------------------------------------------------- */
+
+/** Published Research Thread Markdown, in canonical id order. */
+export async function getPublishedResearchThreads(): Promise<CollectionEntry<'research'>[]> {
+  return (await getResearchThreads()).filter((entry) => !entry.data.draft);
+}
+
+/** All Research Thread Markdown files, including drafts, in canonical id order. */
+export async function getResearchThreads(): Promise<CollectionEntry<'research'>[]> {
+  const entries = await getCollection('research');
+  const extra = entries.filter((entry) => !isResearchThread(entry.id));
+  for (const entry of extra) {
+    console.warn(`[content] ignoring research file "${entry.id}.md"; filename must be a canonical thread id`);
+  }
+
+  const byId = new Map(entries.filter((entry) => isResearchThread(entry.id)).map((entry) => [entry.id, entry]));
+  return RESEARCH_THREADS.flatMap((id) => {
+    const entry = byId.get(id);
+    return entry ? [entry] : [];
+  });
+}
+
+export async function getResearchThread(
+  id: ResearchThread,
+): Promise<CollectionEntry<'research'> | undefined> {
+  const entry = await getEntry('research', id);
+  return entry ?? undefined;
+}
+
+/* --------------------------------------------------------------------------
+   Thread aggregation
+   A thread page is a curated view over existing primary entries: anything
+   published whose `threads` contains the thread id.
    -------------------------------------------------------------------------- */
 
 /** Collections whose schema includes `threads`. */
