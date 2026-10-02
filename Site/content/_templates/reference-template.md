@@ -1,13 +1,16 @@
 ---
-title: 
-creator: 
-year: 
-referenceType: 
-url: 
+title:
+creator:
+year:
+referenceType:
+url:
+
 threads: []
 tags: []
 related: []
-image: 
+
+image:
+
 draft: true
 ---
 

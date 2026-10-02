@@ -1,9 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import GenerativeWaves from './GenerativeWaves.astro';
+import RelatedEntries from './RelatedEntries.astro';
 import {
   formatDate,
   formatEventTime,
+  getBacklinks,
   getPublishedByDate,
   isoDate,
   resolveRelated,
@@ -60,6 +62,7 @@ const galleryLayout = galleryItems.length <= 3 ? String(galleryItems.length) : '
 const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
 
 const related = await resolveRelated(data.related, `events/${entry.id}`);
+const backlinks = await getBacklinks('events', entry.id);
 const publishedStudies = await getPublishedByDate('studies');
 const relatedCards = related.map((item) => {
   const study = item.collection === 'studies' ? publishedStudies.find((s) => s.id === item.id) : undefined;
@@ -285,6 +288,8 @@ const relatedCards = related.map((item) => {
         </section>
       )
     }
+
+    <RelatedEntries items={backlinks} heading="Referenced by" headingId="backlinks-heading" />
   </div>
 </article>
 

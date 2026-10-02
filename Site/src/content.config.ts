@@ -76,6 +76,10 @@ export const relatedRef = z
     };
   });
 
+/**
+ * Explicit artist-declared relationship. This is a strong semantic edge.
+ * Shared `tags` are not related-ness and must not be treated as such.
+ */
 const related = withDefault(z.array(relatedRef), []);
 
 /**
@@ -141,7 +145,7 @@ const gallery = z.preprocess((value) => {
    Collections
    -------------------------------------------------------------------------- */
 
-/** A documented research experiment. Body convention: Question / Setup / Observation / Next. */
+/** A documented experiment or prototype created within the research. Not a Note. Body convention: Question / Setup / Observation / Next. */
 const studies = defineCollection({
   loader: markdownIn('studies'),
   schema: z.object({
@@ -158,12 +162,21 @@ const studies = defineCollection({
   }),
 });
 
-/** A looser research thought, observation, sketch or studio reflection. Free-form body. */
+/**
+ * Generic knowledge object. Anything that is not a Study, Reference or Event
+ * may be a Note: person, institution, place, tool, concept, observation, etc.
+ * Long-form explanation belongs in the Markdown body.
+ */
 const notes = defineCollection({
   loader: markdownIn('notes'),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    type: optional(z.string()),
+    lede: optional(z.string()),
+    url: optional(z.url()),
+    cover: optional(mediaRef),
+    gallery,
     threads,
     tags,
     related,
@@ -171,7 +184,7 @@ const notes = defineCollection({
   }),
 });
 
-/** An artist, artwork, paper, book, project, technology, material or other influence. */
+/** An external source that informed the research. Not a Note. Body explains why it matters to Artificial Emotion. */
 const references = defineCollection({
   loader: markdownIn('references'),
   schema: z.object({

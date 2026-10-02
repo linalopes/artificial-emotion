@@ -71,6 +71,25 @@ export const THREAD_LABELS: Record<ResearchThread, string> = Object.fromEntries(
   RESEARCH_THREADS.map((id) => [id, THREADS[id].label]),
 ) as Record<ResearchThread, string>;
 
+/**
+ * Suggested Note `type` values. Notes stay one collection; this is a
+ * lightweight semantic hint, not a separate content type.
+ * The schema accepts any string so new kinds can appear without a code change.
+ */
+export const NOTE_TYPES = [
+  'person',
+  'institution',
+  'place',
+  'tool',
+  'software',
+  'material',
+  'concept',
+  'process',
+  'collaboration',
+  'other',
+] as const;
+export type NoteType = (typeof NOTE_TYPES)[number];
+
 /** Lifecycle of a Study, from first idea to integration in a larger work. */
 export const STUDY_STATUSES = ['seed', 'experiment', 'prototype', 'integrated'] as const;
 export type StudyStatus = (typeof STUDY_STATUSES)[number];

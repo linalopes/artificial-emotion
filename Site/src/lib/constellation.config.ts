@@ -15,7 +15,7 @@ export type NodeType = 'root' | 'research-thread' | 'study' | 'note' | 'referenc
 export type RelationType =
   | 'root-thread' // Artificial Emotion → research thread
   | 'content-thread' // content → thread listed in its `threads`
-  | 'related' // content → content via `related`
+  | 'related' // content → content via explicit `related` only (never from shared tags)
   | 'root-event'; // Artificial Emotion → event with no threads
 
 export const CONSTELLATION_CONFIG = {

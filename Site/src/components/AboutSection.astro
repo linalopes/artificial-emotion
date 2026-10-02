@@ -1,19 +1,23 @@
 ---
+import { entryPath } from '../lib/paths';
+
+const linaHref = entryPath('notes', 'lina-lopes');
+
 const supporters = [
   {
     id: 'ift',
-    href: 'https://ift.devinci.fr/',
+    href: entryPath('notes', 'institute-for-future-technologies'),
+    label: 'Read about Institute for Future Technologies',
     src: 'https://res.cloudinary.com/da1flkgyb/image/upload/v1790922478/Institutefortechnologies.svg',
-    alt: 'Institute for Future Technologies, De Vinci Higher Education',
     name: 'Institute for Future Technologies (IFT)',
     secondary: 'De Vinci Higher Education',
     scale: 'wordmark',
   },
   {
     id: 'sotai',
-    href: 'https://schooloftomorrows.ai',
+    href: entryPath('notes', 'school-of-tomorrows-ai'),
+    label: 'Read about School of Tomorrow’s AI',
     src: 'https://res.cloudinary.com/da1flkgyb/image/upload/v1790922604/sota-mark-bg-transparent.svg',
-    alt: 'School of Tomorrow’s AI',
     name: 'School of Tomorrow’s AI',
   },
 ];
@@ -22,12 +26,14 @@ const supporters = [
 <section class="about" id="about" aria-labelledby="about-heading">
   <div class="about__inner">
     <figure class="about__portrait">
-      <img
-        src="https://res.cloudinary.com/da1flkgyb/image/upload/v1790923133/lina.webp"
-        alt="Lina Lopes"
-      />
+      <a class="about__portrait-link" href={linaHref} aria-label="Read about Lina Lopes">
+        <img
+          src="https://res.cloudinary.com/da1flkgyb/image/upload/v1790923133/lina.webp"
+          alt=""
+        />
+      </a>
       <figcaption class="about__author">
-        <span class="about__author-name">Lina Lopes</span>
+        <a class="about__author-name" href={linaHref}>Lina Lopes</a>
         <span class="about__author-role">Artist, creative technologist, researcher</span>
       </figcaption>
     </figure>
@@ -55,16 +61,11 @@ const supporters = [
         {
           supporters.map((item) => (
             <li class="support__item">
-              <a
-                class="support__link"
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a class="support__link" href={item.href} aria-label={item.label}>
                 <img
                   class:list={['support__logo', item.scale && `support__logo--${item.scale}`]}
                   src={item.src}
-                  alt={item.alt}
+                  alt=""
                 />
                 <span class="support__name" aria-hidden="true">
                   <span class="support__line">{item.name}</span>
@@ -100,10 +101,25 @@ const supporters = [
     min-width: 0;
   }
 
+  .about__portrait-link,
   .about__portrait img {
     display: block;
     width: 100%;
     max-width: 21.25rem;
+  }
+
+  .about__portrait-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .about__portrait-link:focus-visible,
+  .about__author-name:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 4px;
+  }
+
+  .about__portrait img {
     aspect-ratio: 4 / 5;
     object-fit: cover;
     background: color-mix(in srgb, var(--color-gray-green) 42%, var(--color-white));
@@ -115,6 +131,8 @@ const supporters = [
   }
 
   .about__author-name {
+    width: max-content;
+    max-width: 100%;
     font-family: var(--font-title);
     font-weight: var(--weight-title-light);
     font-size: var(--text-sm);
@@ -200,14 +218,6 @@ const supporters = [
     outline-offset: 4px;
   }
 
-  .support__link:hover .support__name,
-  .support__link:focus-visible .support__name {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
-    text-decoration-color: var(--color-link);
-  }
-
   .support__logo {
     display: block;
     flex: 0 0 auto;
@@ -231,6 +241,17 @@ const supporters = [
     letter-spacing: -0.01em;
     line-height: var(--leading-snug);
     color: var(--fg);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--link-underline);
+    text-decoration-skip-ink: auto;
+  }
+
+  .support__link:hover .support__name,
+  .support__link:focus-visible .support__name {
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--color-link);
   }
 
   .support__line {
@@ -264,6 +285,7 @@ const supporters = [
       grid-row: 1;
     }
 
+    .about__portrait-link,
     .about__portrait img {
       max-width: none;
     }

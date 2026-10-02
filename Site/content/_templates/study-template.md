@@ -1,13 +1,16 @@
 ---
-title: 
-date: 
+title:
+date:
 status: seed
+
 threads: []
 tags: []
 materials: []
 related: []
-cover: 
-youtube: 
+
+cover:
+youtube:
+
 draft: true
 ---
 

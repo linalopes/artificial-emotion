@@ -13,6 +13,7 @@
   --color-gray-green: #cad8d8;
   --color-pink: #ea7dff;
   --color-link: #a21caf;
+  --link-underline: rgba(162, 28, 175, 0.45);
   --color-turquoise: #08f2db;
   --color-white: #ffffff;
 }
@@ -184,11 +185,15 @@ a {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
-  text-decoration-color: var(--accent);
+  text-decoration-color: var(--link-underline);
+  text-decoration-skip-ink: auto;
 }
 
-a:hover {
-  color: var(--accent);
+a:hover,
+a:focus-visible {
+  color: inherit;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--color-link);
 }
 
 code, kbd, samp, pre {

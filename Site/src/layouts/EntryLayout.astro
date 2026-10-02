@@ -1,12 +1,12 @@
 ---
 /**
  * Skeleton for a single content entry: type label, title, metadata,
- * Markdown body (slot), related entries.
+ * Markdown body (slot), related (outbound) and backlinks (inbound).
  */
 import BaseLayout from './BaseLayout.astro';
 import MetaList, { type MetaItem } from '../components/MetaList.astro';
 import RelatedEntries from '../components/RelatedEntries.astro';
-import type { RelatedRef } from '../lib/content';
+import { getBacklinks, type RelatedRef } from '../lib/content';
 import { collectionPath } from '../lib/paths';
 import { COLLECTION_LABELS, type CollectionName } from '../lib/vocabulary';
 
@@ -19,6 +19,7 @@ interface Props {
 }
 
 const { collection, id, title, meta, related } = Astro.props;
+const backlinks = await getBacklinks(collection, id);
 ---
 
 <BaseLayout title={title}>
@@ -36,6 +37,7 @@ const { collection, id, title, meta, related } = Astro.props;
       </div>
 
       <RelatedEntries refs={related} from={`${collection}/${id}`} />
+      <RelatedEntries items={backlinks} heading="Referenced by" headingId="backlinks-heading" />
     </article>
   </main>
 </BaseLayout>

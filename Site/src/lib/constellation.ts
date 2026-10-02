@@ -8,9 +8,12 @@
  * Links (nothing is invented beyond the content model):
  *   root-thread     Artificial Emotion → each research thread
  *   content-thread  content → thread, for every id in its `threads`
- *   related         content → content, from `related` (published targets only,
- *                   de-duplicated so A↔B is one link)
+ *   related         content → content, from explicit `related` only
+ *                   (published targets; de-duplicated so A↔B is one link)
  *   root-event      Artificial Emotion → event with no threads
+ *
+ * Shared tags are stored on nodes for later proximity/filter work.
+ * They are never promoted to `related` edges.
  */
 import type { CollectionEntry } from 'astro:content';
 import { getPublished } from './content';
@@ -31,6 +34,10 @@ export interface ConstellationNode {
   href: string;
   /** Research threads this node belongs to (threads list themselves). */
   threadIds?: ResearchThread[];
+  /** Lightweight characteristics. Not explicit related edges. */
+  tags?: string[];
+  /** Note semantic type (person, institution, …). Notes only. */
+  noteType?: string;
 }
 
 export interface ConstellationLink {
@@ -96,12 +103,16 @@ export async function buildConstellation(): Promise<ConstellationGraph> {
   for (const entry of entries) {
     const id = contentNodeId(entry.collection, entry.id);
     const threadIds = 'threads' in entry.data ? entry.data.threads : [];
+    const tags = 'tags' in entry.data ? entry.data.tags : [];
+    const noteType = entry.collection === 'notes' ? entry.data.type?.trim() : undefined;
     nodes.push({
       id,
       label: entry.data.title,
       type: NODE_TYPE_FOR[entry.collection],
       href: entryPath(entry.collection, entry.id),
       ...(threadIds.length > 0 ? { threadIds } : {}),
+      ...(tags.length > 0 ? { tags } : {}),
+      ...(noteType ? { noteType } : {}),
     });
     nodeIds.add(id);
   }

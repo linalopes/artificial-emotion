@@ -1,23 +1,291 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import EntryList from '../../components/EntryList.astro';
-import { getPublishedByDate, toListItem } from '../../lib/content';
-import { COLLECTION_LABELS } from '../../lib/vocabulary';
+import { getPublishedByDate } from '../../lib/content';
+import { entryPath, mediaSrc } from '../../lib/paths';
+import { COLLECTION_LABELS, THREAD_LABELS } from '../../lib/vocabulary';
+
+const CONTAIN_COVER_TYPES = new Set(['institution', 'tool', 'software']);
 
 const title = COLLECTION_LABELS.notes;
-const items = (await getPublishedByDate('notes')).map(toListItem);
+const notes = (await getPublishedByDate('notes')).map((entry) => {
+  const { data } = entry;
+  const type = data.type?.trim().toLowerCase() || undefined;
+  return {
+    href: entryPath('notes', entry.id),
+    title: data.title,
+    cover: data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined,
+    coverFit: type && CONTAIN_COVER_TYPES.has(type) ? 'contain' : 'cover',
+    typeLabel: data.type?.trim().replace(/-/g, ' ') || undefined,
+    lede: data.lede?.trim() || undefined,
+    threads: data.threads.map((thread) => THREAD_LABELS[thread]),
+  };
+});
 ---
 
 <BaseLayout title={title}>
-  <main class="container">
-    <h1>{title}</h1>
-    <EntryList items={items} />
+  <main class="container note-index">
+    <header class="note-index__header">
+      <h1>{title}</h1>
+      <p class="note-index__lede">People, institutions and other objects in the research.</p>
+    </header>
+
+    {
+      notes.length === 0 ? (
+        <p class="label">Nothing published yet.</p>
+      ) : (
+        <ol class="note-index__list">
+          {notes.map((note) => (
+            <li>
+              <a class="note-index__card" href={note.href}>
+                {note.cover ? (
+                  <img
+                    class:list={[
+                      'note-index__media',
+                      note.coverFit === 'contain' && 'note-index__media--contain',
+                    ]}
+                    src={note.cover}
+                    alt=""
+                  />
+                ) : (
+                  <span class="note-index__media note-index__media--ph" aria-hidden="true"></span>
+                )}
+
+                <span class="note-index__body">
+                  {note.typeLabel && <span class="note-index__type">{note.typeLabel}</span>}
+                  <span class="note-index__name">{note.title}</span>
+                  {note.lede && <span class="note-index__summary">{note.lede}</span>}
+                  {note.threads.length > 0 && (
+                    <span class="note-index__threads">{note.threads.join(' · ')}</span>
+                  )}
+                  <span class="note-index__foot">
+                    <span class="note-index__go" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="12" height="12">
+                        <path
+                          d="M7 12h10M13 7l5 5-5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      )
+    }
   </main>
 </BaseLayout>
 
 <style>
-  h1 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-5);
+  .note-index {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .note-index__header {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 36rem;
+  }
+
+  .note-index__header h1 {
+    font-size: clamp(1.85rem, 1.3rem + 1.6vw, 2.5rem);
+    letter-spacing: -0.03em;
+  }
+
+  .note-index__header h1::after {
+    content: '';
+    display: block;
+    width: 2.35rem;
+    height: 1px;
+    margin-top: 0.85rem;
+    background: var(--color-pink);
+  }
+
+  .note-index__lede {
+    max-width: 34ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .note-index__list {
+    display: grid;
+    gap: var(--space-5);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .note-index__list > li {
+    max-width: none;
+  }
+
+  .note-index__card {
+    display: grid;
+    grid-template-columns: minmax(8.5rem, 0.35fr) minmax(0, 0.65fr);
+    min-height: 12.5rem;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    background: color-mix(in srgb, var(--color-white) 86%, transparent);
+    border: 1px solid var(--color-gray-green);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .note-index__card:hover,
+  .note-index__card:focus-visible {
+    color: inherit;
+  }
+
+  .note-index__card:focus-visible {
+    outline: 2px solid var(--color-pink);
+    outline-offset: 3px;
+  }
+
+  .note-index__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 12.5rem;
+    object-fit: cover;
+    align-self: stretch;
+  }
+
+  .note-index__media--contain {
+    object-fit: contain;
+    box-sizing: border-box;
+    padding: 1.15rem 1.25rem;
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 55%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
+  }
+
+  .note-index__media--ph {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 55%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
+  }
+
+  .note-index__body {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.4rem;
+    padding: 1rem 1.05rem 0.9rem;
+    min-width: 0;
+  }
+
+  .note-index__type,
+  .note-index__threads {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .note-index__type {
+    color: var(--color-link);
+  }
+
+  .note-index__threads {
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--fg-muted);
+  }
+
+  .note-index__foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 0.7rem;
+  }
+
+  .note-index__name {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.7rem);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-snug);
+    color: var(--fg);
+  }
+
+  .note-index__name::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.08em;
+    width: 100%;
+    height: 1px;
+    background: var(--color-pink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.32s ease;
+  }
+
+  .note-index__card:hover .note-index__name::after,
+  .note-index__card:focus-visible .note-index__name::after {
+    transform: scaleX(1);
+  }
+
+  .note-index__summary {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .note-index__go {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    color: var(--fg-muted);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    transition:
+      border-color 0.28s ease,
+      color 0.28s ease;
+  }
+
+  .note-index__card:hover .note-index__go,
+  .note-index__card:focus-visible .note-index__go {
+    border-color: var(--color-pink);
+    color: var(--color-pink);
+  }
+
+  @media (max-width: 39.99rem) {
+    .note-index__card {
+      grid-template-columns: 1fr;
+    }
+
+    .note-index__media {
+      min-height: 11rem;
+      aspect-ratio: 16 / 10;
+      height: auto;
+    }
+
+    .note-index__body {
+      padding: 0.95rem 0.95rem 0.85rem;
+    }
   }
 </style>

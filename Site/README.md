@@ -24,16 +24,17 @@ Site/
 ├── tsconfig.json            extends astro/tsconfigs/strict
 ├── content/                 Markdown authored in Obsidian — one file = one entry
 │   ├── _templates/          blank frontmatter templates (NOT loaded by Astro)
-│   ├── studies/             documented research experiments
-│   ├── notes/               looser thoughts, sketches, reflections
-│   ├── references/          artists, works, papers, materials, influences
+│   ├── studies/             documented experiments / prototypes
+│   ├── notes/               generic knowledge objects (people, places, tools, …)
+│   ├── references/          external sources that informed the research
 │   └── events/              public moments in the research
 ├── public/                  copied verbatim to dist/ (favicon, etc.)
 └── src/
     ├── content.config.ts    collection schemas + glob loaders for content/*
     ├── lib/
     │   ├── vocabulary.ts    threads, statuses, collection names + public labels
-    │   ├── content.ts       published-only fetching, sorting, related resolution, formatting
+    │   ├── content.ts       published-only fetching, related + backlinks, formatting
+    │   ├── search.ts        build-time search records (no UI yet)
     │   └── paths.ts         base-aware URL helpers (href, collectionPath, entryPath)
     ├── layouts/
     │   ├── BaseLayout.astro <html>, <head>, fonts, global CSS, site header
@@ -72,31 +73,112 @@ adding them to Obsidian → Settings → Files and links → Excluded files.
 
 ## Content model
 
-Frontmatter is plain YAML, editable in Obsidian's Properties panel. Rules that
-apply everywhere:
+Artificial Emotion is an ongoing artistic research project, a digital artist
+notebook, a public archive, and a digital garden. The content model stays
+simple: four Markdown collections plus research threads. There are no
+separate collections for people, institutions, places, tools, or materials.
 
-- Anything whose file or folder name starts with `_` is ignored by Astro.
-- An entry's `id` is its filename, slugified (`Breathing Textile.md` → `breathing-textile`).
-  Add a `slug:` property to override.
+| Kind | Meaning |
+| ---- | ------- |
+| **Study** | A documented experiment or prototype created inside the research. |
+| **Reference** | An external source that informed the research (artist, artwork, paper, book, project, technology, historical work). |
+| **Note** | The generic knowledge object: person, institution, place, tool, software, material, concept, process, collaboration, observation, or other context. |
+| **Event** | A public moment in the research, with structured date/time/location data. |
+| **Thread** | A major research cluster. Canonical ids: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. Not a Markdown collection. |
+| **Tag** | A lightweight characteristic or theme (`acrylic`, `3d-printing`, `paris`). Not a page. A tag may later become a Note if editorial content accumulates. |
+| **Related** | An explicit relationship declared by the artist. Strong semantic edge. Example: Prototype B was developed from Prototype A. |
+| **Backlink** | The automatic reverse of `related`. If A lists B, B can show A under Referenced by. Never written by hand. |
+
+Shared tags do **not** mean two entries are related.
+
+### Authoring rules
+
+Frontmatter is plain YAML, editable in Obsidian's Properties panel.
+
+- The **filename is the stable slug / URL**. `content/notes/institute-for-future-technologies.md` → `/notes/institute-for-future-technologies/`. The title may change; the URL does not. Name files in kebab-case. Do not derive URLs from titles.
+- Frontmatter is structured data. The Markdown body is narrative.
+- Anything whose file or folder name starts with `_` is ignored by Astro (`content/_templates/` is never loaded).
 - Empty properties (`cover:`) count as "not set". Lists may be omitted entirely.
 - `draft` defaults to `true`; set `draft: false` to publish.
 - `threads` accepts only: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`.
-- `related` links to other entries as `collection/id`,
-  e.g. `notes/when-does-movement-look-hesitant`. Targets don't have to exist yet.
+- `related` uses `collection/id`, e.g. `notes/when-does-movement-look-hesitant`. Targets do not have to exist yet.
+- Media fields accept a local site-root path (`/images/...`) or an HTTPS URL (Cloudinary or other). The site does not download remote files.
 
 | Collection   | Required        | Optional / defaults |
 | ------------ | --------------- | ------------------- |
 | `studies`    | title, date     | status (`seed` · experiment · prototype · integrated), threads, tags, materials, related, cover, youtube, draft |
-| `notes`      | title, date     | threads, tags, related, draft |
+| `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
 | `references` | title           | creator, year, referenceType, url, threads, tags, related, image, draft |
 | `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |
+
+Suggested Note `type` values (any string is accepted):
+`person` · `institution` · `place` · `tool` · `software` · `material` · `concept` · `process` · `collaboration` · `other`.
 
 Body headings are an editorial convention, not validated:
 Studies `## Question / ## Setup / ## Observation / ## Next` ·
 References `## Why it matters / ## Notes` ·
 Events `## About / ## Program / ## Documentation / ## Reflection`.
+Notes have a free-form body.
 
 Empty event headings are not rendered.
+
+Copy the matching file from `content/_templates/` into the collection folder,
+rename it to the kebab-case slug, and fill in the properties.
+
+### Note examples (do not publish as-is)
+
+Person:
+
+```yaml
+title: Clara Example
+date: 2026-10-02
+type: person
+lede:
+url:
+threads: []
+tags: []
+related: []
+draft: true
+```
+
+Body: who this person is in relation to Artificial Emotion.
+
+Institution:
+
+```yaml
+title: Institute for Future Technologies
+date: 2026-10-02
+type: institution
+lede:
+url: https://ift.devinci.fr/
+threads: []
+tags:
+  - paris
+  - residency
+related: []
+draft: true
+```
+
+Body: why this institution matters to the research.
+
+### Note media
+
+Same model as Events. `cover` is one image. `gallery` is optional structured media.
+
+```yaml
+cover: https://res.cloudinary.com/example/image/upload/portrait.webp
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/example/image/upload/studio.webp
+    alt: Studio work in progress
+    caption: First residency week
+  - type: video
+    src: https://res.cloudinary.com/example/video/upload/test.mp4
+    poster: https://res.cloudinary.com/example/image/upload/test-poster.webp
+    caption: Motion test
+```
+
+A bare path is treated as an image. Remote values must be `https://` URLs.
 
 ### Events
 
@@ -208,6 +290,17 @@ need `type` and `src` (`poster` and `caption` optional). Remote values must be
 To create an entry, copy the matching file from `content/_templates/` into the
 collection folder, rename it, and fill in the properties.
 
+## Search (prepared, no UI)
+
+`src/lib/search.ts` can build a record per published entry: title, lede,
+Markdown body as plain text, tags, type, thread labels, and selected
+metadata. It is not wired to a page yet.
+
+The intended later step for this static site is [Pagefind](https://pagefind.app/)
+after `astro build`. That indexes the rendered HTML, including body-only
+words (e.g. a Note that mentions "Coca-Cola" only in Markdown). No backend
+or CMS is required.
+
 ## Design tokens
 
 Everything lives in `src/styles/global.css`. Components consume the *semantic*
@@ -266,7 +359,7 @@ hoisted from the component, so pages that don't render it load no JS.
 | ------------------------------------ | ---- |
 | Section chrome on light pages        | `src/components/ConstellationSection.astro` |
 | Figure, props (`mode`, `labelledBy`) | `src/components/ResearchConstellation.astro` |
-| Which nodes and links exist          | `src/lib/constellation.ts` |
+| Which nodes and links exist          | `src/lib/constellation.ts` — all published studies, notes, references, events, plus threads. Edges come from `threads` and explicit `related`. Tags are stored on nodes but are not edges. |
 | Composition, forces, motion, sizes, labels | `src/lib/constellation.config.ts` |
 | Colours, glow, link strokes, type    | `src/components/ResearchConstellation.astro` (`<style>`) |
 | Simulation, ambient loop, interaction, debug panel | `src/scripts/constellation-client.ts` |

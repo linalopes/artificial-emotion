@@ -51,6 +51,29 @@ export function hasMarkdownContent(markdown: string): boolean {
   return markdown.replace(/<!--[\s\S]*?-->/g, '').trim().length > 0;
 }
 
+/**
+ * First meaningful block (preface + first H2, or the first section)
+ * and everything after. Used to insert a gallery mid-note.
+ */
+export function splitIntroAndRest(markdown: string): {
+  intro: MarkdownSection[];
+  rest: MarkdownSection[];
+} {
+  const sections = splitMarkdownSections(markdown);
+  if (sections.length === 0) return { intro: [], rest: [] };
+  if (sections[0].heading === null && sections.length > 1) {
+    return { intro: sections.slice(0, 2), rest: sections.slice(2) };
+  }
+  return { intro: [sections[0]], rest: sections.slice(1) };
+}
+
+/** Render one split section, restoring its H2 when present. */
+export function markdownSectionToHtml(section: MarkdownSection): string {
+  const heading = section.heading ? `<h2>${inline(section.heading)}</h2>` : '';
+  const body = markdownToSafeHtml(section.body);
+  return `${heading}${body}`;
+}
+
 function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

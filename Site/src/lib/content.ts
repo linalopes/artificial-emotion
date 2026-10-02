@@ -7,6 +7,7 @@
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { entryPath } from './paths';
 import {
+  COLLECTIONS,
   COLLECTION_LABELS_SINGULAR,
   EVENT_TYPE_LABELS,
   THREAD_LABELS,
@@ -90,9 +91,16 @@ export function sortByTitle<T extends { data: { title: string } }>(entries: T[])
 }
 
 /* --------------------------------------------------------------------------
-   Related entries
-   Frontmatter `related: [ "notes/some-id" ]` is transformed by the schema
-   into { collection, id }. Resolve those to real entries here.
+   Related vs tags vs backlinks
+
+   `related`  Explicit relationship declared by the artist. Strong semantic edge.
+              Example: Prototype B was developed from Prototype A.
+
+   `tags`     Shared characteristics or themes (acrylic, 3d-printing, paris).
+              Two entries with the same tag are not explicitly related.
+
+   backlinks  Reverse of `related`, derived at build time. If A lists B in
+              `related`, B can show A under Referenced by. Never written by hand.
    -------------------------------------------------------------------------- */
 
 export interface RelatedRef {
@@ -140,6 +148,55 @@ export async function resolveRelated(
   return results.filter((r): r is ResolvedRelated => r !== null);
 }
 
+export function contentKey(collection: CollectionName, id: string): string {
+  return `${collection}/${id}`;
+}
+
+const toResolved = (entry: CollectionEntry<CollectionName>): ResolvedRelated => ({
+  collection: entry.collection,
+  id: entry.id,
+  title: entry.data.title,
+  typeLabel: COLLECTION_LABELS_SINGULAR[entry.collection],
+  href: entryPath(entry.collection, entry.id),
+});
+
+let backlinkIndex: Promise<Map<string, ResolvedRelated[]>> | undefined;
+
+/**
+ * Build a reverse index of `related` across all published collections.
+ * Cached for the duration of one build so pages do not rescan the vault.
+ */
+export async function getBacklinkIndex(): Promise<Map<string, ResolvedRelated[]>> {
+  backlinkIndex ??= (async () => {
+    const entries = (await Promise.all(COLLECTIONS.map((collection) => getPublished(collection)))).flat();
+    const index = new Map<string, ResolvedRelated[]>();
+
+    for (const entry of entries) {
+      const source = toResolved(entry);
+      for (const ref of entry.data.related) {
+        const key = contentKey(ref.collection, ref.id);
+        if (key === contentKey(entry.collection, entry.id)) continue;
+        const list = index.get(key) ?? [];
+        if (!list.some((item) => item.href === source.href)) list.push(source);
+        index.set(key, list);
+      }
+    }
+
+    return index;
+  })();
+
+  return backlinkIndex;
+}
+
+/** Published entries that explicitly list this entry in `related`. */
+export async function getBacklinks(
+  collection: CollectionName,
+  id: string,
+): Promise<ResolvedRelated[]> {
+  const index = await getBacklinkIndex();
+  return index.get(contentKey(collection, id)) ?? [];
+}
+
 /* --------------------------------------------------------------------------
    List items
    One place that decides which metadata a collection shows in lists, shared by
@@ -173,7 +230,7 @@ export function toListItem(entry: CollectionEntry<CollectionName>): ListItem {
         href,
         title: data.title,
         datetime: isoDate(data.date),
-        meta: [formatDate(data.date), ...threadLabels(data.threads)],
+        meta: [formatDate(data.date), data.type, ...threadLabels(data.threads)],
       };
     }
     case 'references': {

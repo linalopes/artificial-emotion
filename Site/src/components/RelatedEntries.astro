@@ -1,22 +1,35 @@
 ---
-import { resolveRelated, type RelatedRef } from '../lib/content';
+import { resolveRelated, type RelatedRef, type ResolvedRelated } from '../lib/content';
 
 interface Props {
-  refs: readonly RelatedRef[];
+  /** Outbound `related` refs. Resolved here unless `items` is provided. */
+  refs?: readonly RelatedRef[];
+  /** Already-resolved entries (used for derived backlinks). */
+  items?: readonly ResolvedRelated[];
+  /** Visible heading. Related = outbound; Referenced by = inbound. */
+  heading?: string;
+  headingId?: string;
   /** Used only for build-log warnings about missing targets. */
   from?: string;
 }
 
-const { refs, from } = Astro.props;
-const related = refs.length > 0 ? await resolveRelated(refs, from) : [];
+const {
+  refs = [],
+  items,
+  heading = 'Related',
+  headingId = heading.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+  from,
+} = Astro.props;
+
+const list = items ?? (refs.length > 0 ? await resolveRelated(refs, from) : []);
 ---
 
 {
-  related.length > 0 && (
-    <section class="related" aria-labelledby="related-heading">
-      <h2 id="related-heading" class="label">Related</h2>
+  list.length > 0 && (
+    <section class="related" aria-labelledby={headingId}>
+      <h2 id={headingId} class="label">{heading}</h2>
       <ul class="related__list">
-        {related.map((item) => (
+        {list.map((item) => (
           <li>
             <a href={item.href}>{item.title}</a>
             <span class="label related__type">{item.typeLabel}</span>

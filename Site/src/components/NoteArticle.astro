@@ -1,0 +1,548 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GenerativeWaves from './GenerativeWaves.astro';
+import {
+  formatDate,
+  getBacklinks,
+  isoDate,
+  resolveRelated,
+} from '../lib/content';
+import {
+  hasMarkdownContent,
+  markdownSectionToHtml,
+  splitIntroAndRest,
+} from '../lib/markdown';
+import { collectionPath, mediaSrc, threadPath } from '../lib/paths';
+import { COLLECTION_LABELS, THREAD_LABELS } from '../lib/vocabulary';
+
+interface Props {
+  entry: CollectionEntry<'notes'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+
+const noteType = data.type?.trim().toLowerCase() || 'other';
+const noteClass = noteType.replace(/[^a-z0-9-]+/g, '-') || 'other';
+
+const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
+const galleryItems = data.gallery.filter((item) => item.src.trim());
+const galleryCount = galleryItems.length <= 3 ? String(galleryItems.length) : 'many';
+
+const { intro, rest } = splitIntroAndRest(entry.body ?? '');
+const introHtml = intro
+  .map((section) => markdownSectionToHtml(section))
+  .filter((html) => hasMarkdownContent(html.replace(/<[^>]+>/g, ' ')))
+  .join('');
+const restHtml = rest.map((section) => markdownSectionToHtml(section)).join('');
+
+const related = await resolveRelated(data.related, `notes/${entry.id}`);
+const backlinks = await getBacklinks('notes', entry.id);
+
+const threads = data.threads.map((id) => ({
+  id,
+  label: THREAD_LABELS[id],
+  href: threadPath(id),
+}));
+---
+
+<BaseLayout title={data.title} description={data.lede?.trim() || undefined}>
+  <article class:list={['note', `note--${noteClass}`]}>
+    <header class="note-hero">
+      <div class="note-hero__field" aria-hidden="true">
+        <GenerativeWaves mode="fill" label="" />
+      </div>
+      <div class="note-hero__veil" aria-hidden="true"></div>
+
+      <div class="note-hero__stage">
+        <a class="note-hero__kicker" href={collectionPath('notes')}>
+          {COLLECTION_LABELS.notes}
+        </a>
+        <h1 class="note-hero__title">{data.title}</h1>
+        {data.lede?.trim() && <p class="note-hero__lede">{data.lede.trim()}</p>}
+        <time class="visually-hidden" datetime={isoDate(data.date)}>
+          {formatDate(data.date)}
+        </time>
+      </div>
+    </header>
+
+    <div class="note-shell">
+      {
+        (coverSrc || data.type || threads.length > 0 || data.tags.length > 0 || data.url) && (
+          <div class="note-matter">
+            {coverSrc && (
+              <figure class="note-cover">
+                <img src={coverSrc} alt="" />
+              </figure>
+            )}
+
+            <dl class="note-meta">
+              {data.type?.trim() && (
+                <div class="note-meta__row">
+                  <dt>Type</dt>
+                  <dd>{data.type.trim()}</dd>
+                </div>
+              )}
+              {threads.length > 0 && (
+                <div class="note-meta__row">
+                  <dt>Threads</dt>
+                  <dd>
+                    <ul>
+                      {threads.map((thread) => (
+                        <li>
+                          <a href={thread.href}>{thread.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+              {data.tags.length > 0 && (
+                <div class="note-meta__row">
+                  <dt>Tags</dt>
+                  <dd>
+                    <ul>
+                      {data.tags.map((tag) => (
+                        <li>{tag}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+              {data.url && (
+                <div class="note-meta__row">
+                  <dt>Website</dt>
+                  <dd>
+                    <a href={data.url} target="_blank" rel="noopener noreferrer">
+                      External link
+                    </a>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )
+      }
+
+      {introHtml && <div class="note-body prose" set:html={introHtml} />}
+
+      {
+        galleryItems.length > 0 && (
+          <section class="note-gallery" aria-label="Gallery">
+            <ul class:list={['note-gallery__list', `note-gallery__list--${galleryCount}`]}>
+              {galleryItems.map((item) => (
+                <li>
+                  <figure>
+                    {item.type === 'image' ? (
+                      <img src={mediaSrc(item.src)} alt={item.alt} />
+                    ) : (
+                      <video
+                        src={mediaSrc(item.src)}
+                        poster={item.poster ? mediaSrc(item.poster) : undefined}
+                        controls
+                        playsinline
+                        preload="metadata"
+                        aria-label={item.caption || undefined}
+                      ></video>
+                    )}
+                    {item.caption?.trim() && <figcaption>{item.caption.trim()}</figcaption>}
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {restHtml && <div class="note-body prose" set:html={restHtml} />}
+
+      {
+        related.length > 0 && (
+          <nav class="note-links" aria-labelledby="note-related-heading">
+            <h2 id="note-related-heading" class="label">Related</h2>
+            <ul>
+              {related.map((item) => (
+                <li>
+                  <a href={item.href}>
+                    <span class="note-links__title">{item.title}</span>
+                    <span class="note-links__type">{item.typeLabel}</span>
+                    <span class="note-links__go" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="12" height="12">
+                        <path
+                          d="M7 12h10M13 7l5 5-5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+
+      {
+        backlinks.length > 0 && (
+          <nav class="note-links" aria-labelledby="note-backlinks-heading">
+            <h2 id="note-backlinks-heading" class="label">Referenced by</h2>
+            <ul>
+              {backlinks.map((item) => (
+                <li>
+                  <a href={item.href}>
+                    <span class="note-links__title">{item.title}</span>
+                    <span class="note-links__type">{item.typeLabel}</span>
+                    <span class="note-links__go" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="12" height="12">
+                        <path
+                          d="M7 12h10M13 7l5 5-5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .note {
+    overflow-x: hidden;
+  }
+
+  .note-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: var(--space-6) var(--page-gutter) var(--space-5);
+  }
+
+  .note-hero__field,
+  .note-hero__veil {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .note-hero__field {
+    z-index: 0;
+    top: -22%;
+    right: -6%;
+    width: min(62vw, 40rem);
+    height: 140%;
+    opacity: 0.7;
+    mask-image:
+      linear-gradient(to left, #000 18%, transparent 86%),
+      linear-gradient(to bottom, #000 48%, transparent 100%);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      linear-gradient(to left, #000 18%, transparent 86%),
+      linear-gradient(to bottom, #000 48%, transparent 100%);
+    -webkit-mask-composite: source-in;
+  }
+
+  .note-hero__veil {
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(
+        100deg,
+        var(--color-white) 0%,
+        var(--color-white) 28%,
+        color-mix(in srgb, var(--color-white) 82%, transparent) 52%,
+        color-mix(in srgb, var(--color-white) 18%, transparent) 100%
+      ),
+      linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(in srgb, var(--color-white) 22%, transparent) 74%,
+        var(--color-white) 100%
+      );
+  }
+
+  .note-hero__stage {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--space-4);
+    max-width: 38rem;
+  }
+
+  .note-hero__kicker {
+    width: max-content;
+    text-decoration: none;
+  }
+
+  .note-hero__title {
+    font-size: clamp(2rem, 1.35rem + 2.8vw, 3.6rem);
+    font-weight: var(--weight-title-light);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .note-hero__lede {
+    max-width: 42ch;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.15rem, 1rem + 0.55vw, 1.45rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+
+  .note-shell {
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0 var(--page-gutter) var(--space-7);
+  }
+
+  .note-matter {
+    display: grid;
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  .note-cover {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .note-cover img {
+    display: block;
+    width: 100%;
+    max-width: 22rem;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .note--institution .note-cover,
+  .note--tool .note-cover,
+  .note--software .note-cover {
+    padding-block: var(--space-4);
+  }
+
+  .note--institution .note-cover img,
+  .note--tool .note-cover img,
+  .note--software .note-cover img {
+    width: auto;
+    max-width: min(100%, 22rem);
+    max-height: 13.5rem;
+    object-fit: contain;
+  }
+
+  .note--person .note-cover img {
+    max-width: 21.25rem;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  .note--place .note-cover img {
+    max-width: 36rem;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .note-meta {
+    display: grid;
+    gap: var(--space-3);
+    min-width: 0;
+    max-width: 28rem;
+  }
+
+  .note-meta__row {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .note-meta dt {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .note-meta dd,
+  .note-meta li {
+    max-width: none;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .note-meta ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.7rem;
+  }
+
+  .note-meta a {
+    color: inherit;
+  }
+
+  .note-body {
+    max-width: var(--measure);
+    min-width: 0;
+  }
+
+  .note-body :global(h2) {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-title-medium);
+    letter-spacing: -0.02em;
+  }
+
+  .note-gallery {
+    min-width: 0;
+  }
+
+  .note-gallery__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .note-gallery figure {
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .note-gallery img,
+  .note-gallery video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 38rem;
+    object-fit: contain;
+    background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
+  }
+
+  .note-gallery figcaption {
+    max-width: none;
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .note-links {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 36rem;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  .note-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .note-links li {
+    max-width: none;
+  }
+
+  .note-links a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    gap: 0.55rem 0.85rem;
+    padding-block: 0.55rem;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .note-links a:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 3px;
+  }
+
+  .note-links__title {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: var(--text-base);
+    letter-spacing: -0.02em;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--link-underline);
+    text-decoration-skip-ink: auto;
+  }
+
+  .note-links a:hover .note-links__title,
+  .note-links a:focus-visible .note-links__title {
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--color-link);
+  }
+
+  .note-links__type {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .note-links__go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    color: var(--fg-muted);
+  }
+
+  .note-links a:hover .note-links__go,
+  .note-links a:focus-visible .note-links__go {
+    color: var(--color-pink);
+  }
+
+  @media (min-width: 48rem) {
+    .note-hero {
+      padding-block: var(--space-7) var(--space-6);
+    }
+
+    .note-matter {
+      grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr);
+      column-gap: var(--space-6);
+      align-items: center;
+    }
+
+    .note-matter:not(:has(.note-cover)) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .note-gallery__list--2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .note-gallery__list--3,
+    .note-gallery__list--many {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      align-items: start;
+    }
+  }
+</style>
