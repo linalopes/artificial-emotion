@@ -1,0 +1,96 @@
+---
+const src = 'https://res.cloudinary.com/da1flkgyb/image/upload/v1790934080/first-sketch.webp';
+const alt =
+  'Concept sketch of the Artificial Emotion installation with suspended soft bodies and hanging kinetic elements';
+---
+
+<section class="install" aria-labelledby="install-title">
+  <header class="install__intro">
+    <h2 class="install__title" id="install-title">A Heart That Has No Body</h2>
+    <p class="install__subtitle">
+      A suspended kinetic installation built from movement, fabric, tension, soft structures and
+      physiological signals.
+    </p>
+  </header>
+
+  <figure class="install__figure">
+    <img src={src} alt={alt} width="1448" height="1086" decoding="async" />
+  </figure>
+
+  <div class="install__body">
+    <p>
+      Artificial Emotion investigates how simple mechanical actions — pulling, twisting, releasing,
+      pausing and repeating — can begin to suggest intention or emotional behaviour. The work is
+      being developed through three connected research threads: Soft Mechanics, Kinetic Studies and
+      Heartbeat & Biosignals.
+    </p>
+  </div>
+</section>
+
+<style>
+  .install {
+    display: grid;
+    gap: var(--space-5);
+    width: 100%;
+    padding-block: var(--space-5);
+    background: var(--color-white);
+  }
+
+  .install__intro,
+  .install__body {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .install__title {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(2.1rem, 1.25rem + 2.8vw, 3.6rem);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .install__subtitle {
+    max-width: 38ch;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg-muted);
+  }
+
+  .install__figure {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 90rem;
+    margin: 0 auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .install__figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1448 / 1086;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .install__body p {
+    max-width: 52ch;
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+  }
+
+  @media (min-width: 40rem) {
+    .install {
+      gap: var(--space-6);
+      padding-block: var(--space-6);
+    }
+  }
+</style>

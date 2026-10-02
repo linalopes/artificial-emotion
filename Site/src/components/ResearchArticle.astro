@@ -26,6 +26,7 @@ import {
 interface Props {
   thread: ResearchThread;
   entry: CollectionEntry<'research'>;
+  gallery?: CollectionEntry<'research'>['data']['gallery'];
 }
 
 interface ThreadCard {
@@ -39,7 +40,7 @@ interface ThreadCard {
 
 const CONTAIN_COVER_TYPES = new Set(['institution', 'tool', 'software']);
 
-const { thread, entry } = Astro.props;
+const { thread, entry, gallery } = Astro.props;
 const data = entry.data;
 
 const title = data.title.trim();
@@ -49,7 +50,7 @@ const questions = data.questions.map((item) => item.trim()).filter(Boolean);
 const process = data.process.map((item) => item.trim()).filter(Boolean);
 const tags = data.tags.map((item) => item.trim()).filter(Boolean);
 const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
-const galleryItems = data.gallery.filter((item) => item.src.trim());
+const galleryItems = (gallery ?? data.gallery).filter((item) => item.src.trim());
 const galleryCount = galleryItems.length <= 3 ? String(galleryItems.length) : 'many';
 
 const body = entry.body ?? '';
@@ -137,12 +138,8 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
 ---
 
 <BaseLayout title={title} description={lede}>
-  <article class="research">
+  <article class="research" data-thread={thread}>
     <header class="research-hero">
-      <div class="research-hero__field" aria-hidden="true">
-        <GenerativeWaves mode="fill" label="" />
-      </div>
-      <div class="research-hero__veil" aria-hidden="true"></div>
       <div class="research-hero__stage">
         <a class="research-hero__kicker label" href={researchPath()}>Research thread</a>
         <h1 class="research-hero__title">{title}</h1>
@@ -176,7 +173,11 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
       )
     }
 
-    <div class="research-shell">
+    <div class="research-atmosphere">
+      <div class="research-body-field" aria-hidden="true">
+        <GenerativeWaves mode="fill" atmosphere label="" />
+      </div>
+      <div class="research-shell">
       {
         process.length > 0 && (
           <section class="research-process" aria-labelledby="research-process-heading">
@@ -273,53 +274,56 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
         total === 0 ? (
           <p class="label">Nothing published in this thread yet.</p>
         ) : (
-          groups.map((group) => (
-            <section class="research-index-group" aria-labelledby={`research-group-${group.collection}`}>
-              <h2 id={`research-group-${group.collection}`} class="label">
-                {group.label}
-              </h2>
-              <ol class="research-index-group__list">
-                {group.items.map((item) => (
-                  <li>
-                    <a class="thread-card" href={item.href}>
-                      {item.cover ? (
-                        <img
-                          class:list={[
-                            'thread-card__media',
-                            item.coverFit === 'contain' && 'thread-card__media--contain',
-                          ]}
-                          src={item.cover}
-                          alt=""
-                        />
-                      ) : (
-                        <span class="thread-card__media thread-card__media--ph" aria-hidden="true"></span>
-                      )}
-                      <span class="thread-card__body">
-                        {item.kicker && <span class="thread-card__kicker">{item.kicker}</span>}
-                        <span class="thread-card__name">{item.title}</span>
-                        {item.summary && <span class="thread-card__summary">{item.summary}</span>}
-                        <span class="thread-card__foot">
-                          <span class="thread-card__go" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="12" height="12">
-                              <path
-                                d="M7 12h10M13 7l5 5-5 5"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                            </svg>
+          <div class="research-related">
+            {groups.map((group) => (
+              <section class="research-index-group" aria-labelledby={`research-group-${group.collection}`}>
+                <h2 id={`research-group-${group.collection}`} class="label">
+                  {group.label}
+                </h2>
+                <ol class="research-index-group__list">
+                  {group.items.map((item) => (
+                    <li>
+                      <a class="thread-card" href={item.href}>
+                        {item.cover ? (
+                          <img
+                            class:list={[
+                              'thread-card__media',
+                              item.coverFit === 'contain' && 'thread-card__media--contain',
+                            ]}
+                            src={item.cover}
+                            alt=""
+                          />
+                        ) : (
+                          <span class="thread-card__media thread-card__media--ph" aria-hidden="true"></span>
+                        )}
+                        <span class="thread-card__body">
+                          {item.kicker && <span class="thread-card__kicker">{item.kicker}</span>}
+                          <span class="thread-card__name">{item.title}</span>
+                          {item.summary && <span class="thread-card__summary">{item.summary}</span>}
+                          <span class="thread-card__foot">
+                            <span class="thread-card__go" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" width="12" height="12">
+                                <path
+                                  d="M7 12h10M13 7l5 5-5 5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                              </svg>
+                            </span>
                           </span>
                         </span>
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ))
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ))}
+          </div>
         )
       }
+      </div>
     </div>
   </article>
 </BaseLayout>
@@ -327,59 +331,16 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
 <style>
   .research {
     display: grid;
+    isolation: isolate;
   }
 
   .research-hero {
     position: relative;
-    overflow: hidden;
+    z-index: 2;
     padding: var(--space-6) var(--page-gutter) var(--space-5);
   }
 
-  .research-hero__field,
-  .research-hero__veil {
-    position: absolute;
-    pointer-events: none;
-  }
-
-  .research-hero__field {
-    z-index: 0;
-    top: -18%;
-    right: -8%;
-    width: min(52vw, 34rem);
-    height: 128%;
-    opacity: 0.42;
-    mask-image:
-      linear-gradient(to left, #000 12%, transparent 88%),
-      linear-gradient(to bottom, #000 42%, transparent 100%);
-    mask-composite: intersect;
-    -webkit-mask-image:
-      linear-gradient(to left, #000 12%, transparent 88%),
-      linear-gradient(to bottom, #000 42%, transparent 100%);
-    -webkit-mask-composite: source-in;
-  }
-
-  .research-hero__veil {
-    inset: 0;
-    z-index: 1;
-    background:
-      linear-gradient(
-        102deg,
-        var(--color-white) 0%,
-        var(--color-white) 36%,
-        color-mix(in srgb, var(--color-white) 88%, transparent) 58%,
-        color-mix(in srgb, var(--color-white) 22%, transparent) 100%
-      ),
-      linear-gradient(
-        180deg,
-        transparent 0%,
-        color-mix(in srgb, var(--color-white) 28%, transparent) 78%,
-        var(--color-white) 100%
-      );
-  }
-
   .research-hero__stage {
-    position: relative;
-    z-index: 2;
     display: grid;
     gap: var(--space-3);
     max-width: 44rem;
@@ -419,6 +380,8 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
   }
 
   .research-qs {
+    position: relative;
+    z-index: 2;
     background: var(--bg);
     color: var(--fg);
     padding: var(--space-6) var(--page-gutter);
@@ -473,7 +436,38 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
     color: var(--color-white);
   }
 
+  .research-atmosphere {
+    position: relative;
+  }
+
+  .research-body-field {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.15;
+    mask-image:
+      linear-gradient(to bottom, transparent 0%, #000 8%, #000 58%, transparent 86%),
+      radial-gradient(ellipse 92% 78% at 58% 38%, rgb(0 0 0 / 0.42) 0%, #000 78%);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0%, #000 8%, #000 58%, transparent 86%),
+      radial-gradient(ellipse 92% 78% at 58% 38%, rgb(0 0 0 / 0.42) 0%, #000 78%);
+    -webkit-mask-composite: source-in;
+  }
+
+  .research-body-field :global(.waves.waves--fill) {
+    position: sticky;
+    inset: auto;
+    top: 0;
+    width: 100%;
+    height: 100dvh;
+    background: transparent;
+  }
+
   .research-shell {
+    position: relative;
+    z-index: 1;
     display: grid;
     gap: var(--space-6);
     max-width: var(--page-max);
@@ -601,7 +595,16 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
   }
 
   .research-gallery {
+    position: relative;
     min-width: 0;
+    padding-block: var(--space-4);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-white) 20%, transparent) 0%,
+      var(--color-white) 16%,
+      var(--color-white) 84%,
+      color-mix(in srgb, var(--color-white) 20%, transparent) 100%
+    );
   }
 
   .research-gallery__list {
@@ -635,12 +638,39 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
     color: var(--fg-muted);
   }
 
+  .research-related {
+    display: grid;
+    gap: var(--space-6);
+    position: relative;
+    isolation: isolate;
+    padding-top: var(--space-5);
+  }
+
+  .research-related::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: linear-gradient(180deg, transparent 0%, var(--color-white) 4.5rem, var(--color-white) 100%);
+  }
+
+  .research-related > :global(*) {
+    position: relative;
+    z-index: 1;
+  }
+
   .research-index-group {
     display: grid;
     gap: var(--space-4);
     min-width: 0;
     padding-top: var(--space-4);
     border-top: 1px solid var(--rule);
+    background: var(--color-white);
   }
 
   .research-index-group__list {
@@ -839,6 +869,16 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
       min-height: 10rem;
       aspect-ratio: 16 / 10;
       height: auto;
+    }
+
+    .research-body-field {
+      opacity: 0.09;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .research-body-field {
+      opacity: 0.11;
     }
   }
 </style>

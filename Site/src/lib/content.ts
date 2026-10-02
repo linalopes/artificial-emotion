@@ -5,6 +5,7 @@
  * in one place.
  */
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import { getCloudinaryFolderMedia, mergeGallerySources, normalizeGalleryFolder } from './cloudinary';
 import { entryPath } from './paths';
 import {
   COLLECTIONS,
@@ -100,6 +101,21 @@ export async function getResearchThread(id: ResearchThread): Promise<CollectionE
   const entry = (await loadResearchEntryMap()).get(id);
   if (!entry) throw missingResearchEntryError(id);
   return entry;
+}
+
+/**
+ * Research Thread gallery for rendering: Cloudinary folder assets (if set)
+ * plus manually declared `gallery` items. Folder listing is build-time only.
+ */
+export async function resolveResearchGallery(
+  entry: CollectionEntry<'research'>,
+): Promise<CollectionEntry<'research'>['data']['gallery']> {
+  const folder = entry.data.galleryFolder
+    ? normalizeGalleryFolder(entry.data.galleryFolder)
+    : undefined;
+  const manual = entry.data.gallery.filter((item) => item.src.trim());
+  if (!folder) return manual;
+  return mergeGallerySources(await getCloudinaryFolderMedia(folder), manual);
 }
 
 /* --------------------------------------------------------------------------

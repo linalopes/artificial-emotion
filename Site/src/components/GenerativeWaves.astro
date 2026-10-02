@@ -20,12 +20,18 @@ interface Props {
    * development + `?debug`.
    */
   allowDebug?: boolean;
+  /**
+   * Research Thread body field only. Transparent canvas, slower pointer,
+   * lower intensity. Homepage must never pass this.
+   */
+  atmosphere?: boolean;
 }
 
 const {
   label = "Tomorrow's Waves: generative ribbons crossing the field",
   mode = 'block',
   allowDebug = false,
+  atmosphere = false,
 } = Astro.props;
 ---
 
@@ -33,6 +39,7 @@ const {
   class:list={['waves', `waves--${mode}`]}
   data-waves
   data-waves-debug={allowDebug ? '' : undefined}
+  data-waves-atmosphere={atmosphere ? '' : undefined}
   role="img"
   aria-label={label}
 >

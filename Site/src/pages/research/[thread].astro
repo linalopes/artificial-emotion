@@ -1,6 +1,6 @@
 ---
 import ResearchArticle from '../../components/ResearchArticle.astro';
-import { getResearchThread } from '../../lib/content';
+import { getResearchThread, resolveResearchGallery } from '../../lib/content';
 import { RESEARCH_THREADS, type ResearchThread } from '../../lib/vocabulary';
 
 export function getStaticPaths() {
@@ -13,6 +13,7 @@ interface Props {
 
 const { thread } = Astro.props;
 const entry = await getResearchThread(thread);
+const gallery = await resolveResearchGallery(entry);
 ---
 
-<ResearchArticle thread={thread} entry={entry} />
+<ResearchArticle thread={thread} entry={entry} gallery={gallery} />

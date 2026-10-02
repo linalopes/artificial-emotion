@@ -1,6 +1,6 @@
 ---
-import { collectionPath, href, researchPath } from '../lib/paths';
-import { COLLECTIONS, COLLECTION_LABELS } from '../lib/vocabulary';
+import { isNavCurrent, SITE_NAV } from '../lib/nav';
+import { href } from '../lib/paths';
 
 interface Props {
   /**
@@ -12,19 +12,7 @@ interface Props {
 
 const { variant = 'default' } = Astro.props;
 const publication = variant === 'publication';
-
-const navItems = [
-  { label: 'Research', path: researchPath() },
-  ...COLLECTIONS.map((c) => ({ label: COLLECTION_LABELS[c], path: collectionPath(c) })),
-  { label: 'About', path: href('/#about') },
-  ...(publication ? [{ label: 'Constellation', path: href('/#constellation') }] : []),
-];
-
 const current = Astro.url.pathname;
-const isCurrent = (path: string) => {
-  if (path.includes('#')) return false;
-  return current === path || current.startsWith(path);
-};
 ---
 
 <header class:list={['site-header', publication && 'site-header--publication']}>
@@ -40,8 +28,8 @@ const isCurrent = (path: string) => {
     </button>
     <nav class="site-header__nav" id="site-nav" aria-label="Main">
       {
-        navItems.map(({ label, path }) => (
-          <a href={path} aria-current={isCurrent(path) ? 'page' : undefined}>
+        SITE_NAV.map(({ label, path }) => (
+          <a href={path} aria-current={isNavCurrent(current, path) ? 'page' : undefined}>
             {label}
           </a>
         ))

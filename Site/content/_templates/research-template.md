@@ -10,6 +10,7 @@ questions: []
 process: []
 
 cover:
+galleryFolder:
 gallery: []
 
 tags: []

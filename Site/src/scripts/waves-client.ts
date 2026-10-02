@@ -62,6 +62,15 @@ export function mountWaves(container: HTMLElement): void {
   const params: WavesParams = structuredClone(WAVES_CONFIG.params);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const allowDebug = container.hasAttribute('data-waves-debug');
+  const atmosphere = container.hasAttribute('data-waves-atmosphere');
+  const compactField = atmosphere && window.matchMedia('(max-width: 47.99rem)').matches;
+
+  if (atmosphere) {
+    params.speed = compactField ? 0.4 : 0.55;
+    params.amp = compactField ? 1.05 : 1.2;
+    params.width = compactField ? 1.35 : 1.5;
+    if (compactField) params.lines = 40;
+  }
 
   let seed = WAVES_CONFIG.seed;
   let ribbons: Ribbon[] = [];
@@ -193,8 +202,10 @@ export function mountWaves(container: HTMLElement): void {
             ((p.noise(u * r.f1 + r.off, tt * 0.14) - 0.5) * 2.4 +
               0.45 * Math.sin(u * p.TWO_PI * r.f2 + tt * 0.55 + r.ph));
         if (mInf > 0.001) {
-          const dx = (x - mx) / (W * 0.16);
-          c += (my - c) * 0.3 * mInf * Math.exp(-dx * dx);
+          const spread = atmosphere ? W * 0.24 : W * 0.16;
+          const pull = atmosphere ? 0.14 : 0.3;
+          const dx = (x - mx) / spread;
+          c += (my - c) * pull * mInf * Math.exp(-dx * dx);
         }
         const w =
           H * params.width * widthScale * (r.wBase + r.wRange * p.noise(u * 1.4 + r.off + 50, tt * 0.11));
@@ -286,7 +297,9 @@ export function mountWaves(container: HTMLElement): void {
     };
 
     p.setup = () => {
-      p.pixelDensity(Math.min(WAVES_CONFIG.maxPixelDensity, p.displayDensity()));
+      p.pixelDensity(
+        Math.min(compactField ? 1 : WAVES_CONFIG.maxPixelDensity, p.displayDensity()),
+      );
       p.createCanvas(container.clientWidth || 800, container.clientHeight || 500);
       widthScale = widthScaleFor(p.width, p.height);
       mx = pointerX = p.width / 2;
@@ -301,15 +314,16 @@ export function mountWaves(container: HTMLElement): void {
     p.draw = () => {
       if (!paused && !reducedMotion) t += p.deltaTime * 0.001 * params.speed;
 
-      const moving = !reducedMotion && p.millis() - lastMove < 2500;
+      const moving = !reducedMotion && p.millis() - lastMove < (atmosphere ? 3200 : 2500);
       const target = params.mouse && moving ? 1 : 0;
-      mInf += (target - mInf) * 0.04;
-      mx += (pointerX - mx) * 0.08;
-      my += (pointerY - my) * 0.08;
+      mInf += (target - mInf) * (atmosphere ? 0.016 : 0.04);
+      mx += (pointerX - mx) * (atmosphere ? 0.03 : 0.08);
+      my += (pointerY - my) * (atmosphere ? 0.03 : 0.08);
 
-      if (params.dark) p.background(C.purple[0], C.purple[1], C.purple[2]);
-      else p.background(255);
       const ctx = p.drawingContext as CanvasRenderingContext2D;
+      if (atmosphere) ctx.clearRect(0, 0, p.width, p.height);
+      else if (params.dark) p.background(C.purple[0], C.purple[1], C.purple[2]);
+      else p.background(255);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 

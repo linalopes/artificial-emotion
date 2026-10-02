@@ -2,24 +2,19 @@
 title: Kinetic Studies
 subtitle: From simple mechanisms to expressive movement
 date: 2026-10-02
-
 lede: An artistic research thread investigating how simple mechanical systems can produce movement that is perceived as gesture, rhythm, behaviour and presence.
-
 questions:
   - How can simple mechanical mechanisms produce movement that feels expressive rather than merely functional?
   - At what point does repetition, delay, acceleration or hesitation begin to read as behaviour?
   - How can small autonomous kinetic modules combine into larger collective or sculptural systems?
-
 process:
   - Mechanism
   - Motion
   - Rhythm
   - Behaviour
   - Perception
-
-cover:
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1790935058/IMG_6102.webp
 gallery: []
-
 tags:
   - kinetic-art
   - movement
@@ -35,7 +30,6 @@ tags:
   - prototyping
   - physical-computing
   - artificial-emotion
-
 draft: false
 ---
 

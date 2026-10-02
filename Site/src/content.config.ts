@@ -266,6 +266,8 @@ const research = defineCollection({
     process: processSchema,
     cover: optional(mediaRef),
     gallery,
+    /** Cloudinary asset folder listed at build time. Research Threads only. */
+    galleryFolder: optional(z.string()),
     tags,
     draft,
   }),

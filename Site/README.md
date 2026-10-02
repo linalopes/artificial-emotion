@@ -16,6 +16,10 @@ npm run check      # type-check .astro / .ts files
 
 Requires Node ≥ 22.12.
 
+Cloudinary folder galleries (Research Threads) need credentials in `Site/.env`
+(see `.env.example`). Restart `npm run dev` after changing `.env`. Those
+variables are server/build-time only; they are not exposed to the browser.
+
 ## Folder map
 
 ```
@@ -35,6 +39,7 @@ Site/
     ├── lib/
     │   ├── vocabulary.ts    canonical thread ids, statuses, primary collection labels
     │   ├── content.ts       published-only fetching, related + backlinks, formatting
+    │   ├── cloudinary.ts    build-time Cloudinary folder listing for Research Thread galleries
     │   ├── search.ts        build-time search records (no UI yet)
     │   └── paths.ts         base-aware URL helpers (href, collectionPath, entryPath)
     ├── layouts/
@@ -113,7 +118,7 @@ Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 | `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
 | `references` | title, date     | creator, year, referenceType, url, threads, tags, related, image, draft. `year` is the chronology of the referenced work, not the notebook date. |
 | `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |
-| `research`   | title, date     | subtitle, lede, questions, process, cover, gallery, tags, draft. No `status`, `threads`, or `related`. Filename must be the canonical thread id. |
+| `research`   | title, date     | subtitle, lede, questions, process, cover, gallery, galleryFolder, tags, draft. No `status`, `threads`, or `related`. Filename must be the canonical thread id. |
 
 Suggested Note `type` values (any string is accepted):
 `person` · `institution` · `place` · `tool` · `software` · `material` · `concept` · `process` · `collaboration` · `other`.
@@ -150,8 +155,9 @@ threads:
 
 That entry then appears on the Soft Mechanisms page. Do not list Studies,
 Notes, References or Events inside the research Markdown. Title, subtitle,
-date, lede, questions, process, cover, gallery and tags are edited in the file;
-`src/lib/vocabulary.ts` keeps only the ids and fallback labels.
+date, lede, questions, process, cover, gallery, galleryFolder and tags are
+edited in the file; `src/lib/vocabulary.ts` keeps only the ids and fallback
+labels.
 
 `date` is when the Research Thread entry was authored in the notebook. It is
 not the research start date, completion date, or an event date. The body may
@@ -163,6 +169,60 @@ the system and is not shown beside the title.
 
 Copy `content/_templates/research-template.md`. Canonical order on `/research/`
 is Soft Mechanisms, Kinetic Studies, Heartbeat & Biosignals.
+
+### Research Thread media
+
+Research Threads can build a gallery in three ways. The existing gallery
+layout is unchanged.
+
+**A. Manual gallery** — curated items in Markdown, same shape as Events/Notes:
+
+```yaml
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/example/image/upload/example.webp
+    alt: Prototype on the workbench
+    caption: First movement test
+  - type: video
+    src: https://res.cloudinary.com/example/video/upload/test.mp4
+    poster: https://res.cloudinary.com/example/image/upload/test-poster.webp
+    caption: Motion test
+```
+
+**B. Cloudinary folder** — list every supported image and video in a folder
+at build time:
+
+```yaml
+galleryFolder: artificial-emotion/kinetic
+gallery: []
+```
+
+**C. Both** — folder assets load first (oldest upload first), then any
+manual items that are not already in the folder. If the same asset is
+declared in both, it is shown once; manual `alt`, `caption`, and `poster`
+win when provided.
+
+`galleryFolder` is Research Threads only. Notes, Studies, References and
+Events keep a manual `gallery` (or no gallery).
+
+Folder listing uses the Cloudinary Admin API during `astro build` / `astro
+dev`. The page receives public delivery URLs only. Required environment
+variables (placeholders in `Site/.env.example`):
+
+```
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+Copy `.env.example` to `.env` locally. Restart the dev server after changing
+`.env`. GitHub Pages deploy needs the same names as repository secrets.
+
+Because the site is statically built, uploading a new file to Cloudinary does
+**not** appear on the live site until the site is rebuilt and deployed.
+
+If `galleryFolder` is set and credentials are missing, the build fails with a
+clear error instead of rendering an empty gallery.
 
 ### Date
 

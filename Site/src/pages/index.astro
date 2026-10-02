@@ -4,37 +4,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ConstellationSection from '../components/ConstellationSection.astro';
 import CurrentPublic from '../components/CurrentPublic.astro';
 import GenerativeWaves from '../components/GenerativeWaves.astro';
+import InstallationIntro from '../components/InstallationIntro.astro';
 import LatestStudies from '../components/LatestStudies.astro';
-import { threadPath } from '../lib/paths';
-import type { ResearchThread } from '../lib/vocabulary';
+import { getPublishedResearchThreads } from '../lib/content';
+import { mediaSrc, threadPath } from '../lib/paths';
+import { isResearchThread, researchLogicalId } from '../lib/vocabulary';
 
 const indexLines = ['Bodies', 'Machines', 'Materials', 'Emotions', 'in circulation'];
 
-const threads: {
-  id: ResearchThread;
-  n: string;
-  title: string;
-  lede: string;
-}[] = [
-  {
-    id: 'soft-mechanisms',
-    n: '01',
-    title: 'Soft Mechanisms',
-    lede: 'Compliant materials, adaptive structures, soft robotics.',
-  },
-  {
-    id: 'kinetic-studies',
-    n: '02',
-    title: 'Kinetic Studies',
-    lede: 'Movement, weight, balance and temporal behavior.',
-  },
-  {
-    id: 'heartbeat-biosignals',
-    n: '03',
-    title: 'Heartbeat & Biosignals',
-    lede: 'Sensing, rhythms, physiological data and affect.',
-  },
-];
+const threads = (await getPublishedResearchThreads()).flatMap((entry, index) => {
+  const id = researchLogicalId(entry.id);
+  if (!isResearchThread(id)) return [];
+  const { data } = entry;
+  const cover = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
+  return [
+    {
+      id,
+      href: threadPath(id),
+      n: String(index + 1).padStart(2, '0'),
+      title: data.title.trim(),
+      lede: data.subtitle?.trim() || data.lede?.trim() || undefined,
+      cover,
+    },
+  ];
+});
 ---
 
 <BaseLayout header="publication">
@@ -81,12 +74,16 @@ const threads: {
           {
             threads.map((thread) => (
               <li>
-                <a class="thread-card" href={threadPath(thread.id)}>
-                  <span class="thread-card__media" aria-hidden="true"></span>
+                <a class="thread-card" href={thread.href}>
+                  {thread.cover ? (
+                    <img class="thread-card__media" src={thread.cover} alt="" />
+                  ) : (
+                    <span class="thread-card__media" aria-hidden="true"></span>
+                  )}
                   <span class="thread-card__body">
                     <span class="thread-card__num">{thread.n}</span>
                     <span class="thread-card__title">{thread.title}</span>
-                    <span class="thread-card__lede">{thread.lede}</span>
+                    {thread.lede && <span class="thread-card__lede">{thread.lede}</span>}
                     <span class="thread-card__go" aria-hidden="true">
                       <svg viewBox="0 0 24 24" width="12" height="12">
                         <path
@@ -106,6 +103,8 @@ const threads: {
         </ul>
       </div>
     </section>
+
+    <InstallationIntro />
 
     <CurrentPublic />
     <LatestStudies />
@@ -306,8 +305,10 @@ const threads: {
 
   .thread-card__media {
     display: block;
+    width: 100%;
     min-height: 8.5rem;
     aspect-ratio: 16 / 10;
+    object-fit: cover;
     background:
       linear-gradient(
         165deg,
@@ -448,9 +449,11 @@ const threads: {
 
     .thread-card__media {
       aspect-ratio: auto;
+      width: 100%;
       height: 100%;
       min-height: 9.75rem;
       align-self: stretch;
+      object-fit: cover;
     }
 
     .thread-card__body {

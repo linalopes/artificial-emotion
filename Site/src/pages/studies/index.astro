@@ -1,23 +1,256 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import EntryList from '../../components/EntryList.astro';
-import { getPublishedByDate, toListItem } from '../../lib/content';
-import { COLLECTION_LABELS } from '../../lib/vocabulary';
+import { formatDateShort, getPublishedByDate, isoDate } from '../../lib/content';
+import { entryPath, mediaSrc } from '../../lib/paths';
+import { COLLECTION_LABELS, THREAD_LABELS } from '../../lib/vocabulary';
 
 const title = COLLECTION_LABELS.studies;
-const items = (await getPublishedByDate('studies')).map(toListItem);
+const studies = (await getPublishedByDate('studies')).map((entry) => {
+  const { data } = entry;
+  return {
+    href: entryPath('studies', entry.id),
+    title: data.title,
+    cover: data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined,
+    status: data.status,
+    datetime: isoDate(data.date),
+    date: formatDateShort(data.date),
+    threads: data.threads.map((thread) => THREAD_LABELS[thread]),
+  };
+});
 ---
 
 <BaseLayout title={title}>
-  <main class="container">
-    <h1>{title}</h1>
-    <EntryList items={items} />
+  <main class="container study-index">
+    <header class="study-index__header">
+      <h1>{title}</h1>
+    </header>
+
+    {
+      studies.length === 0 ? (
+        <p class="label">Nothing published yet.</p>
+      ) : (
+        <ol class="study-index__list">
+          {studies.map((study) => (
+            <li>
+              <a class="study-index__card" href={study.href}>
+                {study.cover ? (
+                  <img class="study-index__media" src={study.cover} alt="" />
+                ) : (
+                  <span class="study-index__media study-index__media--ph" aria-hidden="true"></span>
+                )}
+
+                <span class="study-index__body">
+                  <span class="study-index__type">{study.status}</span>
+                  <span class="study-index__name">{study.title}</span>
+                  <time class="study-index__when" datetime={study.datetime}>{study.date}</time>
+                  {study.threads.length > 0 && (
+                    <span class="study-index__threads">{study.threads.join(' · ')}</span>
+                  )}
+                  <span class="study-index__foot">
+                    <span class="study-index__go" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="12" height="12">
+                        <path
+                          d="M7 12h10M13 7l5 5-5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      )
+    }
   </main>
 </BaseLayout>
 
 <style>
-  h1 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-5);
+  .study-index {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .study-index__header {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 36rem;
+  }
+
+  .study-index__header h1 {
+    font-size: clamp(1.85rem, 1.3rem + 1.6vw, 2.5rem);
+    letter-spacing: -0.03em;
+  }
+
+  .study-index__header h1::after {
+    content: '';
+    display: block;
+    width: 2.35rem;
+    height: 1px;
+    margin-top: 0.85rem;
+    background: var(--color-pink);
+  }
+
+  .study-index__list {
+    display: grid;
+    gap: var(--space-5);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .study-index__list > li {
+    max-width: none;
+  }
+
+  .study-index__card {
+    display: grid;
+    grid-template-columns: minmax(8.5rem, 0.35fr) minmax(0, 0.65fr);
+    min-height: 12.5rem;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    background: color-mix(in srgb, var(--color-white) 86%, transparent);
+    border: 1px solid var(--color-gray-green);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .study-index__card:hover,
+  .study-index__card:focus-visible {
+    color: inherit;
+  }
+
+  .study-index__card:focus-visible {
+    outline: 2px solid var(--color-pink);
+    outline-offset: 3px;
+  }
+
+  .study-index__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 12.5rem;
+    object-fit: cover;
+    align-self: stretch;
+  }
+
+  .study-index__media--ph {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 55%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
+  }
+
+  .study-index__body {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.4rem;
+    padding: 1rem 1.05rem 0.9rem;
+    min-width: 0;
+  }
+
+  .study-index__type,
+  .study-index__when,
+  .study-index__threads {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .study-index__type {
+    color: var(--color-link);
+  }
+
+  .study-index__when,
+  .study-index__threads {
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--fg-muted);
+  }
+
+  .study-index__foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 0.7rem;
+  }
+
+  .study-index__name {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.7rem);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-snug);
+    color: var(--fg);
+  }
+
+  .study-index__name::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.08em;
+    width: 100%;
+    height: 1px;
+    background: var(--color-pink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.32s ease;
+  }
+
+  .study-index__card:hover .study-index__name::after,
+  .study-index__card:focus-visible .study-index__name::after {
+    transform: scaleX(1);
+  }
+
+  .study-index__go {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    color: var(--fg-muted);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    transition:
+      border-color 0.28s ease,
+      color 0.28s ease;
+  }
+
+  .study-index__card:hover .study-index__go,
+  .study-index__card:focus-visible .study-index__go {
+    border-color: var(--color-pink);
+    color: var(--color-pink);
+  }
+
+  @media (max-width: 39.99rem) {
+    .study-index__card {
+      grid-template-columns: 1fr;
+    }
+
+    .study-index__media {
+      min-height: 11rem;
+      aspect-ratio: 16 / 10;
+      height: auto;
+    }
+
+    .study-index__body {
+      padding: 0.95rem 0.95rem 0.85rem;
+    }
   }
 </style>

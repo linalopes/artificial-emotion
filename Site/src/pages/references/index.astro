@@ -1,23 +1,258 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import EntryList from '../../components/EntryList.astro';
-import { getPublished, sortByTitle, toListItem } from '../../lib/content';
-import { COLLECTION_LABELS } from '../../lib/vocabulary';
+import { getPublished, sortByTitle } from '../../lib/content';
+import { entryPath, mediaSrc } from '../../lib/paths';
+import { COLLECTION_LABELS, THREAD_LABELS } from '../../lib/vocabulary';
 
 const title = COLLECTION_LABELS.references;
-const items = sortByTitle(await getPublished('references')).map(toListItem);
+const references = sortByTitle(await getPublished('references')).map((entry) => {
+  const { data } = entry;
+  const year = data.year !== undefined && String(data.year).trim() ? String(data.year).trim() : undefined;
+  const byline = [data.creator?.trim() || undefined, year].filter(Boolean).join(' · ');
+  return {
+    href: entryPath('references', entry.id),
+    title: data.title,
+    image: data.image?.trim() ? mediaSrc(data.image.trim()) : undefined,
+    typeLabel: data.referenceType?.trim().replace(/-/g, ' ') || undefined,
+    byline: byline || undefined,
+    threads: data.threads.map((thread) => THREAD_LABELS[thread]),
+  };
+});
 ---
 
 <BaseLayout title={title}>
-  <main class="container">
-    <h1>{title}</h1>
-    <EntryList items={items} />
+  <main class="container reference-index">
+    <header class="reference-index__header">
+      <h1>{title}</h1>
+    </header>
+
+    {
+      references.length === 0 ? (
+        <p class="label">Nothing published yet.</p>
+      ) : (
+        <ol class="reference-index__list">
+          {references.map((reference) => (
+            <li>
+              <a class="reference-index__card" href={reference.href}>
+                {reference.image ? (
+                  <img class="reference-index__media" src={reference.image} alt="" />
+                ) : (
+                  <span class="reference-index__media reference-index__media--ph" aria-hidden="true"
+                  ></span>
+                )}
+
+                <span class="reference-index__body">
+                  {reference.typeLabel && <span class="reference-index__type">{reference.typeLabel}</span>}
+                  <span class="reference-index__name">{reference.title}</span>
+                  {reference.byline && <span class="reference-index__byline">{reference.byline}</span>}
+                  {reference.threads.length > 0 && (
+                    <span class="reference-index__threads">{reference.threads.join(' · ')}</span>
+                  )}
+                  <span class="reference-index__foot">
+                    <span class="reference-index__go" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="12" height="12">
+                        <path
+                          d="M7 12h10M13 7l5 5-5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      )
+    }
   </main>
 </BaseLayout>
 
 <style>
-  h1 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-5);
+  .reference-index {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .reference-index__header {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 36rem;
+  }
+
+  .reference-index__header h1 {
+    font-size: clamp(1.85rem, 1.3rem + 1.6vw, 2.5rem);
+    letter-spacing: -0.03em;
+  }
+
+  .reference-index__header h1::after {
+    content: '';
+    display: block;
+    width: 2.35rem;
+    height: 1px;
+    margin-top: 0.85rem;
+    background: var(--color-pink);
+  }
+
+  .reference-index__list {
+    display: grid;
+    gap: var(--space-5);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .reference-index__list > li {
+    max-width: none;
+  }
+
+  .reference-index__card {
+    display: grid;
+    grid-template-columns: minmax(8.5rem, 0.35fr) minmax(0, 0.65fr);
+    min-height: 12.5rem;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+    background: color-mix(in srgb, var(--color-white) 86%, transparent);
+    border: 1px solid var(--color-gray-green);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .reference-index__card:hover,
+  .reference-index__card:focus-visible {
+    color: inherit;
+  }
+
+  .reference-index__card:focus-visible {
+    outline: 2px solid var(--color-pink);
+    outline-offset: 3px;
+  }
+
+  .reference-index__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 12.5rem;
+    object-fit: cover;
+    align-self: stretch;
+  }
+
+  .reference-index__media--ph {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 55%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
+  }
+
+  .reference-index__body {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.4rem;
+    padding: 1rem 1.05rem 0.9rem;
+    min-width: 0;
+  }
+
+  .reference-index__type,
+  .reference-index__byline,
+  .reference-index__threads {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .reference-index__type {
+    color: var(--color-link);
+  }
+
+  .reference-index__byline,
+  .reference-index__threads {
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: var(--fg-muted);
+  }
+
+  .reference-index__foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 0.7rem;
+  }
+
+  .reference-index__name {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.7rem);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-snug);
+    color: var(--fg);
+  }
+
+  .reference-index__name::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.08em;
+    width: 100%;
+    height: 1px;
+    background: var(--color-pink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.32s ease;
+  }
+
+  .reference-index__card:hover .reference-index__name::after,
+  .reference-index__card:focus-visible .reference-index__name::after {
+    transform: scaleX(1);
+  }
+
+  .reference-index__go {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    color: var(--fg-muted);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    transition:
+      border-color 0.28s ease,
+      color 0.28s ease;
+  }
+
+  .reference-index__card:hover .reference-index__go,
+  .reference-index__card:focus-visible .reference-index__go {
+    border-color: var(--color-pink);
+    color: var(--color-pink);
+  }
+
+  @media (max-width: 39.99rem) {
+    .reference-index__card {
+      grid-template-columns: 1fr;
+    }
+
+    .reference-index__media {
+      min-height: 11rem;
+      aspect-ratio: 16 / 10;
+      height: auto;
+    }
+
+    .reference-index__body {
+      padding: 0.95rem 0.95rem 0.85rem;
+    }
   }
 </style>
