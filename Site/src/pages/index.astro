@@ -43,9 +43,15 @@ const threads = (await getPublishedResearchThreads()).flatMap((entry, index) => 
           <h1 class="hero__title" id="hero-title">
             Artificial <span class="hero__word">Emotion</span>
           </h1>
-          <p class="hero__lede">
-            Research into soft mechanisms, kinetic behavior and bodily rhythms.
-          </p>
+          <div class="hero__standfirst">
+            <p class="hero__lede">
+              Research into soft mechanisms, kinetic behavior and bodily rhythms.
+            </p>
+            <p class="hero__note">
+              An evolving artist notebook documenting experiments, prototypes, references and public
+              research.
+            </p>
+          </div>
         </header>
 
         <p class="hero__index">
@@ -232,10 +238,22 @@ const threads = (await getPublishedResearchThreads()).flatMap((entry, index) => 
     display: block;
   }
 
+  .hero__standfirst {
+    display: grid;
+    gap: var(--space-2);
+  }
+
   .hero__lede {
     font-size: clamp(1rem, 0.95rem + 0.35vw, 1.2rem);
     line-height: var(--leading-snug);
     max-width: 34ch;
+  }
+
+  .hero__note {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
   }
 
   .hero__index {
