@@ -7,7 +7,22 @@ lede: A paper study exploring how folding transforms a flat, flexible material i
 threads:
   - soft-mechanisms
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791121982/IMG_6154.webp
-gallery: []
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791128925/IMG_6136.webp
+    alt: atelier table
+  - type: video
+    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791125429/C6CBF710-36AF-4B76-B678-B9E69D411401.mp4
+    alt: paper heart tests
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791128924/IMG_6123.webp
+    alt: paper heart studies
+  - type: video
+    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791128258/IMG_6149.mp4
+    alt: moviment of the paper heart
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791128924/IMG_6135.webp
+    alt: papers on table
 tags:
   - paper
   - origami
@@ -101,6 +116,8 @@ Most of the movement still comes from the folds.
 
 The printed part simply gives the mechanism a stable point from which to act.
 
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6150.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6150.webp)
+
 ## Finding the right paper
 
 Once the geometry was working more reliably, I moved from printer paper to **180 gsm paper**.
@@ -140,7 +157,7 @@ And a very small external movement becomes something that can be perceived as a 
 ## Files
 
 - **SVG template:** [download / view SVG](https://github.com/linalopes/artificial-emotion/blob/main/little-heart-machine/paper_heart_template.svg)
-- **PDF template:** [download / view PDF]()
+- **PDF template:** [download / view PDF](https://github.com/linalopes/artificial-emotion/blob/main/little-heart-machine/paper_heart_template.pdf)
 
 ## Fabrication
 
@@ -152,3 +169,21 @@ The current version uses:
 - one small 3D-printed brace
 
 The template and brace are still being refined as the study develops.
+
+
+## Assemble
+
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6142.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6142.webp)
+
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6144.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6144.webp)
+
+
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6145.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6145.webp)
+
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128514/IMG_6146.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128514/IMG_6146.webp)
+
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6147.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6147.webp)
+
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6148.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6148.webp)
+
+![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6152.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6152.webp)
