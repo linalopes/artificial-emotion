@@ -1,21 +1,15 @@
 ---
 title: School of Tomorrow's AI
 date: 2026-10-02
-
 type: institution
-
 lede: An independent art, technology and creative-learning initiative founded by Lina Lopes in Wetzikon, Greater Zurich — and the main Swiss research base of Artificial Emotion.
-
 url: https://schoolai.linalopes.info/
-
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1790922604/sota-mark-bg-transparent.svg
 gallery: []
-
 threads:
   - soft-mechanisms
   - kinetic-studies
   - heartbeat-biosignals
-
 tags:
   - wetzikon
   - schonau
@@ -24,9 +18,8 @@ tags:
   - physical-computing
   - experimental-education
   - creative-technology
-
+  - Switzerland
 related: []
-
 draft: false
 ---
 

@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import SiteSearch from '../components/SiteSearch.astro';
 import { href } from '../lib/paths';
 
 interface Props {
@@ -66,5 +67,6 @@ const googleFonts =
     <SiteHeader variant={header} />
     <slot />
     <SiteFooter />
+    <SiteSearch />
   </body>
 </html>

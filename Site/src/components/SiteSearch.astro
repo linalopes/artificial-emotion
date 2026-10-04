@@ -1,0 +1,223 @@
+---
+/**
+ * Full-text search overlay. Pagefind assets load only after the user opens it.
+ */
+---
+
+<div class="site-search" id="site-search" data-site-search data-pagefind-ignore="all" hidden>
+  <div class="site-search__backdrop" data-search-close tabindex="-1"></div>
+
+  <div
+    class="site-search__panel"
+    data-search-dialog
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="site-search-title"
+  >
+    <div class="site-search__bar">
+      <h2 id="site-search-title" class="visually-hidden">Search the research notebook</h2>
+      <label class="visually-hidden" for="site-search-input">Search</label>
+      <input
+        id="site-search-input"
+        class="site-search__input"
+        data-search-input
+        type="search"
+        placeholder="Search the research notebook…"
+        autocomplete="off"
+        enterkeyhint="search"
+      />
+      <button class="site-search__close" type="button" data-search-close>
+        Close
+      </button>
+    </div>
+
+    <p class="site-search__status" data-search-status aria-live="polite">
+      Search across studies, notes, references, events and research threads.
+    </p>
+
+    <ol class="site-search__results" data-search-results role="listbox" aria-label="Search results"></ol>
+  </div>
+</div>
+
+<script>
+  import { mountSiteSearch } from '../scripts/site-search';
+  mountSiteSearch();
+</script>
+
+<style is:global>
+  body.is-search-open {
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  .site-search[hidden] {
+    display: none;
+  }
+
+  .site-search {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+  }
+
+  .site-search__backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-deep-purple) 18%, transparent);
+  }
+
+  .site-search__panel {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    align-self: stretch;
+    width: min(40rem, 100%);
+    max-height: 100dvh;
+    margin-inline: auto;
+    padding: var(--space-4) var(--page-gutter) var(--space-5);
+    background: var(--color-white);
+    color: var(--color-deep-purple);
+    overflow: hidden;
+  }
+
+  .site-search__bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    align-items: end;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .site-search__input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.2rem 0 0.35rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+    letter-spacing: -0.03em;
+    color: inherit;
+  }
+
+  .site-search__input::placeholder {
+    color: var(--fg-muted);
+  }
+
+  .site-search__input:focus {
+    outline: none;
+  }
+
+  .site-search__input:focus-visible {
+    box-shadow: inset 0 -2px 0 var(--color-link);
+  }
+
+  .site-search__close {
+    padding: 0.15rem 0;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: 0.9375rem;
+    letter-spacing: 0.06em;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .site-search__status {
+    margin: 0;
+    padding-block: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+  }
+
+  .site-search__results {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .site-search__results > li {
+    max-width: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .site-search__results a {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.9rem 0.15rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .site-search__results a:hover,
+  .site-search__results a:focus-visible,
+  .site-search__results a.is-active {
+    color: inherit;
+  }
+
+  .site-search__results a.is-active,
+  .site-search__results a:focus-visible {
+    box-shadow: inset 3px 0 0 var(--color-pink);
+  }
+
+  .site-search__type {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-link);
+  }
+
+  .site-search__title {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-snug);
+  }
+
+  .site-search__excerpt {
+    max-width: 46ch;
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .site-search__excerpt :global(mark) {
+    background: color-mix(in srgb, var(--color-pink) 22%, var(--color-white));
+    color: inherit;
+    padding: 0 0.05em;
+  }
+
+  .site-search__meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+    color: var(--fg-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .site-search {
+      padding-block: 8vh;
+    }
+
+    .site-search__panel {
+      align-self: start;
+      max-height: min(40rem, 84dvh);
+      padding: var(--space-5);
+      border: 1px solid var(--color-gray-green);
+    }
+  }
+</style>

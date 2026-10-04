@@ -1,29 +1,22 @@
 ---
 title: Institute for Future Technologies
 date: 2026-10-02
-
 type: institution
-
 lede: A research and teaching environment in Paris where a week of making, teaching and conversation around Sensitive Machines became one of the starting points for Artificial Emotion.
-
 url: https://ift.devinci.fr/
-
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1790922478/Institutefortechnologies.svg
 gallery: []
-
 threads:
   - soft-mechanisms
   - kinetic-studies
-
 tags:
   - paris
   - residency
   - sensitive-machines
   - creative-technology
   - engineering-education
-
+  - France
 related: []
-
 draft: false
 ---
 

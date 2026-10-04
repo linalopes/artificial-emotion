@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import type { GalleryItem } from '../lib/cloudinary';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import PagefindMeta from './PagefindMeta.astro';
 import ResearchGallery from './ResearchGallery.astro';
 import TagLinks from './TagLinks.astro';
 import {
@@ -141,11 +142,17 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
 ---
 
 <BaseLayout title={title} description={lede}>
-  <article class="research" data-thread={thread}>
+  <article class="research" data-thread={thread} data-pagefind-body>
+    <PagefindMeta
+      type="research"
+      title={title}
+      tags={tags.join(', ') || undefined}
+      date={data.date ? isoDate(data.date) : undefined}
+    />
     <header class="research-hero">
       <div class="research-hero__stage">
         <a class="research-hero__kicker label" href={researchPath()}>Research thread</a>
-        <h1 class="research-hero__title">{title}</h1>
+        <h1 class="research-hero__title" data-pagefind-weight="10">{title}</h1>
         {subtitle && <p class="research-hero__subtitle">{subtitle}</p>}
         {lede && <p class="research-hero__lede">{lede}</p>}
         {
@@ -249,7 +256,7 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
         total === 0 ? (
           <p class="label">Nothing published in this thread yet.</p>
         ) : (
-          <div class="research-related">
+          <div class="research-related" data-pagefind-ignore>
             {groups.map((group) => (
               <section class="research-index-group" aria-labelledby={`research-group-${group.collection}`}>
                 <h2 id={`research-group-${group.collection}`} class="label">

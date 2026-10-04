@@ -33,6 +33,7 @@ tags:
   - 3d-printing
 related:
   - events/open-research-studio
+  - studies/simple-crank
 draft: false
 ---
 

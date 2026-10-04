@@ -8,6 +8,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import RelatedEntries from './RelatedEntries.astro';
 import ResearchGallery from './ResearchGallery.astro';
+import PagefindMeta from './PagefindMeta.astro';
 import TagLinks from './TagLinks.astro';
 import { formatDate, getBacklinks, isoDate, youtubeUrl } from '../lib/content';
 import {
@@ -57,7 +58,14 @@ const backlinks = await getBacklinks('studies', entry.id);
 ---
 
 <BaseLayout title={title} description={lede}>
-  <article class="study">
+  <article class="study" data-pagefind-body>
+    <PagefindMeta
+      type="study"
+      title={title}
+      threads={data.threads.map((thread) => THREAD_LABELS[thread]).join(' · ') || undefined}
+      tags={tags.join(', ') || undefined}
+      date={isoDate(data.date)}
+    />
     <header class="study-hero">
       <div class="study-hero__field" aria-hidden="true">
         <GenerativeWaves mode="fill" label="" />
@@ -70,7 +78,7 @@ const backlinks = await getBacklinks('studies', entry.id);
           <span aria-hidden="true"> / </span>
           <span>{data.status}</span>
         </p>
-        <h1 class="study-hero__title">{title}</h1>
+        <h1 class="study-hero__title" data-pagefind-weight="10">{title}</h1>
         {subtitle && <p class="study-hero__subtitle">{subtitle}</p>}
         {lede && <p class="study-hero__lede">{lede}</p>}
         <time class="visually-hidden" datetime={isoDate(data.date)}>

@@ -20,6 +20,7 @@ const thumbSrc = (item: GalleryItem) => {
   total > 0 && (
     <section
       class="research-gallery"
+      data-pagefind-ignore
       data-research-gallery={interactive ? '' : undefined}
       data-count={total}
       tabindex={interactive ? 0 : undefined}

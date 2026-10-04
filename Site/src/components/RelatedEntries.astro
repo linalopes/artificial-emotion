@@ -26,7 +26,7 @@ const list = items ?? (refs.length > 0 ? await resolveRelated(refs, from) : []);
 
 {
   list.length > 0 && (
-    <section class="related" aria-labelledby={headingId}>
+    <section class="related" aria-labelledby={headingId} data-pagefind-ignore>
       <h2 id={headingId} class="label">{heading}</h2>
       <ul class="related__list">
         {list.map((item) => (

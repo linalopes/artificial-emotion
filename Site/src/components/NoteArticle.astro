@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import PagefindMeta from './PagefindMeta.astro';
 import TagLinks from './TagLinks.astro';
 import {
   formatDate,
@@ -49,7 +50,14 @@ const threads = data.threads.map((id) => ({
 ---
 
 <BaseLayout title={data.title} description={data.lede?.trim() || undefined}>
-  <article class:list={['note', `note--${noteClass}`]}>
+  <article class:list={['note', `note--${noteClass}`]} data-pagefind-body>
+    <PagefindMeta
+      type="note"
+      title={data.title}
+      threads={data.threads.map((thread) => THREAD_LABELS[thread]).join(' · ') || undefined}
+      tags={data.tags.join(', ') || undefined}
+      date={isoDate(data.date)}
+    />
     <header class="note-hero">
       <div class="note-hero__field" aria-hidden="true">
         <GenerativeWaves mode="fill" label="" />
@@ -60,7 +68,7 @@ const threads = data.threads.map((id) => ({
         <a class="note-hero__kicker" href={collectionPath('notes')}>
           {COLLECTION_LABELS.notes}
         </a>
-        <h1 class="note-hero__title">{data.title}</h1>
+        <h1 class="note-hero__title" data-pagefind-weight="10">{data.title}</h1>
         {data.lede?.trim() && <p class="note-hero__lede">{data.lede.trim()}</p>}
         <time class="visually-hidden" datetime={isoDate(data.date)}>
           {formatDate(data.date)}
@@ -156,7 +164,7 @@ const threads = data.threads.map((id) => ({
 
       {
         related.length > 0 && (
-          <nav class="note-links" aria-labelledby="note-related-heading">
+          <nav class="note-links" aria-labelledby="note-related-heading" data-pagefind-ignore>
             <h2 id="note-related-heading" class="label">Related</h2>
             <ul>
               {related.map((item) => (
@@ -185,7 +193,7 @@ const threads = data.threads.map((id) => ({
 
       {
         backlinks.length > 0 && (
-          <nav class="note-links" aria-labelledby="note-backlinks-heading">
+          <nav class="note-links" aria-labelledby="note-backlinks-heading" data-pagefind-ignore>
             <h2 id="note-backlinks-heading" class="label">Referenced by</h2>
             <ul>
               {backlinks.map((item) => (

@@ -37,6 +37,7 @@ tags:
   - creative-learning
 related:
   - events/open-research-studio
+  - studies/paper-heart
 draft: false
 ---
 

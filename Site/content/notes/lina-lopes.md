@@ -1,34 +1,26 @@
 ---
 title: Lina Lopes
 date: 2026-10-02
-
 type: person
-
 lede: Brazilian artist, creative technologist and educator based in Switzerland, working across kinetic systems, physical computing, artificial intelligence, interactive environments and experimental forms of learning.
-
 url: https://www.linalopes.info/
-
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1790923133/lina.webp
 gallery: []
-
 threads:
   - soft-mechanisms
   - kinetic-studies
   - heartbeat-biosignals
-
 tags:
   - creative-technology
   - physical-computing
   - artificial-intelligence
   - interactive-installation
   - experimental-education
-  - wetzikon
   - brazil
-
+  - switzerland
 related:
   - notes/school-of-tomorrows-ai
   - notes/institute-for-future-technologies
-
 draft: false
 ---
 

@@ -24,10 +24,10 @@ const backlinks = await getBacklinks(collection, id);
 
 <BaseLayout title={title}>
   <main class="container">
-    <article class="entry">
+    <article class="entry" data-pagefind-body>
       <header class="entry__header">
         <a class="label" href={collectionPath(collection)}>{COLLECTION_LABELS[collection]}</a>
-        <h1>{title}</h1>
+        <h1 data-pagefind-weight="10">{title}</h1>
       </header>
 
       <MetaList items={meta} />

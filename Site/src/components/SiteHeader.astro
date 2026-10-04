@@ -15,17 +15,9 @@ const publication = variant === 'publication';
 const current = Astro.url.pathname;
 ---
 
-<header class:list={['site-header', publication && 'site-header--publication']}>
+<header class:list={['site-header', publication && 'site-header--publication']} data-pagefind-ignore="all">
   <div class="site-header__inner">
     <a class="site-header__title" href={href('/')}>Artificial Emotion</a>
-    <button
-      type="button"
-      class="site-header__menu"
-      aria-expanded="false"
-      aria-controls="site-nav"
-    >
-      Menu
-    </button>
     <nav class="site-header__nav" id="site-nav" aria-label="Main">
       {
         SITE_NAV.map(({ label, path }) => (
@@ -35,21 +27,30 @@ const current = Astro.url.pathname;
         ))
       }
     </nav>
-    {
-      publication && (
-        <button
-          type="button"
-          class="site-header__search"
-          aria-label="Search (coming later)"
-          disabled
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.4"></circle>
-            <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path>
-          </svg>
-        </button>
-      )
-    }
+    <div class="site-header__tools">
+      <button
+        type="button"
+        class="site-header__search"
+        data-search-open
+        aria-label="Search"
+        aria-haspopup="dialog"
+        aria-controls="site-search"
+        aria-expanded="false"
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.4"></circle>
+          <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="site-header__menu"
+        aria-expanded="false"
+        aria-controls="site-nav"
+      >
+        Menu
+      </button>
+    </div>
   </div>
 </header>
 
@@ -123,6 +124,13 @@ const current = Astro.url.pathname;
     display: flex;
     flex-wrap: nowrap;
     gap: var(--space-4);
+    margin-left: auto;
+  }
+
+  .site-header__tools {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
   }
 
   .site-header__nav a {
@@ -146,7 +154,6 @@ const current = Astro.url.pathname;
 
   .site-header__menu {
     display: none;
-    margin-left: auto;
     padding: 0.15rem 0;
     border: 0;
     background: transparent;
@@ -222,16 +229,20 @@ const current = Astro.url.pathname;
     justify-content: center;
     width: 1.75rem;
     height: 1.75rem;
-    margin-left: 0.35rem;
     padding: 0;
-    color: color-mix(in srgb, var(--color-white) 82%, transparent);
+    color: inherit;
     background: transparent;
     border: 0;
-    cursor: default;
+    cursor: pointer;
   }
 
-  .site-header__search:disabled {
-    opacity: 1;
+  .site-header--publication .site-header__search {
+    color: color-mix(in srgb, var(--color-white) 82%, transparent);
+  }
+
+  .site-header--publication .site-header__search:hover,
+  .site-header--publication .site-header__search:focus-visible {
+    color: var(--color-white);
   }
 
   .site-header.is-open {
@@ -262,12 +273,6 @@ const current = Astro.url.pathname;
     }
   }
 
-  @media (max-width: 63.99rem) {
-    .site-header__search {
-      display: none;
-    }
-  }
-
   @media (max-width: 47.99rem) {
     .site-header__inner,
     .site-header--publication .site-header__inner {
@@ -281,15 +286,20 @@ const current = Astro.url.pathname;
       order: 1;
     }
 
+    .site-header__tools {
+      order: 2;
+      margin-left: auto;
+    }
+
     .site-header__menu {
       display: inline-flex;
       align-items: center;
-      order: 2;
     }
 
     .site-header__nav {
       display: none;
       order: 3;
+      margin-left: 0;
     }
 
     .site-header.is-open .site-header__nav {

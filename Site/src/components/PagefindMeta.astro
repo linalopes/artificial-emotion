@@ -1,0 +1,25 @@
+---
+/**
+ * Pagefind result metadata. Lives inside `data-pagefind-body` so the
+ * attributes are collected; the wrapper is ignored as searchable text.
+ */
+interface Props {
+  type: 'research' | 'study' | 'note' | 'reference' | 'event';
+  title: string;
+  threads?: string;
+  tags?: string;
+  date?: string;
+  year?: string;
+}
+
+const { type, title, threads, tags, date, year } = Astro.props;
+---
+
+<div data-pagefind-ignore hidden>
+  <span data-pagefind-meta="type">{type}</span>
+  <span data-pagefind-meta="title">{title}</span>
+  {threads && <span data-pagefind-meta="threads">{threads}</span>}
+  {tags && <span data-pagefind-meta="tags">{tags}</span>}
+  {date && <span data-pagefind-meta="date">{date}</span>}
+  {year && <span data-pagefind-meta="year">{year}</span>}
+</div>

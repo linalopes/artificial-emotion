@@ -1,7 +1,8 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import EntryLayout from '../../layouts/EntryLayout.astro';
-import { getPublished, tagDisplayLabel, uniqueEntryTags } from '../../lib/content';
+import PagefindMeta from '../../components/PagefindMeta.astro';
+import { getPublished, isoDate, tagDisplayLabel, uniqueEntryTags } from '../../lib/content';
 import { tagPath } from '../../lib/paths';
 import { THREAD_LABELS } from '../../lib/vocabulary';
 
@@ -34,5 +35,13 @@ const tags = uniqueEntryTags(data.tags);
     { label: 'Tags', value: tags.map(tagDisplayLabel), hrefs: tags.map(tagPath) },
   ]}
 >
+  <PagefindMeta
+    type="reference"
+    title={data.title}
+    threads={data.threads.map((thread) => THREAD_LABELS[thread]).join(' · ') || undefined}
+    tags={tags.join(', ') || undefined}
+    date={isoDate(data.date)}
+    year={data.year !== undefined ? String(data.year) : undefined}
+  />
   <Content />
 </EntryLayout>
