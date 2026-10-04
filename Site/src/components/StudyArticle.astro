@@ -8,6 +8,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import RelatedEntries from './RelatedEntries.astro';
 import ResearchGallery from './ResearchGallery.astro';
+import TagLinks from './TagLinks.astro';
 import { formatDate, getBacklinks, isoDate, youtubeUrl } from '../lib/content';
 import {
   hasMarkdownContent,
@@ -141,11 +142,7 @@ const backlinks = await getBacklinks('studies', entry.id);
               <div class="study-meta__row">
                 <dt>Tags</dt>
                 <dd>
-                  <ul>
-                    {tags.map((tag) => (
-                      <li>{tag.replace(/-/g, ' ')}</li>
-                    ))}
-                  </ul>
+                  <TagLinks tags={tags} />
                 </dd>
               </div>
             )

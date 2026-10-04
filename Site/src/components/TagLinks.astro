@@ -1,0 +1,48 @@
+---
+/**
+ * Authored tags as metadata links. Display replaces hyphens with spaces;
+ * the route stays the canonical kebab-case id.
+ */
+import { normalizeTag, tagDisplayLabel, uniqueEntryTags } from '../lib/content';
+import { tagPath } from '../lib/paths';
+
+interface Props {
+  tags: readonly string[];
+  /** When set, that tag is shown as text instead of a self-link. */
+  current?: string;
+}
+
+const tags = uniqueEntryTags(Astro.props.tags);
+const current = Astro.props.current ? normalizeTag(Astro.props.current) : undefined;
+---
+
+{
+  tags.length > 0 && (
+    <ul class="tag-links">
+      {tags.map((id) => (
+        <li>
+          {current === id ? (
+            <span>{tagDisplayLabel(id)}</span>
+          ) : (
+            <a href={tagPath(id)}>{tagDisplayLabel(id)}</a>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .tag-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.7rem;
+  }
+
+  .tag-links li {
+    max-width: none;
+  }
+</style>

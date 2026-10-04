@@ -37,3 +37,15 @@ export function researchPath(): string {
 export function threadPath(thread: ResearchThread): string {
   return href(`${RESEARCH_PATH}${thread}/`);
 }
+
+/** Tag vocabulary index: /tags/ */
+export const TAGS_PATH = '/tags/';
+
+export function tagsPath(): string {
+  return href(TAGS_PATH);
+}
+
+/** Tag page: /tags/paper/ */
+export function tagPath(tag: string): string {
+  return href(`${TAGS_PATH}${encodeURIComponent(tag)}/`);
+}

@@ -4,6 +4,7 @@ import type { GalleryItem } from '../lib/cloudinary';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import ResearchGallery from './ResearchGallery.astro';
+import TagLinks from './TagLinks.astro';
 import {
   countThreadContent,
   formatDate,
@@ -218,11 +219,9 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
 
       {
         tags.length > 0 && (
-          <ul class="research-tags" aria-label="Tags">
-            {tags.map((tag) => (
-              <li>{tag.replace(/-/g, ' ')}</li>
-            ))}
-          </ul>
+          <div class="research-tags" aria-label="Tags">
+            <TagLinks tags={tags} />
+          </div>
         )
       }
 
@@ -505,16 +504,6 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
   }
 
   .research-tags {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.85rem;
-  }
-
-  .research-tags li {
-    max-width: none;
     font-family: var(--font-mono);
     font-size: 0.68rem;
     letter-spacing: 0.08em;

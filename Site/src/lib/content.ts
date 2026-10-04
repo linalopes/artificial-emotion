@@ -14,6 +14,7 @@ import {
 import { entryPath } from './paths';
 import {
   COLLECTIONS,
+  COLLECTION_LABELS,
   COLLECTION_LABELS_SINGULAR,
   EVENT_TYPE_LABELS,
   RESEARCH_THREADS,
@@ -163,6 +164,159 @@ export async function getPublishedByThread(thread: ResearchThread): Promise<Thre
 /** Total number of entries across all groups. */
 export function countThreadContent(content: ThreadContent): number {
   return THREADED_COLLECTIONS.reduce((n, c) => n + content[c].length, 0);
+}
+
+/* --------------------------------------------------------------------------
+   Tags
+   Shared characteristics across collections. Not Research Threads and not
+   `related`. Pages are built only from published entries that actually use
+   a tag.
+   -------------------------------------------------------------------------- */
+
+/** Collections that may carry tags, in tag-page group order. */
+export const TAGGED_COLLECTIONS = [
+  'research',
+  'studies',
+  'notes',
+  'references',
+  'events',
+] as const;
+export type TaggedCollection = (typeof TAGGED_COLLECTIONS)[number];
+
+export const TAG_COLLECTION_LABELS: Record<TaggedCollection, string> = {
+  research: 'Research',
+  studies: COLLECTION_LABELS.studies,
+  notes: COLLECTION_LABELS.notes,
+  references: COLLECTION_LABELS.references,
+  events: COLLECTION_LABELS.events,
+};
+
+export interface TagContent {
+  research: CollectionEntry<'research'>[];
+  studies: CollectionEntry<'studies'>[];
+  notes: CollectionEntry<'notes'>[];
+  references: CollectionEntry<'references'>[];
+  events: CollectionEntry<'events'>[];
+}
+
+export interface TagIndexItem {
+  id: string;
+  count: number;
+}
+
+/** Lowercase + trim only. Do not invent kebab-case at runtime. */
+export function normalizeTag(raw: string): string | undefined {
+  const id = raw.trim().toLowerCase();
+  return id || undefined;
+}
+
+/** Human label for an authored tag id. Keep technical names readable. */
+export function tagDisplayLabel(id: string): string {
+  return id.replace(/-/g, ' ');
+}
+
+/** Unique normalized tags on one entry, first occurrence kept. */
+export function uniqueEntryTags(tags: readonly string[] | undefined): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of tags ?? []) {
+    const id = normalizeTag(raw);
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+}
+
+function entryHasTag(tags: readonly string[] | undefined, tag: string): boolean {
+  return uniqueEntryTags(tags).includes(tag);
+}
+
+let taggedCorpus: Promise<TagContent> | undefined;
+
+async function loadPublishedTaggedCorpus(): Promise<TagContent> {
+  taggedCorpus ??= (async () => {
+    const [research, studies, notes, references, events] = await Promise.all([
+      getPublishedResearchThreads(),
+      getPublishedByDate('studies'),
+      getPublishedByDate('notes'),
+      getPublished('references'),
+      getPublishedByDate('events'),
+    ]);
+
+    return {
+      research,
+      studies,
+      notes,
+      references: sortByTitle(references),
+      events,
+    };
+  })();
+
+  return taggedCorpus;
+}
+
+/** Published entries that carry a tag, grouped by collection. */
+export async function getPublishedByTag(tag: string): Promise<TagContent> {
+  const id = normalizeTag(tag);
+  const empty: TagContent = {
+    research: [],
+    studies: [],
+    notes: [],
+    references: [],
+    events: [],
+  };
+  if (!id) return empty;
+
+  const corpus = await loadPublishedTaggedCorpus();
+  return {
+    research: corpus.research.filter((entry) => entryHasTag(entry.data.tags, id)),
+    studies: corpus.studies.filter((entry) => entryHasTag(entry.data.tags, id)),
+    notes: corpus.notes.filter((entry) => entryHasTag(entry.data.tags, id)),
+    references: corpus.references.filter((entry) => entryHasTag(entry.data.tags, id)),
+    events: corpus.events.filter((entry) => entryHasTag(entry.data.tags, id)),
+  };
+}
+
+export function countTagContent(content: TagContent): number {
+  return TAGGED_COLLECTIONS.reduce((n, collection) => n + content[collection].length, 0);
+}
+
+/** "4 entries across Studies, Studio Notes and Events." */
+export function formatTagEntrySummary(content: TagContent): string {
+  const count = countTagContent(content);
+  const groups = TAGGED_COLLECTIONS.filter((collection) => content[collection].length > 0).map(
+    (collection) => TAG_COLLECTION_LABELS[collection],
+  );
+  const noun = count === 1 ? 'entry' : 'entries';
+  if (groups.length === 0) return `${count} ${noun}.`;
+  if (groups.length === 1) return `${count} ${noun} across ${groups[0]}.`;
+  if (groups.length === 2) return `${count} ${noun} across ${groups[0]} and ${groups[1]}.`;
+  const last = groups[groups.length - 1];
+  return `${count} ${noun} across ${groups.slice(0, -1).join(', ')} and ${last}.`;
+}
+
+/** Alphabetical published tags with unique-entry counts. Empty tags omitted. */
+export async function getPublishedTagIndex(): Promise<TagIndexItem[]> {
+  const corpus = await loadPublishedTaggedCorpus();
+  const counts = new Map<string, number>();
+
+  for (const collection of TAGGED_COLLECTIONS) {
+    for (const entry of corpus[collection]) {
+      for (const tag of uniqueEntryTags(entry.data.tags)) {
+        counts.set(tag, (counts.get(tag) ?? 0) + 1);
+      }
+    }
+  }
+
+  return [...counts.entries()]
+    .filter(([, count]) => count > 0)
+    .map(([id, count]) => ({ id, count }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+}
+
+export async function collectPublishedTags(): Promise<string[]> {
+  return (await getPublishedTagIndex()).map((item) => item.id);
 }
 
 /* --------------------------------------------------------------------------

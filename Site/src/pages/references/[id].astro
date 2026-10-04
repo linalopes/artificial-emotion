@@ -1,7 +1,8 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import EntryLayout from '../../layouts/EntryLayout.astro';
-import { getPublished } from '../../lib/content';
+import { getPublished, tagDisplayLabel, uniqueEntryTags } from '../../lib/content';
+import { tagPath } from '../../lib/paths';
 import { THREAD_LABELS } from '../../lib/vocabulary';
 
 export async function getStaticPaths() {
@@ -16,6 +17,7 @@ interface Props {
 const { entry } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
+const tags = uniqueEntryTags(data.tags);
 ---
 
 <EntryLayout
@@ -29,7 +31,7 @@ const { Content } = await render(entry);
     { label: 'Type', value: data.referenceType },
     { label: 'Link', value: data.url, href: data.url },
     { label: 'Threads', value: data.threads.map((t) => THREAD_LABELS[t]) },
-    { label: 'Tags', value: data.tags },
+    { label: 'Tags', value: tags.map(tagDisplayLabel), hrefs: tags.map(tagPath) },
   ]}
 >
   <Content />

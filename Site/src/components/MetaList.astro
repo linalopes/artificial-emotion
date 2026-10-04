@@ -8,6 +8,8 @@ export interface MetaItem {
   value?: string | number | readonly string[] | null;
   /** Render the value as a link. */
   href?: string;
+  /** Per-item hrefs when `value` is an array, in the same order. */
+  hrefs?: readonly (string | undefined)[];
   /** Render the value inside <time datetime="…">. */
   datetime?: string;
 }
@@ -38,8 +40,10 @@ const isExternal = (url: string) => /^https?:\/\//.test(url);
           <dd>
             {Array.isArray(item.value) ? (
               <ul class="meta__list">
-                {item.value.map((v) => (
-                  <li>{v}</li>
+                {item.value.map((v, index) => (
+                  <li>
+                    {item.hrefs?.[index] ? <a href={item.hrefs[index]}>{v}</a> : v}
+                  </li>
                 ))}
               </ul>
             ) : item.href ? (

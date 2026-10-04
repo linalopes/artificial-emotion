@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedTagIndex, tagDisplayLabel } from '../../lib/content';
+import { tagPath } from '../../lib/paths';
+
+const title = 'Tags';
+const tags = await getPublishedTagIndex();
+---
+
+<BaseLayout title={title}>
+  <main class="container tag-index">
+    <header class="tag-index__header">
+      <h1>{title}</h1>
+      <p class="tag-index__lede">
+        A transversal vocabulary across the Artificial Emotion research archive.
+      </p>
+    </header>
+
+    {
+      tags.length === 0 ? (
+        <p class="label">Nothing published yet.</p>
+      ) : (
+        <ol class="tag-index__list">
+          {tags.map((tag) => (
+            <li>
+              <a class="tag-index__row" href={tagPath(tag.id)}>
+                <span class="tag-index__name">{tagDisplayLabel(tag.id)}</span>
+                <span class="tag-index__count">{tag.count}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+  </main>
+</BaseLayout>
+
+<style>
+  .tag-index {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .tag-index__header {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 36rem;
+  }
+
+  .tag-index__header h1 {
+    font-size: clamp(1.85rem, 1.3rem + 1.6vw, 2.5rem);
+    letter-spacing: -0.03em;
+  }
+
+  .tag-index__header h1::after {
+    content: '';
+    display: block;
+    width: 2.35rem;
+    height: 1px;
+    margin-top: 0.85rem;
+    background: var(--color-pink);
+  }
+
+  .tag-index__lede {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .tag-index__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    max-width: 36rem;
+  }
+
+  .tag-index__list > li {
+    max-width: none;
+  }
+
+  .tag-index__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    align-items: baseline;
+    padding-block: 0.65rem;
+    border-top: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .tag-index__list > li:last-child .tag-index__row {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .tag-index__name {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.02em;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .tag-index__count {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tag-index__row:hover .tag-index__name,
+  .tag-index__row:focus-visible .tag-index__name {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--color-link);
+  }
+</style>
