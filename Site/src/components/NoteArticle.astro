@@ -225,9 +225,8 @@ const threads = data.threads.map((id) => ({
 
   .note-hero {
     position: relative;
+    display: grid;
     isolation: isolate;
-    overflow: hidden;
-    padding: var(--space-6) var(--page-gutter) var(--space-5);
   }
 
   .note-hero__field,
@@ -238,19 +237,18 @@ const threads = data.threads.map((id) => ({
 
   .note-hero__field {
     z-index: 0;
-    top: -22%;
-    right: -6%;
-    width: min(62vw, 40rem);
-    height: 140%;
-    opacity: 0.7;
-    mask-image:
-      linear-gradient(to left, #000 18%, transparent 86%),
-      linear-gradient(to bottom, #000 48%, transparent 100%);
-    mask-composite: intersect;
-    -webkit-mask-image:
-      linear-gradient(to left, #000 18%, transparent 86%),
-      linear-gradient(to bottom, #000 48%, transparent 100%);
-    -webkit-mask-composite: source-in;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: min(28rem, 70%);
+  }
+
+  @media (min-width: 40rem) {
+    .note-hero__field {
+      left: 18%;
+      width: 92%;
+      height: 78%;
+    }
   }
 
   .note-hero__veil {
@@ -258,18 +256,42 @@ const threads = data.threads.map((id) => ({
     z-index: 1;
     background:
       linear-gradient(
-        100deg,
+        90deg,
         var(--color-white) 0%,
-        var(--color-white) 28%,
-        color-mix(in srgb, var(--color-white) 82%, transparent) 52%,
-        color-mix(in srgb, var(--color-white) 18%, transparent) 100%
+        color-mix(in srgb, var(--color-white) 88%, transparent) 22%,
+        color-mix(in srgb, var(--color-white) 32%, transparent) 48%,
+        transparent 68%
       ),
       linear-gradient(
         180deg,
-        transparent 0%,
-        color-mix(in srgb, var(--color-white) 22%, transparent) 74%,
+        color-mix(in srgb, var(--color-white) 18%, transparent) 0%,
+        transparent 22%,
+        color-mix(in srgb, var(--color-white) 55%, transparent) 72%,
         var(--color-white) 100%
       );
+  }
+
+  @media (max-width: 39.99rem) {
+    .note-hero__field {
+      height: 58%;
+    }
+
+    .note-hero__veil {
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--color-white) 78%, transparent) 0%,
+          color-mix(in srgb, var(--color-white) 48%, transparent) 26%,
+          color-mix(in srgb, var(--color-white) 36%, transparent) 48%,
+          color-mix(in srgb, var(--color-white) 82%, transparent) 78%,
+          var(--color-white) 100%
+        ),
+        radial-gradient(
+          ellipse 95% 58% at 12% 22%,
+          color-mix(in srgb, var(--color-white) 84%, transparent) 0%,
+          transparent 72%
+        );
+    }
   }
 
   .note-hero__stage {
@@ -277,7 +299,10 @@ const threads = data.threads.map((id) => ({
     z-index: 2;
     display: grid;
     gap: var(--space-4);
-    max-width: 38rem;
+    width: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-5) var(--page-gutter) var(--space-6);
   }
 
   .note-hero__kicker {
