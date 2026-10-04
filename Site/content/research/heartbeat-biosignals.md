@@ -2,25 +2,20 @@
 title: Heartbeat & Biosignals
 subtitle: One heartbeat, many signals
 date: 2026-10-02
-
 lede: An artistic research thread investigating the heartbeat as a coupled electrical, mechanical, acoustic and circulatory event — and how different ways of sensing it can become material for movement.
-
 questions:
   - What are we actually sensing when we say we are measuring a heartbeat?
   - How do different sensing methods transform the same cardiac event into different signals, rhythms and representations?
   - How can the pumping, twisting and releasing mechanics of the heart inform a kinetic body without simply imitating anatomical form?
-
 process:
   - Heartbeat
   - Phenomenon
   - Sensor
   - Signal
   - Behaviour
-
-cover:
-galleryFolder: 
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791130791/IMG_6155.webp
+galleryFolder: artificial-emotion/heartbeat-biosignals
 gallery: []
-
 tags:
   - heartbeat
   - biosignals
@@ -37,7 +32,6 @@ tags:
   - kinetic-sculpture
   - physical-computing
   - artificial-emotion
-
 draft: false
 ---
 
