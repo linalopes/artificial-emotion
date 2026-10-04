@@ -18,6 +18,7 @@ process:
   - Behaviour
 
 cover:
+galleryFolder: 
 gallery: []
 
 tags:

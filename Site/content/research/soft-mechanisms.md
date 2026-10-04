@@ -1,9 +1,7 @@
 ---
 title: Soft Mechanics
 subtitle: From wearable electronics to kinetic textile bodies
-
 date: 2026-10-02
-
 lede: An artistic research thread investigating how textile structures can become mechanical systems capable of producing volume, movement and expressive behaviour.
 questions:
   - How can textile structures become mechanical systems capable of producing controlled but expressive movement?
@@ -14,8 +12,9 @@ process:
   - Force
   - Movement
   - Behaviour
-cover:
-gallery: []
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791121982/IMG_6154.webp
+galleryFolder: artificial-emotion/soft-mechanisms
+gallery:
 tags:
   - textiles
   - soft-mechanics

@@ -33,7 +33,7 @@ tags:
   - open-studio
   - public-research
 related:
-  - studies/breathing-textile
+  - studies/paper-heart
 
 draft: false
 ---

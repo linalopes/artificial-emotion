@@ -9,8 +9,7 @@ threads:
   - kinetic-studies
 tags:
   - example
-related:
-  - studies/breathing-textile
+related: []
 image: 
 draft: false
 ---
