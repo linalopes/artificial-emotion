@@ -93,10 +93,11 @@ export async function buildSearchIndex(): Promise<SearchRecord[]> {
   return [
     ...studies.map((entry) =>
       record('studies', entry, {
+        lede: asText(entry.data.lede),
         tags: entry.data.tags,
         type: entry.data.status,
         threadIds: entry.data.threads,
-        metadata: [entry.data.materials.join(' ')],
+        metadata: [asText(entry.data.subtitle), entry.data.materials.join(' ')].filter(Boolean),
       }),
     ),
     ...notes.map((entry) =>

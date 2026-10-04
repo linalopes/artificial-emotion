@@ -10,6 +10,7 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
   return {
     href: entryPath('studies', entry.id),
     title: data.title,
+    lede: data.lede?.trim() || undefined,
     cover: data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined,
     status: data.status,
     datetime: isoDate(data.date),
@@ -23,6 +24,7 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
   <main class="container study-index">
     <header class="study-index__header">
       <h1>{title}</h1>
+      <p class="study-index__lede">Experiments, prototypes and process records.</p>
     </header>
 
     {
@@ -33,15 +35,18 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
           {studies.map((study) => (
             <li>
               <a class="study-index__card" href={study.href}>
-                {study.cover ? (
-                  <img class="study-index__media" src={study.cover} alt="" />
-                ) : (
-                  <span class="study-index__media study-index__media--ph" aria-hidden="true"></span>
-                )}
+                <span class="study-index__media-wrap">
+                  {study.cover ? (
+                    <img class="study-index__media" src={study.cover} alt="" />
+                  ) : (
+                    <span class="study-index__media study-index__media--ph" aria-hidden="true"></span>
+                  )}
+                </span>
 
                 <span class="study-index__body">
                   <span class="study-index__type">{study.status}</span>
                   <span class="study-index__name">{study.title}</span>
+                  {study.lede && <span class="study-index__summary">{study.lede}</span>}
                   <time class="study-index__when" datetime={study.datetime}>{study.date}</time>
                   {study.threads.length > 0 && (
                     <span class="study-index__threads">{study.threads.join(' · ')}</span>
@@ -95,6 +100,13 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
     background: var(--color-pink);
   }
 
+  .study-index__lede {
+    max-width: 34ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
   .study-index__list {
     display: grid;
     gap: var(--space-5);
@@ -110,8 +122,10 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
   .study-index__card {
     display: grid;
     grid-template-columns: minmax(8.5rem, 0.35fr) minmax(0, 0.65fr);
+    grid-template-rows: minmax(12.5rem, auto);
     min-height: 12.5rem;
     min-width: 0;
+    align-items: stretch;
     text-decoration: none;
     color: inherit;
     background: color-mix(in srgb, var(--color-white) 86%, transparent);
@@ -130,13 +144,20 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
     outline-offset: 3px;
   }
 
+  .study-index__media-wrap {
+    position: relative;
+    min-width: 0;
+    min-height: 12.5rem;
+    overflow: hidden;
+  }
+
   .study-index__media {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
-    min-height: 12.5rem;
     object-fit: cover;
-    align-self: stretch;
   }
 
   .study-index__media--ph {
@@ -174,6 +195,13 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
   .study-index__threads {
     text-transform: none;
     letter-spacing: 0.02em;
+    color: var(--fg-muted);
+  }
+
+  .study-index__summary {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
     color: var(--fg-muted);
   }
 
@@ -241,12 +269,12 @@ const studies = (await getPublishedByDate('studies')).map((entry) => {
   @media (max-width: 39.99rem) {
     .study-index__card {
       grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
     }
 
-    .study-index__media {
-      min-height: 11rem;
+    .study-index__media-wrap {
+      min-height: 0;
       aspect-ratio: 16 / 10;
-      height: auto;
     }
 
     .study-index__body {

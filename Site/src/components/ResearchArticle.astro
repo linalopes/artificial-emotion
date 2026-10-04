@@ -85,6 +85,7 @@ const toCard = (item: CollectionEntry<CollectionName>): ThreadCard => {
         cover: study.cover?.trim() ? mediaSrc(study.cover.trim()) : undefined,
         coverFit: 'cover',
         kicker: study.status,
+        summary: study.lede?.trim() || undefined,
       };
     }
     case 'notes': {

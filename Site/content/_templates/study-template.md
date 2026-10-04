@@ -1,6 +1,9 @@
 ---
 title:
+subtitle:
 date:
+type:
+lede:
 status: seed
 
 threads: []
@@ -9,6 +12,7 @@ materials: []
 related: []
 
 cover:
+gallery: []
 youtube:
 
 draft: true

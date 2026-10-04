@@ -1,0 +1,408 @@
+---
+/**
+ * Study record: experiment / prototype / process documentation.
+ * Quieter than a Research Thread, more documentary than a Studio Note.
+ */
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GenerativeWaves from './GenerativeWaves.astro';
+import RelatedEntries from './RelatedEntries.astro';
+import ResearchGallery from './ResearchGallery.astro';
+import { formatDate, getBacklinks, isoDate, youtubeUrl } from '../lib/content';
+import {
+  hasMarkdownContent,
+  markdownSectionToHtml,
+  splitIntroAndRest,
+} from '../lib/markdown';
+import { collectionPath, mediaSrc, threadPath } from '../lib/paths';
+import { COLLECTION_LABELS_SINGULAR, THREAD_LABELS } from '../lib/vocabulary';
+
+interface Props {
+  entry: CollectionEntry<'studies'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+
+const title = data.title.trim();
+const subtitle = data.subtitle?.trim() || undefined;
+const lede = data.lede?.trim() || undefined;
+const typeLabel = data.type?.trim().replace(/-/g, ' ') || undefined;
+const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
+const galleryItems = data.gallery.filter((item) => item.src.trim());
+const youtube = data.youtube?.trim() ? youtubeUrl(data.youtube.trim()) : undefined;
+
+const { intro, rest } = splitIntroAndRest(entry.body ?? '');
+const withHtml = (sections: typeof intro) =>
+  sections
+    .map((section) => ({
+      heading: section.heading,
+      html: markdownSectionToHtml(section),
+    }))
+    .filter((section) => hasMarkdownContent(section.html.replace(/<[^>]+>/g, ' ')));
+
+const introSections = withHtml(intro);
+const restSections = withHtml(rest);
+
+const threads = data.threads.map((id) => ({
+  id,
+  label: THREAD_LABELS[id],
+  href: threadPath(id),
+}));
+
+const materials = data.materials.map((item) => item.trim()).filter(Boolean);
+const tags = data.tags.map((item) => item.trim()).filter(Boolean);
+const backlinks = await getBacklinks('studies', entry.id);
+---
+
+<BaseLayout title={title} description={lede}>
+  <article class="study">
+    <header class="study-hero">
+      <p class="study-hero__kicker">
+        <a href={collectionPath('studies')}>{COLLECTION_LABELS_SINGULAR.studies}</a>
+        <span aria-hidden="true"> / </span>
+        <span>{data.status}</span>
+      </p>
+      <h1 class="study-hero__title">{title}</h1>
+      {subtitle && <p class="study-hero__subtitle">{subtitle}</p>}
+      {lede && <p class="study-hero__lede">{lede}</p>}
+      <time class="visually-hidden" datetime={isoDate(data.date)}>
+        {formatDate(data.date)}
+      </time>
+    </header>
+
+    <div class="study-atmosphere">
+      <div class="study-field" aria-hidden="true">
+        <GenerativeWaves mode="fill" atmosphere label="" />
+      </div>
+
+      <div class="study-shell">
+        {
+          coverSrc && (
+            <figure class="study-cover">
+              <img src={coverSrc} alt="" />
+            </figure>
+          )
+        }
+
+        <dl class="study-meta">
+          <div class="study-meta__row">
+            <dt>Date</dt>
+            <dd>
+              <time datetime={isoDate(data.date)}>{formatDate(data.date)}</time>
+            </dd>
+          </div>
+          <div class="study-meta__row">
+            <dt>Status</dt>
+            <dd>{data.status}</dd>
+          </div>
+          {
+            typeLabel && (
+              <div class="study-meta__row">
+                <dt>Type</dt>
+                <dd>{typeLabel}</dd>
+              </div>
+            )
+          }
+          {
+            threads.length > 0 && (
+              <div class="study-meta__row">
+                <dt>Research Thread</dt>
+                <dd>
+                  <ul>
+                    {threads.map((thread) => (
+                      <li>
+                        <a href={thread.href}>{thread.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )
+          }
+          {
+            materials.length > 0 && (
+              <div class="study-meta__row">
+                <dt>Materials</dt>
+                <dd>
+                  <ul>
+                    {materials.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )
+          }
+          {
+            tags.length > 0 && (
+              <div class="study-meta__row">
+                <dt>Tags</dt>
+                <dd>
+                  <ul>
+                    {tags.map((tag) => (
+                      <li>{tag.replace(/-/g, ' ')}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )
+          }
+          {
+            youtube && (
+              <div class="study-meta__row">
+                <dt>Video</dt>
+                <dd>
+                  <a href={youtube} target="_blank" rel="noopener noreferrer">
+                    Watch
+                  </a>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+
+        {
+          introSections.map((section) => (
+            <section
+              class:list={['study-block', 'prose', section.heading && 'study-block--headed']}
+              set:html={section.html}
+            />
+          ))
+        }
+
+        {galleryItems.length > 0 && <ResearchGallery items={galleryItems} />}
+
+        {
+          restSections.map((section) => (
+            <section
+              class:list={['study-block', 'prose', section.heading && 'study-block--headed']}
+              set:html={section.html}
+            />
+          ))
+        }
+
+        <RelatedEntries refs={data.related} from={`studies/${entry.id}`} />
+        <RelatedEntries items={backlinks} heading="Referenced by" headingId="backlinks-heading" />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .study {
+    overflow-x: hidden;
+  }
+
+  .study-hero {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--space-3);
+    max-width: 44rem;
+    padding: var(--space-6) var(--page-gutter) var(--space-5);
+  }
+
+  .study-hero__kicker {
+    margin: 0;
+    width: max-content;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-link);
+  }
+
+  .study-hero__kicker a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .study-hero__title {
+    font-size: clamp(2rem, 1.3rem + 2.4vw, 3.4rem);
+    font-weight: var(--weight-title-light);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .study-hero__subtitle {
+    max-width: 36ch;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.1rem, 1rem + 0.45vw, 1.4rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg-muted);
+  }
+
+  .study-hero__lede {
+    max-width: 46ch;
+    margin-top: var(--space-1);
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.15rem, 1.02rem + 0.5vw, 1.45rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+
+  .study-atmosphere {
+    position: relative;
+  }
+
+  .study-field {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.08;
+    mask-image:
+      linear-gradient(to bottom, transparent 0%, #000 10%, #000 42%, transparent 78%),
+      radial-gradient(ellipse 80% 64% at 72% 28%, rgb(0 0 0 / 0.38) 0%, #000 76%);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0%, #000 10%, #000 42%, transparent 78%),
+      radial-gradient(ellipse 80% 64% at 72% 28%, rgb(0 0 0 / 0.38) 0%, #000 76%);
+    -webkit-mask-composite: source-in;
+  }
+
+  .study-field :global(.waves.waves--fill) {
+    position: sticky;
+    inset: auto;
+    top: 0;
+    width: 100%;
+    height: 100dvh;
+    background: transparent;
+  }
+
+  .study-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0 var(--page-gutter) var(--space-7);
+  }
+
+  .study-cover {
+    margin: 0;
+    min-width: 0;
+    max-width: 42rem;
+  }
+
+  .study-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 38rem;
+    object-fit: contain;
+    background: color-mix(in srgb, var(--color-gray-green) 22%, var(--color-white));
+  }
+
+  .study-meta {
+    display: grid;
+    gap: 0.65rem 1.75rem;
+    min-width: 0;
+    max-width: 40rem;
+    margin: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .study-meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .study-meta__row {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .study-meta dt {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .study-meta dd,
+  .study-meta li {
+    max-width: none;
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .study-meta ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.7rem;
+  }
+
+  .study-meta a {
+    color: inherit;
+  }
+
+  .study-block {
+    display: grid;
+    gap: var(--space-3);
+    min-width: 0;
+    max-width: var(--measure);
+  }
+
+  .study-block :global(h2) {
+    margin: 0;
+    font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.85rem);
+    font-weight: var(--weight-title-light);
+    letter-spacing: -0.03em;
+    line-height: var(--leading-snug);
+  }
+
+  .study-block :global(h3) {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: var(--weight-title-medium);
+    letter-spacing: -0.015em;
+  }
+
+  .study-block :global(p),
+  .study-block :global(li) {
+    max-width: 46ch;
+  }
+
+  .study-block :global(blockquote) {
+    margin-block: var(--space-4);
+    padding: 0.15em 0 0.15em 1.05em;
+    border-left: 1px solid var(--color-pink);
+    max-width: 36rem;
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.15rem, 1.02rem + 0.55vw, 1.5rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.025em;
+    color: var(--fg);
+    quotes: none;
+  }
+
+  .study-block :global(blockquote)::before,
+  .study-block :global(blockquote)::after {
+    content: none;
+  }
+
+  .study-block :global(blockquote p) {
+    max-width: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .study-field :global(.waves canvas) {
+      opacity: 0.55;
+    }
+  }
+</style>

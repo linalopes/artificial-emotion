@@ -20,10 +20,12 @@ const latest = published.slice(0, 3).map((study, index) => {
   const isPlaceholder = /^(placeholder\.?\s*)+$/i.test(fromBody);
   const status = study.data.status;
   const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+  const authored = study.data.lede?.trim() || undefined;
   const lede =
-    fromBody && !isPlaceholder
+    authored ||
+    (fromBody && !isPlaceholder
       ? fromBody
-      : [statusLabel, threads].filter(Boolean).join(' · ');
+      : [statusLabel, threads].filter(Boolean).join(' · '));
 
   return {
     href: entryPath('studies', study.id),
