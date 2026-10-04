@@ -139,8 +139,8 @@ And a very small external movement becomes something that can be perceived as a 
 
 ## Files
 
-- **SVG template:** [download / view SVG]()
-- **PDF template:** [download / view PDF]({{PDF_URL}})
+- **SVG template:** [download / view SVG](https://github.com/linalopes/artificial-emotion/blob/main/little-heart-machine/paper_heart_template.svg)
+- **PDF template:** [download / view PDF]()
 
 ## Fabrication
 
