@@ -18,11 +18,9 @@ threads:
 tags:
   - paris
   - residency
-  - creative-technology
   - sensitive-machines
+  - creative-technology
   - engineering-education
-  - prototyping
-  - transdisciplinary-research
 
 related: []
 

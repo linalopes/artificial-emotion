@@ -25,14 +25,12 @@ gallery:
     alt: papers on table
 tags:
   - paper
-  - origami
   - folding
-  - soft-materials
-  - flexible-materials
   - heart
   - movement
-  - workshop
-  - artificial-emotion
+  - silhouette-cameo
+  - digital-cutting
+  - 3d-printing
 related:
   - events/open-research-studio
 draft: false

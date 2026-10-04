@@ -18,20 +18,14 @@ galleryFolder: artificial-emotion/heartbeat-biosignals
 gallery: []
 tags:
   - heartbeat
+  - heart
   - biosignals
-  - bioart
-  - embodied-data
   - sensing
   - ecg
   - ppg
   - phonocardiography
   - echocardiography
-  - pulse
-  - heart-sound
-  - cardiac-motion
-  - kinetic-sculpture
-  - physical-computing
-  - artificial-emotion
+  - touch
 draft: false
 ---
 

@@ -32,6 +32,7 @@ threads:
 tags:
   - open-studio
   - public-research
+  - wetzikon
 related:
   - studies/paper-heart
 

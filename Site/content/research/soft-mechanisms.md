@@ -16,16 +16,14 @@ cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791121982/IMG_6154.we
 galleryFolder: artificial-emotion/soft-mechanisms
 gallery:
 tags:
-  - textiles
-  - soft-mechanics
+  - textile
   - wearable-electronics
   - e-textiles
-  - kinetic-sculpture
   - tension
   - actuation
   - movement
-  - fabrication
-  - artistic-research
+  - folding
+  - smocking
 draft: false
 ---
 

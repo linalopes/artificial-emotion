@@ -18,15 +18,12 @@ threads:
 
 tags:
   - wetzikon
-  - zurich
-  - zurcher-oberland
-  - creative-technology
-  - ai-for-creative-practices
-  - physical-computing
-  - artistic-research
-  - experimental-education
   - schonau
   - textile-history
+  - ai-for-creative-practices
+  - physical-computing
+  - experimental-education
+  - creative-technology
 
 related: []
 

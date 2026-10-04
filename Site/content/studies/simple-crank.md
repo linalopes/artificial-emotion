@@ -30,15 +30,11 @@ tags:
   - crank
   - automata
   - wood
-  - brass-wire
   - wire
-  - motion
+  - movement
   - mechanisms
   - hand-tools
-  - prototyping
   - creative-learning
-  - tinkering
-  - artificial-emotion
 related:
   - events/open-research-studio
 draft: false

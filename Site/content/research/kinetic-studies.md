@@ -19,18 +19,13 @@ gallery: []
 tags:
   - kinetic-art
   - movement
-  - mechanisms
-  - motors
-  - stepper-motors
-  - spools
-  - pulleys
+  - stepper-motor
+  - spool
+  - pulley
   - tension
   - suspension
+  - gravity
   - rhythm
-  - behaviour
-  - prototyping
-  - physical-computing
-  - artificial-emotion
 draft: false
 ---
 

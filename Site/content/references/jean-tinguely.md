@@ -7,8 +7,7 @@ referenceType: artist
 url: 
 threads:
   - kinetic-studies
-tags:
-  - example
+tags: []
 related: []
 image: 
 draft: false

@@ -17,15 +17,12 @@ threads:
   - heartbeat-biosignals
 
 tags:
-  - artist
   - creative-technology
   - physical-computing
   - artificial-intelligence
   - interactive-installation
   - experimental-education
-  - artistic-research
   - wetzikon
-  - zurich
   - brazil
 
 related:
