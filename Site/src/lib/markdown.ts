@@ -2,7 +2,14 @@
  * Small Markdown helpers for splitting an entry body into named H2 sections
  * and rendering those fragments to HTML. Used when a page needs to show
  * About / Program / Documentation / Reflection independently, and skip empty headings.
+ *
+ * Raw HTML is escaped on purpose. Internal labs use the `::lab{src title}` directive.
  */
+import { isLabDirectiveLine, labEmbedHtml, parseLabDirective } from './lab-embed';
+
+export type MarkdownPart =
+  | { type: 'html'; html: string }
+  | { type: 'lab'; src: string; title: string };
 
 export interface MarkdownSection {
   /** H2 title, or null for copy before the first H2. */
@@ -69,9 +76,20 @@ export function splitIntroAndRest(markdown: string): {
 
 /** Render one split section, restoring its H2 when present. */
 export function markdownSectionToHtml(section: MarkdownSection): string {
+  return markdownSectionToParts(section)
+    .map((part) => (part.type === 'lab' ? labEmbedHtml(part) : part.html))
+    .join('');
+}
+
+/** Same as `markdownSectionToHtml`, but keeps lab directives as typed parts. */
+export function markdownSectionToParts(section: MarkdownSection): MarkdownPart[] {
   const heading = section.heading ? `<h2>${inline(section.heading)}</h2>` : '';
-  const body = markdownToSafeHtml(section.body);
-  return `${heading}${body}`;
+  const parts = markdownToParts(section.body);
+  if (!heading) return parts;
+  if (parts[0]?.type === 'html') {
+    return [{ type: 'html', html: heading + parts[0].html }, ...parts.slice(1)];
+  }
+  return [{ type: 'html', html: heading }, ...parts];
 }
 
 function escapeHtml(value: string): string {
@@ -86,10 +104,11 @@ function inline(value: string): string {
     .replace(/`([^`]+)`/g, '<code>$1</code>');
 }
 
-type BlockKind = 'quote' | 'ul' | 'ol' | 'other';
+type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'other';
 
 function lineKind(line: string): BlockKind {
   const text = line.trim();
+  if (isLabDirectiveLine(text)) return 'lab';
   if (/^>/.test(text)) return 'quote';
   if (/^[-*]\s+\S/.test(text)) return 'ul';
   if (/^\d+\.\s+\S/.test(text)) return 'ol';
@@ -116,6 +135,11 @@ function renderQuote(lines: readonly string[]): string {
 }
 
 function renderRun(kind: BlockKind, lines: readonly string[]): string {
+  if (kind === 'lab') {
+    const parsed = parseLabDirective(lines.map((line) => line.trim()).join(' '));
+    return parsed ? labEmbedHtml(parsed) : `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
+  }
+
   if (kind === 'quote') return renderQuote(lines);
 
   if (kind === 'ul') {
@@ -145,32 +169,49 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
- * Covers paragraphs, lists, blockquotes, links, emphasis and images.
+ * Covers paragraphs, lists, blockquotes, links, emphasis, images,
+ * and internal `::lab` embeds. Raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
+  return markdownToParts(markdown)
+    .map((part) => (part.type === 'lab' ? labEmbedHtml(part) : part.html))
+    .join('');
+}
+
+export function markdownToParts(markdown: string): MarkdownPart[] {
   const normalized = markdown
     .replace(/^\uFEFF/, '')
     .trim()
     .replace(/^[ \t]+$/gm, '');
 
-  return normalized
-    .split(/\n{2,}/)
-    .map((block) => {
-      const lines = block.split('\n').filter((line) => line.trim().length > 0);
-      if (lines.length === 0) return '';
+  const parts: MarkdownPart[] = [];
 
-      const runs: { kind: BlockKind; lines: string[] }[] = [];
-      for (const line of lines) {
-        const kind = lineKind(line);
-        const current = runs[runs.length - 1];
-        if (current && current.kind === kind) current.lines.push(line);
-        else runs.push({ kind, lines: [line] });
+  for (const block of normalized.split(/\n{2,}/)) {
+    const lines = block.split('\n').filter((line) => line.trim().length > 0);
+    if (lines.length === 0) continue;
+
+    const runs: { kind: BlockKind; lines: string[] }[] = [];
+    for (const line of lines) {
+      const kind = lineKind(line);
+      const current = runs[runs.length - 1];
+      if (current && current.kind === kind) current.lines.push(line);
+      else runs.push({ kind, lines: [line] });
+    }
+
+    for (const run of runs) {
+      if (run.kind === 'lab') {
+        const parsed = parseLabDirective(run.lines.map((line) => line.trim()).join(' '));
+        if (parsed) {
+          parts.push({ type: 'lab', src: parsed.src, title: parsed.title });
+          continue;
+        }
       }
+      const html = renderRun(run.kind, run.lines);
+      if (html) parts.push({ type: 'html', html });
+    }
+  }
 
-      return runs.map((run) => renderRun(run.kind, run.lines)).join('');
-    })
-    .filter(Boolean)
-    .join('');
+  return parts;
 }
 
 /** Pull list markup into a separate fragment so Program can sit in two columns. */

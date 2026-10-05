@@ -15,6 +15,12 @@ interface Props {
   header?: 'default' | 'publication';
   /** Keep experimental pages out of search indexes. */
   noindex?: boolean;
+  /**
+   * Hide site chrome (header, nav, footer, search).
+   * Also applied at runtime when the URL has `?embed=1`, so static
+   * production builds of the same HTML can be embedded without a second page.
+   */
+  embed?: boolean;
 }
 
 const siteName = 'Artificial Emotion';
@@ -26,7 +32,10 @@ const {
   theme = 'light',
   header = 'default',
   noindex = false,
+  embed = false,
 } = Astro.props;
+
+const isEmbed = embed || Astro.url.searchParams.get('embed') === '1';
 
 const themeColor =
   header === 'publication' || theme === 'dark' ? '#22113e' : theme === 'soft' ? '#cad8d8' : '#ffffff';
@@ -45,7 +54,7 @@ const googleFonts =
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} class:list={[isEmbed && 'embed']}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -62,11 +71,37 @@ const googleFonts =
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href={googleFonts} />
+    <script is:inline>
+      (function () {
+        try {
+          if (new URLSearchParams(location.search).get('embed') !== '1') return;
+          document.documentElement.classList.add('embed');
+          var removeChrome = function () {
+            ['.site-header', '.site-footer', '.site-search'].forEach(function (sel) {
+              document.querySelectorAll(sel).forEach(function (el) {
+                el.remove();
+              });
+            });
+          };
+          if (document.body) removeChrome();
+          else document.addEventListener('DOMContentLoaded', removeChrome);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class={theme === 'light' ? undefined : `theme-${theme}`}>
-    <SiteHeader variant={header} />
+    {!isEmbed && <SiteHeader variant={header} />}
     <slot />
-    <SiteFooter />
-    <SiteSearch />
+    {!isEmbed && <SiteFooter />}
+    {!isEmbed && <SiteSearch />}
   </body>
 </html>
+
+<style is:global>
+  /* Static production HTML is shared for ?embed=1; hide chrome before first paint. */
+  html.embed .site-header,
+  html.embed .site-footer,
+  html.embed .site-search {
+    display: none !important;
+  }
+</style>

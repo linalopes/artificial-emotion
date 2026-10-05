@@ -7,7 +7,7 @@ import {
   MASK_BLACK,
   PAPER_WHITE,
   type HeartGeometry,
-  type KinegramModel,
+  type SlitAnimationModel,
 } from './types';
 
 function xmlEscape(value: string): string {
@@ -51,7 +51,7 @@ function circlePath(cx: number, cy: number, radius: number): string {
 
 /** Interlaced red heart: each frame clipped to its radial wedges. */
 export function encodedHeart(
-  model: KinegramModel,
+  model: SlitAnimationModel,
   cx: number,
   cy: number,
   radius: number,
@@ -81,7 +81,7 @@ export function encodedHeart(
 }
 
 /** Black disc with transparent radial apertures. */
-export function maskEvenoddPath(model: KinegramModel, cx: number, cy: number, radius: number): string {
+export function maskEvenoddPath(model: SlitAnimationModel, cx: number, cy: number, radius: number): string {
   const { params, wedgeCount, wedgeAngle } = model;
   const parts = [circlePath(cx, cy, radius)];
   for (let i = 0; i < wedgeCount; i += 1) {
@@ -92,7 +92,7 @@ export function maskEvenoddPath(model: KinegramModel, cx: number, cy: number, ra
   return `<path fill-rule="evenodd" fill="${MASK_BLACK}" d="${parts.join(' ')}"/>`;
 }
 
-function discSvg(model: KinegramModel, kind: 'base' | 'mask'): string {
+function discSvg(model: SlitAnimationModel, kind: 'base' | 'mask'): string {
   const d = model.params.diameterMm;
   const r = d / 2;
   const cx = r;
@@ -100,22 +100,22 @@ function discSvg(model: KinegramModel, kind: 'base' | 'mask'): string {
   const bg = kind === 'base' ? `<rect width="${d}" height="${d}" fill="${PAPER_WHITE}"/>` : '';
   const paper = kind === 'base' ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${PAPER_WHITE}"/>` : '';
   const art =
-    kind === 'base' ? encodedHeart(model, cx, cy, r, 'hk') : maskEvenoddPath(model, cx, cy, r);
+    kind === 'base' ? encodedHeart(model, cx, cy, r, 'sa') : maskEvenoddPath(model, cx, cy, r);
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${d}mm" height="${d}mm" viewBox="0 0 ${d} ${d}">
 ${bg}${paper}${art}${marks(cx, cy, r, model.params.guideMm)}
 </svg>`;
 }
 
-export function exportBaseSvg(model: KinegramModel): string {
+export function exportBaseSvg(model: SlitAnimationModel): string {
   return discSvg(model, 'base');
 }
 
-export function exportMaskSvg(model: KinegramModel): string {
+export function exportMaskSvg(model: SlitAnimationModel): string {
   return discSvg(model, 'mask');
 }
 
-export function exportA4TestSheetSvg(model: KinegramModel): string {
+export function exportA4TestSheetSvg(model: SlitAnimationModel): string {
   const { width, height } = A4_MM;
   const d = model.params.diameterMm;
   const r = d / 2;
@@ -134,11 +134,11 @@ export function exportA4TestSheetSvg(model: KinegramModel): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}mm" height="${height}mm" viewBox="0 0 ${width} ${height}">
 <rect width="${width}" height="${height}" fill="${PAPER_WHITE}"/>
-<text x="${cx}" y="${labelYTop}" text-anchor="middle" font-family="sans-serif" font-size="3.2" fill="#22113E">${xmlEscape('BASE — PAPER')}</text>
+<text x="${cx}" y="${labelYTop}" text-anchor="middle" font-family="sans-serif" font-size="3.2" fill="#22113E">${xmlEscape('ENCODED BASE — PAPER')}</text>
 <circle cx="${cx}" cy="${topCy}" r="${r}" fill="${PAPER_WHITE}"/>
 ${baseArt}
 ${marks(cx, topCy, r, model.params.guideMm)}
-<text x="${cx}" y="${labelYBot}" text-anchor="middle" font-family="sans-serif" font-size="3.2" fill="#22113E">${xmlEscape('MASK — TRANSPARENCY')}</text>
+<text x="${cx}" y="${labelYBot}" text-anchor="middle" font-family="sans-serif" font-size="3.2" fill="#22113E">${xmlEscape('SLIT MASK — TRANSPARENCY')}</text>
 ${maskArt}
 ${marks(cx, botCy, r, model.params.guideMm)}
 </svg>`;

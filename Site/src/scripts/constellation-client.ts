@@ -13,8 +13,8 @@
  *   - an "ambient" requestAnimationFrame loop (node breathing, travelling
  *     pulses on `related` links). Disabled under prefers-reduced-motion.
  */
+import { drag as d3Drag, type D3DragEvent } from 'd3-drag';
 import {
-  drag as d3Drag,
   forceCenter,
   forceCollide,
   forceLink,
@@ -22,13 +22,11 @@ import {
   forceSimulation,
   forceX,
   forceY,
-  select,
-  type D3DragEvent,
-  type Selection,
   type Simulation,
   type SimulationLinkDatum,
   type SimulationNodeDatum,
-} from 'd3';
+} from 'd3-force';
+import { select, type Selection } from 'd3-selection';
 import type { ConstellationGraph, ConstellationNode } from '../lib/constellation';
 import { CONSTELLATION_CONFIG, type RelationType } from '../lib/constellation.config';
 

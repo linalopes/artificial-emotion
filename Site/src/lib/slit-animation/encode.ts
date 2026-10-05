@@ -1,29 +1,29 @@
 import { generateHeartbeatFrames, frameNames, contractionForFrame } from './heart';
-import { DEFAULT_PARAMS, type KinegramModel, type KinegramParams } from './types';
+import { DEFAULT_PARAMS, type SlitAnimationModel, type SlitAnimationParams } from './types';
 
-export function wedgeAngle(params: Pick<KinegramParams, 'frames' | 'slices'>): number {
+export function wedgeAngle(params: Pick<SlitAnimationParams, 'frames' | 'slices'>): number {
   return (Math.PI * 2) / (params.frames * params.slices);
 }
 
-export function wedgeCount(params: Pick<KinegramParams, 'frames' | 'slices'>): number {
+export function wedgeCount(params: Pick<SlitAnimationParams, 'frames' | 'slices'>): number {
   return params.frames * params.slices;
 }
 
 /** Frame revealed when the mask is rotated by `angle` radians. */
-export function frameAtAngle(angle: number, params: Pick<KinegramParams, 'frames' | 'slices'>): number {
+export function frameAtAngle(angle: number, params: Pick<SlitAnimationParams, 'frames' | 'slices'>): number {
   const da = wedgeAngle(params);
   const idx = Math.round(angle / da);
   const n = params.frames;
   return ((idx % n) + n) % n;
 }
 
-export function snapAngle(angle: number, params: Pick<KinegramParams, 'frames' | 'slices'>): number {
+export function snapAngle(angle: number, params: Pick<SlitAnimationParams, 'frames' | 'slices'>): number {
   const da = wedgeAngle(params);
   return Math.round(angle / da) * da;
 }
 
-export function buildKinegram(partial: Partial<KinegramParams> = {}): KinegramModel {
-  const params: KinegramParams = {
+export function buildSlitAnimation(partial: Partial<SlitAnimationParams> = {}): SlitAnimationModel {
+  const params: SlitAnimationParams = {
     frames: partial.frames ?? DEFAULT_PARAMS.frames,
     slices: partial.slices ?? DEFAULT_PARAMS.slices,
     diameterMm: partial.diameterMm ?? DEFAULT_PARAMS.diameterMm,
@@ -70,7 +70,7 @@ export function isMaskSolid(wedgeIndex: number, frames: number): boolean {
   return wedgeIndex % frames !== 0;
 }
 
-export function apertureWedges(params: Pick<KinegramParams, 'frames' | 'slices'>): number[] {
+export function apertureWedges(params: Pick<SlitAnimationParams, 'frames' | 'slices'>): number[] {
   const total = wedgeCount(params);
   const open: number[] = [];
   for (let i = 0; i < total; i += 1) {

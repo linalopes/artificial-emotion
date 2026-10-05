@@ -9,8 +9,8 @@ export {
   MASK_BLACK,
   PAPER_WHITE,
   type HeartGeometry,
-  type KinegramModel,
-  type KinegramParams,
+  type SlitAnimationModel,
+  type SlitAnimationParams,
   type Point,
 } from './types';
 
@@ -28,7 +28,7 @@ export {
 
 export {
   apertureWedges,
-  buildKinegram,
+  buildSlitAnimation,
   frameAtAngle,
   isMaskSolid,
   snapAngle,

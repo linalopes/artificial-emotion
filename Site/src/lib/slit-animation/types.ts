@@ -1,4 +1,4 @@
-/** Shared types for the Heartbeat Kinegram lab. Unit space: disc radius = 1, origin at centre, y down. */
+/** Shared types for the Heartbeat Slit Animation lab. Unit space: disc radius = 1, origin at centre, y down. */
 
 export type Point = { x: number; y: number };
 
@@ -23,7 +23,7 @@ export type HeartGeometry = {
   vessels: BezierPath[];
 };
 
-export type KinegramParams = {
+export type SlitAnimationParams = {
   frames: number;
   slices: number;
   /** Physical disc diameter in millimetres. */
@@ -32,8 +32,8 @@ export type KinegramParams = {
   guideMm: number;
 };
 
-export type KinegramModel = {
-  params: KinegramParams;
+export type SlitAnimationModel = {
+  params: SlitAnimationParams;
   names: string[];
   contractions: number[];
   hearts: HeartGeometry[];
@@ -46,7 +46,7 @@ export const MASK_BLACK = '#000000';
 export const PAPER_WHITE = '#FFFFFF';
 export const MARK_STROKE = '#6B5A78';
 
-export const DEFAULT_PARAMS: KinegramParams = {
+export const DEFAULT_PARAMS: SlitAnimationParams = {
   frames: 6,
   slices: 10,
   diameterMm: 120,

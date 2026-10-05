@@ -1,12 +1,12 @@
 /**
- * Heartbeat Kinegram — p5 instance-mode lab.
- * Preview and SVG export share src/lib/kinegram geometry.
+ * Heartbeat Slit Animation — p5 instance-mode lab.
+ * Preview and SVG export share src/lib/slit-animation geometry.
  */
 import p5 from 'p5';
 import {
   CLOCK_TICK_DEG,
   DEFAULT_PARAMS,
-  buildKinegram,
+  buildSlitAnimation,
   clockReport,
   downloadSvg,
   drawCheckerboard,
@@ -23,10 +23,10 @@ import {
   frameAtAngle,
   snapAngle,
   wedgeAngle,
-  type KinegramModel,
-  type KinegramParams,
+  type SlitAnimationModel,
+  type SlitAnimationParams,
   type PreviewMode,
-} from '../lib/kinegram';
+} from '../lib/slit-animation';
 
 const LAB_BG = '#22113E';
 
@@ -40,44 +40,44 @@ function readNumber(el: HTMLInputElement | HTMLSelectElement, fallback: number):
   return Number.isFinite(n) ? n : fallback;
 }
 
-export function mountHeartbeatKinegram(root: HTMLElement): void {
-  const canvasHost = root.querySelector<HTMLElement>('[data-kine-canvas]');
+export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
+  const canvasHost = root.querySelector<HTMLElement>('[data-slit-canvas]');
   if (!canvasHost) return;
 
   const ui = {
-    preview: root.querySelectorAll<HTMLButtonElement>('[data-kine-preview]'),
-    rotation: root.querySelector<HTMLInputElement>('[data-kine-rotation]'),
-    angle: root.querySelector<HTMLElement>('[data-kine-angle]'),
-    snap: root.querySelector<HTMLButtonElement>('[data-kine-snap]'),
-    prev: root.querySelector<HTMLButtonElement>('[data-kine-prev]'),
-    next: root.querySelector<HTMLButtonElement>('[data-kine-next]'),
-    tick: root.querySelector<HTMLButtonElement>('[data-kine-tick]'),
-    tickBack: root.querySelector<HTMLButtonElement>('[data-kine-tick-back]'),
-    frames: root.querySelector<HTMLSelectElement>('[data-kine-frames]'),
-    slices: root.querySelector<HTMLInputElement>('[data-kine-slices]'),
-    diameter: root.querySelector<HTMLInputElement>('[data-kine-diameter]'),
-    guide: root.querySelector<HTMLInputElement>('[data-kine-guide]'),
-    state: root.querySelector<HTMLElement>('[data-kine-state]'),
-    slicesOut: root.querySelector<HTMLElement>('[data-kine-slices-out]'),
-    diameterOut: root.querySelector<HTMLElement>('[data-kine-diameter-out]'),
-    guideOut: root.querySelector<HTMLElement>('[data-kine-guide-out]'),
-    positions: root.querySelector<HTMLElement>('[data-kine-positions]'),
-    step: root.querySelector<HTMLElement>('[data-kine-step]'),
-    clockTick: root.querySelector<HTMLElement>('[data-kine-clock-tick]'),
-    clockStep: root.querySelector<HTMLElement>('[data-kine-clock-step]'),
-    clockPositions: root.querySelector<HTMLElement>('[data-kine-clock-positions]'),
-    clockAdvance: root.querySelector<HTMLElement>('[data-kine-clock-advance]'),
-    clockStatus: root.querySelector<HTMLElement>('[data-kine-clock-status]'),
-    clockNote: root.querySelector<HTMLElement>('[data-kine-clock-note]'),
-    presets: root.querySelectorAll<HTMLButtonElement>('[data-kine-preset]'),
-    a4Fit: root.querySelector<HTMLElement>('[data-kine-a4-fit]'),
-    exportA4: root.querySelector<HTMLButtonElement>('[data-kine-export-a4]'),
-    exportBase: root.querySelector<HTMLButtonElement>('[data-kine-export-base]'),
-    exportMask: root.querySelector<HTMLButtonElement>('[data-kine-export-mask]'),
+    preview: root.querySelectorAll<HTMLButtonElement>('[data-slit-preview]'),
+    rotation: root.querySelector<HTMLInputElement>('[data-slit-rotation]'),
+    angle: root.querySelector<HTMLElement>('[data-slit-angle]'),
+    snap: root.querySelector<HTMLButtonElement>('[data-slit-snap]'),
+    prev: root.querySelector<HTMLButtonElement>('[data-slit-prev]'),
+    next: root.querySelector<HTMLButtonElement>('[data-slit-next]'),
+    tick: root.querySelector<HTMLButtonElement>('[data-slit-tick]'),
+    tickBack: root.querySelector<HTMLButtonElement>('[data-slit-tick-back]'),
+    frames: root.querySelector<HTMLSelectElement>('[data-slit-frames]'),
+    slices: root.querySelector<HTMLInputElement>('[data-slit-slices]'),
+    diameter: root.querySelector<HTMLInputElement>('[data-slit-diameter]'),
+    guide: root.querySelector<HTMLInputElement>('[data-slit-guide]'),
+    state: root.querySelector<HTMLElement>('[data-slit-state]'),
+    slicesOut: root.querySelector<HTMLElement>('[data-slit-slices-out]'),
+    diameterOut: root.querySelector<HTMLElement>('[data-slit-diameter-out]'),
+    guideOut: root.querySelector<HTMLElement>('[data-slit-guide-out]'),
+    positions: root.querySelector<HTMLElement>('[data-slit-positions]'),
+    step: root.querySelector<HTMLElement>('[data-slit-step]'),
+    clockTick: root.querySelector<HTMLElement>('[data-slit-clock-tick]'),
+    clockStep: root.querySelector<HTMLElement>('[data-slit-clock-step]'),
+    clockPositions: root.querySelector<HTMLElement>('[data-slit-clock-positions]'),
+    clockAdvance: root.querySelector<HTMLElement>('[data-slit-clock-advance]'),
+    clockStatus: root.querySelector<HTMLElement>('[data-slit-clock-status]'),
+    clockNote: root.querySelector<HTMLElement>('[data-slit-clock-note]'),
+    presets: root.querySelectorAll<HTMLButtonElement>('[data-slit-preset]'),
+    a4Fit: root.querySelector<HTMLElement>('[data-slit-a4-fit]'),
+    exportA4: root.querySelector<HTMLButtonElement>('[data-slit-export-a4]'),
+    exportBase: root.querySelector<HTMLButtonElement>('[data-slit-export-base]'),
+    exportMask: root.querySelector<HTMLButtonElement>('[data-slit-export-mask]'),
   };
 
-  const params: KinegramParams = { ...DEFAULT_PARAMS };
-  let model: KinegramModel = buildKinegram(params);
+  const params: SlitAnimationParams = { ...DEFAULT_PARAMS };
+  let model: SlitAnimationModel = buildSlitAnimation(params);
   let preview: PreviewMode = 'composite';
   let rotation = 0;
   let dragging = false;
@@ -88,7 +88,7 @@ export function mountHeartbeatKinegram(root: HTMLElement): void {
     if (ui.slices) params.slices = Math.round(readNumber(ui.slices, DEFAULT_PARAMS.slices));
     if (ui.diameter) params.diameterMm = readNumber(ui.diameter, DEFAULT_PARAMS.diameterMm);
     if (ui.guide) params.guideMm = readNumber(ui.guide, DEFAULT_PARAMS.guideMm);
-    model = buildKinegram(params);
+    model = buildSlitAnimation(params);
     if (ui.slicesOut) ui.slicesOut.textContent = String(params.slices);
     if (ui.diameterOut) ui.diameterOut.textContent = `${params.diameterMm} mm`;
     if (ui.guideOut) ui.guideOut.textContent = `${params.guideMm} mm`;
@@ -97,7 +97,7 @@ export function mountHeartbeatKinegram(root: HTMLElement): void {
       ui.a4Fit.hidden = fits;
     }
     ui.presets.forEach((btn) => {
-      const [f, s] = (btn.dataset.kinePreset ?? '').split(',').map(Number);
+      const [f, s] = (btn.dataset.slitPreset ?? '').split(',').map(Number);
       btn.setAttribute('aria-pressed', f === params.frames && s === params.slices ? 'true' : 'false');
     });
     updateState();
@@ -115,8 +115,8 @@ export function mountHeartbeatKinegram(root: HTMLElement): void {
     if (ui.clockAdvance) ui.clockAdvance.textContent = formatCount(report.framesPerTick);
     if (ui.clockStatus) {
       ui.clockStatus.textContent = report.status;
-      ui.clockStatus.classList.remove('kine__status--good', 'kine__status--mixed', 'kine__status--poor');
-      ui.clockStatus.classList.add(`kine__status--${report.fit}`);
+      ui.clockStatus.classList.remove('slit__status--good', 'slit__status--mixed', 'slit__status--poor');
+      ui.clockStatus.classList.add(`slit__status--${report.fit}`);
     }
     if (ui.clockNote) ui.clockNote.textContent = report.interpretation;
   };
@@ -138,14 +138,14 @@ export function mountHeartbeatKinegram(root: HTMLElement): void {
   const setPreview = (next: PreviewMode) => {
     preview = next;
     ui.preview.forEach((btn) => {
-      const on = btn.dataset.kinePreview === next;
+      const on = btn.dataset.slitPreview === next;
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   };
 
   ui.preview.forEach((btn) => {
     btn.addEventListener('click', () => {
-      const mode = btn.dataset.kinePreview as PreviewMode;
+      const mode = btn.dataset.slitPreview as PreviewMode;
       if (mode) setPreview(mode);
     });
   });
@@ -177,7 +177,7 @@ export function mountHeartbeatKinegram(root: HTMLElement): void {
 
   ui.presets.forEach((btn) => {
     btn.addEventListener('click', () => {
-      const [f, s] = (btn.dataset.kinePreset ?? '').split(',').map(Number);
+      const [f, s] = (btn.dataset.slitPreset ?? '').split(',').map(Number);
       if (!Number.isFinite(f) || !Number.isFinite(s)) return;
       if (ui.frames) ui.frames.value = String(f);
       if (ui.slices) ui.slices.value = String(s);
@@ -191,13 +191,13 @@ export function mountHeartbeatKinegram(root: HTMLElement): void {
   }
 
   ui.exportA4?.addEventListener('click', () => {
-    downloadSvg('heartbeat-kinegram-a4-test-sheet.svg', exportA4TestSheetSvg(model));
+    downloadSvg('heartbeat-slit-animation-a4-test-sheet.svg', exportA4TestSheetSvg(model));
   });
   ui.exportBase?.addEventListener('click', () => {
-    downloadSvg('heartbeat-kinegram-base.svg', exportBaseSvg(model));
+    downloadSvg('heartbeat-slit-animation-base.svg', exportBaseSvg(model));
   });
   ui.exportMask?.addEventListener('click', () => {
-    downloadSvg('heartbeat-kinegram-mask.svg', exportMaskSvg(model));
+    downloadSvg('heartbeat-slit-animation-mask.svg', exportMaskSvg(model));
   });
 
   const sketch = (p: p5) => {

@@ -1,0 +1,491 @@
+---
+/**
+ * date: 2026-10-05
+ * document: Heartbeat Slit Animation Lab
+ * role: experimental lab / fabrication tool
+ * page: /lab/heartbeat-slit-animation/
+ *
+ * Isolated rotational barrier-grid animation study. Not in navigation, not indexed.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CLOCK_PRESETS, DEFAULT_PARAMS, FRAME_CHOICES } from '../../lib/slit-animation/types';
+
+const isEmbed = Astro.url.searchParams.get('embed') === '1';
+---
+
+<!--
+  date: 2026-10-05
+  document: Heartbeat Slit Animation Lab
+  role: experimental lab / fabrication tool
+  page: /lab/heartbeat-slit-animation/
+-->
+<BaseLayout
+  title="Heartbeat Slit Animation Lab"
+  description="A rotational barrier-grid animation simulator and fabrication tool."
+  theme="dark"
+  noindex
+  embed={isEmbed}
+>
+  <main class="lab" data-pagefind-ignore="all" data-slit-animation>
+    <header class="lab__header">
+      <p class="label">Lab · prototype</p>
+      <h1>Heartbeat Slit Animation Lab</h1>
+      <p class="lab__subtitle">A rotational barrier-grid animation simulator and fabrication tool</p>
+      <p class="lab__lede">
+        An experimental tool for designing a physical slit animation driven by a quartz clock mechanism.
+        Multiple states of an anatomical heart are interlaced into a fixed image and revealed through a rotating radial mask.
+        The animation is encoded physically into printed layers rather than played on a screen.
+      </p>
+      <p class="lab__note">
+        Barrier-grid animation interlaces multiple image states into a single image. An opaque mask with
+        narrow openings reveals different fragments as it moves. In this experiment, the usual linear slit
+        system is transformed into a circular one, so rotation around a clock axis reveals the animation.
+      </p>
+      <p class="lab__note">
+        A simple mechanical rotation is translated into the perception of a beating body. The goal is
+        perceptual behavior, not physiological realism.
+      </p>
+      <p class="lab__note">
+        Barrier-grid animation predates digital animation and appeared in several printed optical systems.
+        A historical example is the French Ombro-Cinéma, which used linear interlaced images and a striped
+        barrier. This lab adapts the same general principle to circular rotation.
+      </p>
+    </header>
+
+    <div class="slit">
+      <div class="slit__stage" data-slit-canvas aria-label="Heartbeat slit animation simulator"></div>
+
+      <div class="slit__panel">
+        <p class="slit__state" data-slit-state>State 1 / 6 — Open</p>
+        <p class="slit__hint">Visual motion state — not a medical phase.</p>
+
+        <fieldset class="slit__fieldset">
+          <legend>Preview</legend>
+          <div class="slit__tabs" role="toolbar" aria-label="Preview mode">
+            <button type="button" data-slit-preview="composite" aria-pressed="true">Composite</button>
+            <button type="button" data-slit-preview="base" aria-pressed="false">Encoded Base</button>
+            <button type="button" data-slit-preview="mask" aria-pressed="false">Slit Mask</button>
+            <button type="button" data-slit-preview="source" aria-pressed="false">Source Frame</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="slit__fieldset">
+          <legend>Rotation</legend>
+          <p class="slit__angle">Angle: <output data-slit-angle>0.0°</output></p>
+          <label class="slit__row">
+            <span>Angle</span>
+            <input data-slit-rotation type="range" min="0" max="360" step="0.1" value="0" />
+          </label>
+          <div class="slit__actions">
+            <button type="button" data-slit-tick-back>−6° Clock tick</button>
+            <button type="button" data-slit-tick>＋6° Clock tick</button>
+          </div>
+          <div class="slit__actions">
+            <button type="button" data-slit-snap>Snap to frame</button>
+            <button type="button" data-slit-prev>Prev frame</button>
+            <button type="button" data-slit-next>Next frame</button>
+          </div>
+          <p class="slit__hint">
+            Rotate the slit mask manually, or step it using the controls. A standard ticking quartz second hand
+            advances by 6° per second. Use the clock-tick buttons to test whether the current encoding works
+            well with a real clock mechanism.
+          </p>
+        </fieldset>
+
+        <fieldset class="slit__fieldset">
+          <legend>Clock Compatibility</legend>
+          <dl class="slit__stats">
+            <div><dt>Clock tick</dt><dd data-slit-clock-tick>6°</dd></div>
+            <div><dt>Encoding step</dt><dd data-slit-clock-step>6.0°</dd></div>
+            <div><dt>Total encoded positions</dt><dd data-slit-clock-positions>60</dd></div>
+            <div><dt>Frames advanced per clock tick</dt><dd data-slit-clock-advance>1.0</dd></div>
+          </dl>
+          <p class="slit__status slit__status--good" data-slit-clock-status>
+            This encoding aligns cleanly with a 6° quartz tick.
+          </p>
+          <p class="slit__hint" data-slit-clock-note>
+            Each second advances one encoded position — one visual state.
+          </p>
+          <details class="slit__details">
+            <summary>What happens with a real clock?</summary>
+            <p>
+              When driven by a real quartz second-hand clock movement, the slit mask does not move continuously.
+              It jumps 6° once per second. That means some encodings work better than others. If the encoded
+              angular step does not align well with 6°, the animation may skip states or appear less smooth.
+            </p>
+            <p>
+              The goal of this lab is not a medically realistic systole/diastole simulation. The goal is to
+              find a visual encoding that produces a convincing kinetic effect when printed and driven by a
+              real mechanism.
+            </p>
+          </details>
+        </fieldset>
+
+        <fieldset class="slit__fieldset">
+          <legend>Frame Interlacing</legend>
+          <label class="slit__row">
+            <span>Frames</span>
+            <select data-slit-frames>
+              {FRAME_CHOICES.map((n) => (
+                <option value={n} selected={n === DEFAULT_PARAMS.frames}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p class="slit__hint">Frames = the number of different visual states encoded into the disc.</p>
+          <label class="slit__row">
+            <span>Slices per frame <output data-slit-slices-out>{DEFAULT_PARAMS.slices}</output></span>
+            <input
+              data-slit-slices
+              type="range"
+              min="5"
+              max="28"
+              step="1"
+              value={DEFAULT_PARAMS.slices}
+            />
+          </label>
+          <p class="slit__hint">
+            Slices per frame = how many times each frame is repeated around the circle. More slices can
+            improve continuity, but they also change how the design behaves with a real clock tick.
+          </p>
+          <dl class="slit__stats">
+            <div>
+              <dt>Total encoded positions</dt>
+              <dd data-slit-positions>{DEFAULT_PARAMS.frames} × {DEFAULT_PARAMS.slices} = {DEFAULT_PARAMS.frames * DEFAULT_PARAMS.slices}</dd>
+            </div>
+            <div>
+              <dt>Encoding step angle</dt>
+              <dd data-slit-step>6.0° per position</dd>
+            </div>
+          </dl>
+          <p class="slit__preset-label">Clock-friendly presets</p>
+          <div class="slit__actions" role="group" aria-label="Clock-friendly presets">
+            {CLOCK_PRESETS.map((preset) => (
+              <button
+                type="button"
+                data-slit-preset={`${preset.frames},${preset.slices}`}
+                aria-pressed={preset.frames === DEFAULT_PARAMS.frames && preset.slices === DEFAULT_PARAMS.slices ? 'true' : 'false'}
+              >
+                {preset.frames} × {preset.slices}{preset.frames === 6 && preset.slices === 10 ? ' · rec.' : ''}
+              </button>
+            ))}
+          </div>
+          <p class="slit__hint">These presets align exactly with a 6° quartz second-hand tick.</p>
+        </fieldset>
+
+        <fieldset class="slit__fieldset">
+          <legend>Physical</legend>
+          <label class="slit__row">
+            <span>Disc diameter <output data-slit-diameter-out>{DEFAULT_PARAMS.diameterMm} mm</output></span>
+            <input
+              data-slit-diameter
+              type="range"
+              min="80"
+              max="180"
+              step="1"
+              value={DEFAULT_PARAMS.diameterMm}
+            />
+          </label>
+          <label class="slit__row">
+            <span>Center guide <output data-slit-guide-out>{DEFAULT_PARAMS.guideMm} mm</output></span>
+            <input
+              data-slit-guide
+              type="range"
+              min="1"
+              max="12"
+              step="0.5"
+              value={DEFAULT_PARAMS.guideMm}
+            />
+          </label>
+          <p class="slit__warn" data-slit-a4-fit hidden>
+            Two discs at this diameter no longer fit on one A4 sheet at 1:1. Disc SVGs remain correct.
+          </p>
+        </fieldset>
+
+        <fieldset class="slit__fieldset">
+          <legend>Export</legend>
+          <div class="slit__actions slit__actions--stack">
+            <button type="button" class="slit__primary" data-slit-export-a4>Export A4 Test Sheet SVG</button>
+            <button type="button" data-slit-export-base>Export Encoded Base SVG</button>
+            <button type="button" data-slit-export-mask>Export Slit Mask SVG</button>
+          </div>
+        </fieldset>
+
+        <aside class="slit__fab">
+          <p><strong>Encoded base:</strong> Print on white paper.</p>
+          <p><strong>Slit mask:</strong> Print on transparent inkjet film using black ink.</p>
+          <p><strong>Print at:</strong> 100% / Actual Size. Do not Fit to Page.</p>
+        </aside>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import { mountHeartbeatSlitAnimation } from '../../scripts/heartbeat-slit-animation-client';
+  const root = document.querySelector<HTMLElement>('[data-slit-animation]');
+  if (root) mountHeartbeatSlitAnimation(root);
+</script>
+
+<style>
+  .lab {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-4) var(--page-gutter) var(--space-5);
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  :global(html.embed) .lab {
+    max-width: none;
+    margin: 0;
+    padding: var(--space-3);
+  }
+
+  .lab__header {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .lab__header h1 {
+    font-size: var(--text-xl);
+    color: var(--accent);
+  }
+
+  .lab__subtitle {
+    font-size: var(--text-lg);
+    color: var(--fg);
+    max-width: 48ch;
+  }
+
+  .lab__lede,
+  .lab__note {
+    color: var(--fg-muted);
+    max-width: 62ch;
+  }
+
+  .lab__note {
+    font-size: var(--text-sm);
+  }
+
+  .slit {
+    display: grid;
+    gap: var(--space-3);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .slit {
+      grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+      gap: var(--space-4);
+    }
+  }
+
+  .slit__stage {
+    width: min(100%, 72dvh, 44rem);
+    aspect-ratio: 1 / 1;
+    justify-self: center;
+    background: var(--bg);
+    touch-action: none;
+  }
+
+  .slit__stage :global(canvas) {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    cursor: grab;
+  }
+
+  .slit__stage :global(canvas:active) {
+    cursor: grabbing;
+  }
+
+  .slit__panel {
+    display: grid;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .slit__state {
+    font-family: var(--font-title);
+    font-size: var(--text-lg);
+    color: var(--accent-alt);
+    max-width: none;
+    margin-bottom: 0;
+  }
+
+  .slit__angle {
+    font-family: var(--font-title);
+    font-size: var(--text-lg);
+    color: var(--fg);
+    max-width: none;
+  }
+
+  .slit__angle output {
+    font-family: var(--font-mono);
+  }
+
+  .slit__stats {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+  }
+
+  .slit__stats > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    max-width: none;
+  }
+
+  .slit__stats dt {
+    color: var(--fg-muted);
+  }
+
+  .slit__stats dd {
+    margin: 0;
+    text-align: right;
+    color: var(--fg);
+  }
+
+  .slit__status {
+    max-width: none;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--rule);
+  }
+
+  .slit__status--good {
+    border-color: var(--accent-alt);
+    color: var(--accent-alt);
+  }
+
+  .slit__status--mixed {
+    color: var(--fg);
+  }
+
+  .slit__status--poor {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .slit__preset-label {
+    margin: 0.2rem 0 0;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-label);
+    color: var(--fg-muted);
+    max-width: none;
+  }
+
+  .slit__details {
+    max-width: none;
+  }
+
+  .slit__details summary {
+    cursor: pointer;
+    color: var(--fg);
+  }
+
+  .slit__details p {
+    margin-top: 0.5rem;
+    max-width: none;
+    color: var(--fg-muted);
+  }
+
+  .slit__fieldset {
+    border: 1px solid var(--rule);
+    padding: 0.85rem 0.9rem 1rem;
+    display: grid;
+    gap: 0.65rem;
+    min-width: 0;
+  }
+
+  .slit__fieldset legend {
+    padding-inline: 0.35rem;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-label);
+  }
+
+  .slit__tabs,
+  .slit__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .slit__actions--stack {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .slit__row {
+    display: grid;
+    gap: 0.35rem;
+    max-width: none;
+  }
+
+  .slit__row span {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .slit__row input[type='range'] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .slit__row select {
+    font: inherit;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--rule);
+    padding: 0.35rem 0.5rem;
+    max-width: 8rem;
+  }
+
+  .slit__panel button {
+    font: inherit;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--fg-muted);
+    padding: 0.4rem 0.7rem;
+    cursor: pointer;
+  }
+
+  .slit__panel button:hover,
+  .slit__panel button[aria-pressed='true'] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .slit__primary {
+    border-color: var(--accent-alt) !important;
+    color: var(--accent-alt) !important;
+  }
+
+  .slit__hint,
+  .slit__warn,
+  .slit__fab p {
+    max-width: none;
+    color: var(--fg-muted);
+  }
+
+  .slit__warn {
+    color: var(--accent);
+  }
+
+  .slit__fab {
+    display: grid;
+    gap: 0.35rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 0.85rem;
+  }
+
+  .slit__fab strong {
+    color: var(--fg);
+    font-weight: var(--weight-mono-regular);
+  }
+</style>

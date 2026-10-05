@@ -314,14 +314,35 @@ function pickAlt(resource: CloudinaryResource): string {
   return firstField(context, ALT_KEYS) || firstField(structured, ALT_KEYS) || '';
 }
 
-function derivedVideoPoster(src: string): string | undefined {
+/**
+ * Still frame from a Cloudinary video delivery URL.
+ * Inserts `so_auto` (representative frame) and requests JPG.
+ * Does not require a separate uploaded thumbnail.
+ */
+export function cloudinaryVideoPoster(src: string): string | undefined {
   try {
-    const url = new URL(src);
+    const url = new URL(src.trim());
     if (!url.hostname.includes('cloudinary.com')) return undefined;
-    if (!url.pathname.includes('/video/upload/')) return undefined;
-    url.pathname = url.pathname
-      .replace('/video/upload/', '/video/upload/so_0/')
-      .replace(/\.[a-z0-9]+$/i, '.jpg');
+    const marker = '/video/upload/';
+    const at = url.pathname.indexOf(marker);
+    if (at === -1) return undefined;
+
+    const head = url.pathname.slice(0, at + marker.length);
+    const segments = url.pathname.slice(at + marker.length).split('/').filter(Boolean);
+    const versionAt = segments.findIndex((part) => /^v\d+$/.test(part));
+    const transformParts = versionAt === -1 ? [] : segments.slice(0, versionAt);
+    const rest = versionAt === -1 ? segments : segments.slice(versionAt);
+    const withoutOffset = transformParts
+      .map((part) =>
+        part
+          .split(',')
+          .filter((token) => token.length > 0 && !token.startsWith('so_'))
+          .join(','),
+      )
+      .filter(Boolean);
+
+    url.pathname = `${head}${['so_auto', ...withoutOffset, ...rest].join('/')}`;
+    url.pathname = url.pathname.replace(/\.[a-z0-9]+$/i, '.jpg');
     return url.toString();
   } catch {
     return undefined;
@@ -331,7 +352,7 @@ function derivedVideoPoster(src: string): string | undefined {
 function pickPoster(resource: CloudinaryResource, src: string): string | undefined {
   const fromContext = firstField(contextFields(resource), POSTER_KEYS);
   if (fromContext) return fromContext;
-  return derivedVideoPoster(src);
+  return cloudinaryVideoPoster(src);
 }
 
 function toGalleryItem(resource: CloudinaryResource): GalleryItem | undefined {

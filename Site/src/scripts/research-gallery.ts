@@ -1,6 +1,9 @@
 /**
  * Compact Research Thread gallery: one item at a time, keyboard, swipe,
  * and polite autoplay. Captions/alt come from Cloudinary at build time.
+ *
+ * Images advance on AUTOPLAY_MS. Videos autoplay (muted, inline) while
+ * active; the carousel waits for `ended` instead of the image timer.
  */
 
 const AUTOPLAY_MS = 4000;
@@ -20,14 +23,17 @@ export function mountResearchGallery(root: HTMLElement): void {
   const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   let index = 0;
+  let ready = false;
   let pointerId: number | undefined;
   let startX = 0;
   let advanceTimer: number | undefined;
   let resumeTimer: number | undefined;
   let pausedHover = false;
   let pausedFocus = false;
-  let pausedVideo = false;
   let pausedManual = false;
+  let userPausedVideo = false;
+  let programmaticPause = false;
+  let programmaticPlay = false;
 
   const prefersReducedMotion = () => motionQuery.matches;
 
@@ -42,19 +48,18 @@ export function mountResearchGallery(root: HTMLElement): void {
 
   const activeVideo = () => activeSlide()?.querySelector('video') ?? null;
 
-  const isVideoPlaying = () => {
-    const video = activeVideo();
-    return Boolean(video && !video.paused && !video.ended);
-  };
+  const allVideos = () => [...root.querySelectorAll('video')];
 
-  const canAutoplay = () =>
+  const canAdvance = () =>
     !prefersReducedMotion() &&
     !document.hidden &&
     !pausedHover &&
     !pausedFocus &&
-    !pausedVideo &&
     !pausedManual &&
+    !userPausedVideo &&
     !lightboxOpen();
+
+  const canAutoplayVideo = () => !prefersReducedMotion() && !document.hidden && !lightboxOpen();
 
   const stopAdvance = () => {
     if (advanceTimer !== undefined) {
@@ -70,12 +75,68 @@ export function mountResearchGallery(root: HTMLElement): void {
     }
   };
 
+  const withProgrammaticPause = (fn: () => void) => {
+    programmaticPause = true;
+    try {
+      fn();
+    } finally {
+      queueMicrotask(() => {
+        programmaticPause = false;
+      });
+    }
+  };
+
+  const resetVideo = (video: HTMLVideoElement) => {
+    withProgrammaticPause(() => {
+      video.pause();
+      try {
+        video.currentTime = 0;
+      } catch {
+        // Seeking can fail before metadata; ignore.
+      }
+      video.preload = 'metadata';
+    });
+  };
+
+  const pauseInactiveVideos = () => {
+    allVideos().forEach((video) => {
+      if (video.closest('[data-slide]') === activeSlide()) return;
+      resetVideo(video);
+    });
+  };
+
+  const isActiveVideoPlaying = () => {
+    const video = activeVideo();
+    return Boolean(video && !video.paused && !video.ended);
+  };
+
+  const playSafe = (video: HTMLVideoElement) => {
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    programmaticPlay = true;
+    const attempt = video.play();
+    if (attempt === undefined) {
+      programmaticPlay = false;
+      return;
+    }
+    void attempt
+      .catch(() => {
+        /* Autoplay blocked: native controls remain. */
+      })
+      .finally(() => {
+        programmaticPlay = false;
+        if (video.paused && !video.ended && !userPausedVideo) scheduleAdvance();
+      });
+  };
+
   const scheduleAdvance = () => {
     stopAdvance();
-    if (!canAutoplay()) return;
+    if (!canAdvance()) return;
+    if (isActiveVideoPlaying() || userPausedVideo) return;
     advanceTimer = window.setTimeout(() => {
       advanceTimer = undefined;
-      if (!canAutoplay() || isVideoPlaying()) return;
+      if (!canAdvance() || isActiveVideoPlaying() || userPausedVideo) return;
       show(index + 1, 'auto');
     }, AUTOPLAY_MS);
   };
@@ -91,24 +152,31 @@ export function mountResearchGallery(root: HTMLElement): void {
     }, RESUME_MS);
   };
 
-  const syncVideoState = () => {
-    pausedVideo = isVideoPlaying();
-    if (pausedVideo) stopAdvance();
+  const startActiveVideo = () => {
+    const video = activeVideo();
+    if (!video) {
+      scheduleAdvance();
+      return;
+    }
+    stopAdvance();
+    if (!canAutoplayVideo()) return;
+    playSafe(video);
   };
 
   const show = (nextIndex: number, origin: 'auto' | 'manual' = 'manual') => {
-    index = ((nextIndex % total) + total) % total;
+    const wrapped = ((nextIndex % total) + total) % total;
+    if (ready && wrapped === index) {
+      if (origin === 'manual') noteManual();
+      return;
+    }
+
+    index = wrapped;
     slides.forEach((slide, i) => {
       const active = i === index;
       slide.classList.toggle('is-active', active);
       slide.toggleAttribute('aria-hidden', !active);
       if (active) slide.removeAttribute('inert');
       else slide.setAttribute('inert', '');
-      if (!active) {
-        slide.querySelectorAll('video').forEach((video) => {
-          video.pause();
-        });
-      }
     });
     thumbs.forEach((thumb, i) => {
       if (i === index) thumb.setAttribute('aria-current', 'true');
@@ -117,14 +185,17 @@ export function mountResearchGallery(root: HTMLElement): void {
     if (currentEl) currentEl.textContent = String(index + 1);
     if (liveEl) liveEl.setAttribute('aria-live', origin === 'manual' ? 'polite' : 'off');
     root.setAttribute('data-index', String(index));
-    syncVideoState();
+
+    userPausedVideo = false;
+    pauseInactiveVideos();
+    startActiveVideo();
     if (origin === 'manual') noteManual();
-    else scheduleAdvance();
   };
 
   root.dataset.ready = '';
   slides.forEach((slide) => slide.removeAttribute('hidden'));
   show(0, 'auto');
+  ready = true;
 
   prev?.addEventListener('click', () => show(index - 1));
   next?.addEventListener('click', () => show(index + 1));
@@ -170,26 +241,48 @@ export function mountResearchGallery(root: HTMLElement): void {
     scheduleAdvance();
   });
 
-  root.addEventListener('play', (event) => {
-    if (!(event.target instanceof HTMLVideoElement)) return;
-    if (event.target.closest('[data-slide]') !== activeSlide()) return;
-    pausedVideo = true;
-    stopAdvance();
-  }, true);
+  root.addEventListener(
+    'play',
+    (event) => {
+      if (!(event.target instanceof HTMLVideoElement)) return;
+      const video = event.target;
+      allVideos().forEach((other) => {
+        if (other === video) return;
+        withProgrammaticPause(() => other.pause());
+      });
+      if (video.closest('[data-slide]') !== activeSlide()) return;
+      userPausedVideo = false;
+      stopAdvance();
+      if (!programmaticPlay) noteManual();
+    },
+    true,
+  );
 
-  root.addEventListener('pause', (event) => {
-    if (!(event.target instanceof HTMLVideoElement)) return;
-    if (event.target.closest('[data-slide]') !== activeSlide()) return;
-    pausedVideo = isVideoPlaying();
-    if (!pausedVideo) scheduleAdvance();
-  }, true);
+  root.addEventListener(
+    'pause',
+    (event) => {
+      if (!(event.target instanceof HTMLVideoElement)) return;
+      if (programmaticPause) return;
+      if (event.target.closest('[data-slide]') !== activeSlide()) return;
+      if (event.target.ended) return;
+      userPausedVideo = true;
+      stopAdvance();
+      noteManual();
+    },
+    true,
+  );
 
-  root.addEventListener('ended', (event) => {
-    if (!(event.target instanceof HTMLVideoElement)) return;
-    if (event.target.closest('[data-slide]') !== activeSlide()) return;
-    pausedVideo = false;
-    scheduleAdvance();
-  }, true);
+  root.addEventListener(
+    'ended',
+    (event) => {
+      if (!(event.target instanceof HTMLVideoElement)) return;
+      if (event.target.closest('[data-slide]') !== activeSlide()) return;
+      userPausedVideo = false;
+      if (prefersReducedMotion() || document.hidden) return;
+      show(index + 1, 'auto');
+    },
+    true,
+  );
 
   const isSwipeTarget = (target: EventTarget | null) => {
     if (!(target instanceof Element)) return false;
@@ -215,7 +308,15 @@ export function mountResearchGallery(root: HTMLElement): void {
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopAdvance();
+    const video = activeVideo();
+    if (document.hidden) {
+      stopAdvance();
+      if (video && !video.paused) {
+        withProgrammaticPause(() => video.pause());
+      }
+      return;
+    }
+    if (video && !userPausedVideo && canAutoplayVideo()) playSafe(video);
     else scheduleAdvance();
   });
 
@@ -229,9 +330,12 @@ export function mountResearchGallery(root: HTMLElement): void {
       stopAdvance();
       stopResume();
       pausedManual = false;
+      withProgrammaticPause(() => {
+        allVideos().forEach((video) => video.pause());
+      });
       return;
     }
-    scheduleAdvance();
+    startActiveVideo();
   };
 
   motionQuery.addEventListener('change', onMotionChange);

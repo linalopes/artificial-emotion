@@ -272,6 +272,35 @@ hr {
   padding-left: 1.25em;
 }
 
+/* Internal lab embeds from the `::lab` Markdown directive */
+.lab-embed {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: none;
+  margin-block: var(--space-2) 0;
+}
+
+.lab-embed iframe {
+  display: block;
+  width: 100%;
+  height: min(68dvh, 32rem);
+  border: 1px solid var(--rule);
+  background: var(--color-deep-purple, #22113e);
+}
+
+@media (min-width: 40rem) {
+  .lab-embed iframe {
+    height: 820px;
+  }
+}
+
+.lab-embed__open {
+  max-width: none;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
 /* Small labels, metadata, mono accents */
 .label {
   font-family: var(--font-mono);

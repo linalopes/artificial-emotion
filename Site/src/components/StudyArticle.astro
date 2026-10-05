@@ -6,6 +6,7 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import LabEmbed from './LabEmbed.astro';
 import RelatedEntries from './RelatedEntries.astro';
 import ResearchGallery from './ResearchGallery.astro';
 import PagefindMeta from './PagefindMeta.astro';
@@ -13,7 +14,7 @@ import TagLinks from './TagLinks.astro';
 import { formatDate, getBacklinks, isoDate, youtubeUrl } from '../lib/content';
 import {
   hasMarkdownContent,
-  markdownSectionToHtml,
+  markdownSectionToParts,
   splitIntroAndRest,
 } from '../lib/markdown';
 import { collectionPath, mediaSrc, threadPath } from '../lib/paths';
@@ -35,16 +36,22 @@ const galleryItems = data.gallery.filter((item) => item.src.trim());
 const youtube = data.youtube?.trim() ? youtubeUrl(data.youtube.trim()) : undefined;
 
 const { intro, rest } = splitIntroAndRest(entry.body ?? '');
-const withHtml = (sections: typeof intro) =>
+const withParts = (sections: typeof intro) =>
   sections
     .map((section) => ({
       heading: section.heading,
-      html: markdownSectionToHtml(section),
+      parts: markdownSectionToParts(section),
     }))
-    .filter((section) => hasMarkdownContent(section.html.replace(/<[^>]+>/g, ' ')));
+    .filter((section) =>
+      section.parts.some((part) =>
+        part.type === 'lab'
+          ? true
+          : hasMarkdownContent(part.html.replace(/<[^>]+>/g, ' ')),
+      ),
+    );
 
-const introSections = withHtml(intro);
-const restSections = withHtml(rest);
+const introSections = withParts(intro);
+const restSections = withParts(rest);
 
 const threads = data.threads.map((id) => ({
   id,
@@ -173,8 +180,15 @@ const backlinks = await getBacklinks('studies', entry.id);
           introSections.map((section) => (
             <section
               class:list={['study-block', 'prose', section.heading && 'study-block--headed']}
-              set:html={section.html}
-            />
+            >
+              {section.parts.map((part) =>
+                part.type === 'lab' ? (
+                  <LabEmbed src={part.src} title={part.title} />
+                ) : (
+                  <Fragment set:html={part.html} />
+                ),
+              )}
+            </section>
           ))
         }
 
@@ -184,8 +198,15 @@ const backlinks = await getBacklinks('studies', entry.id);
           restSections.map((section) => (
             <section
               class:list={['study-block', 'prose', section.heading && 'study-block--headed']}
-              set:html={section.html}
-            />
+            >
+              {section.parts.map((part) =>
+                part.type === 'lab' ? (
+                  <LabEmbed src={part.src} title={part.title} />
+                ) : (
+                  <Fragment set:html={part.html} />
+                ),
+              )}
+            </section>
           ))
         }
 
@@ -405,6 +426,15 @@ const backlinks = await getBacklinks('studies', entry.id);
     gap: var(--space-3);
     min-width: 0;
     max-width: var(--measure);
+  }
+
+  .study-block:has(.lab-embed) {
+    max-width: min(100%, 54rem);
+  }
+
+  .study-block :global(.lab-embed),
+  .study-block :global(.lab-embed__open) {
+    max-width: none;
   }
 
   .study-block :global(h2) {

@@ -6,7 +6,7 @@ import {
   PAPER_WHITE,
   type BezierPath,
   type HeartGeometry,
-  type KinegramModel,
+  type SlitAnimationModel,
 } from './types';
 
 export type PreviewMode = 'composite' | 'base' | 'mask' | 'source';
@@ -42,7 +42,7 @@ export function drawHeart(ctx: CanvasRenderingContext2D, geom: HeartGeometry, cx
 
 export function drawEncodedBase(
   ctx: CanvasRenderingContext2D,
-  model: KinegramModel,
+  model: SlitAnimationModel,
   cx: number,
   cy: number,
   radius: number,
@@ -63,7 +63,7 @@ export function drawEncodedBase(
 
 export function drawMask(
   ctx: CanvasRenderingContext2D,
-  model: KinegramModel,
+  model: SlitAnimationModel,
   cx: number,
   cy: number,
   radius: number,

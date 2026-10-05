@@ -1,0 +1,28 @@
+---
+/**
+ * Internal lab iframe for study (and other) pages.
+ * Only same-origin `/lab/` routes are accepted.
+ */
+import { internalLabEmbedHref, internalLabHref } from '../lib/lab-embed';
+
+interface Props {
+  src: string;
+  title: string;
+}
+
+const { src, title } = Astro.props;
+const openUrl = internalLabHref(src);
+const embedUrl = internalLabEmbedHref(src);
+const label = title.trim() || 'Lab';
+---
+
+{
+  openUrl && embedUrl && (
+    <div class="lab-embed">
+      <iframe src={embedUrl} title={label} loading="lazy"></iframe>
+      <p class="lab-embed__open">
+        <a href={openUrl}>Open the {label}</a>
+      </p>
+    </div>
+  )
+}
