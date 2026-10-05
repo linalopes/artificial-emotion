@@ -7,6 +7,9 @@ import {
   getPublishedByTag,
   getPublishedTagIndex,
   isoDate,
+  referenceByline,
+  referenceCoverPath,
+  REFERENCE_CONTAIN_TYPES,
   TAG_COLLECTION_LABELS,
   TAGGED_COLLECTIONS,
   tagDisplayLabel,
@@ -100,15 +103,16 @@ function noteCards(entries: TagContent['notes']): TagCard[] {
 function referenceCards(entries: TagContent['references']): TagCard[] {
   return entries.map((entry) => {
     const { data } = entry;
-    const year =
-      data.year !== undefined && String(data.year).trim() ? String(data.year).trim() : undefined;
-    const byline = [data.creator?.trim() || undefined, year].filter(Boolean).join(' · ');
+    const type = data.referenceType?.trim().toLowerCase() || undefined;
+    const cover = referenceCoverPath(data);
     return {
       href: entryPath('references', entry.id),
       title: data.title,
-      cover: data.image?.trim() ? mediaSrc(data.image.trim()) : undefined,
+      cover: cover ? mediaSrc(cover) : undefined,
+      coverFit: type && REFERENCE_CONTAIN_TYPES.has(type) ? 'contain' : 'cover',
       kicker: data.referenceType?.trim().replace(/-/g, ' ') || undefined,
-      meta: byline || undefined,
+      lede: data.lede?.trim() || undefined,
+      meta: referenceByline(data.title, data),
     };
   });
 }

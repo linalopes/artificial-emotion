@@ -1,0 +1,358 @@
+---
+/**
+ * External source entering the research.
+ * Stronger than a Studio Note, quieter than a Research Thread.
+ */
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GenerativeWaves from './GenerativeWaves.astro';
+import PagefindMeta from './PagefindMeta.astro';
+import RelatedEntries from './RelatedEntries.astro';
+import ResearchGallery from './ResearchGallery.astro';
+import TagLinks from './TagLinks.astro';
+import {
+  formatReferenceYear,
+  getBacklinks,
+  isoDate,
+  referenceCoverPath,
+  referenceCreator,
+} from '../lib/content';
+import { collectionPath, mediaSrc, threadPath } from '../lib/paths';
+import { COLLECTION_LABELS_SINGULAR, THREAD_LABELS } from '../lib/vocabulary';
+
+interface Props {
+  entry: CollectionEntry<'references'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const title = data.title.trim();
+const lede = data.lede?.trim() || undefined;
+const typeLabel = data.referenceType?.trim().replace(/-/g, ' ') || undefined;
+const year = formatReferenceYear(data.year);
+const creator = referenceCreator(title, data.creator);
+const facts = [creator, year, typeLabel].filter(Boolean);
+const byline = facts.join(' · ');
+const coverPath = referenceCoverPath(data);
+const coverSrc = coverPath ? mediaSrc(coverPath) : undefined;
+const galleryItems = data.gallery.filter((item) => item.src.trim());
+const sourceUrl = data.url?.trim() || undefined;
+const tags = data.tags.map((item) => item.trim()).filter(Boolean);
+
+const threads = data.threads.map((id) => ({
+  id,
+  label: THREAD_LABELS[id],
+  href: threadPath(id),
+}));
+
+const backlinks = await getBacklinks('references', entry.id);
+---
+
+<BaseLayout title={title} description={lede}>
+  <article class="reference" data-pagefind-body>
+    <PagefindMeta
+      type="reference"
+      title={title}
+      threads={data.threads.map((thread) => THREAD_LABELS[thread]).join(' · ') || undefined}
+      tags={tags.join(', ') || undefined}
+      date={isoDate(data.date)}
+      year={year}
+    />
+
+    <header class="reference-hero">
+      <div class="reference-hero__field" aria-hidden="true">
+        <GenerativeWaves mode="fill" />
+      </div>
+      <div class="reference-hero__veil" aria-hidden="true"></div>
+
+      <div class="reference-hero__stage">
+        <a class="reference-hero__kicker" href={collectionPath('references')}>
+          {COLLECTION_LABELS_SINGULAR.references}
+        </a>
+        <h1 class="reference-hero__title" data-pagefind-weight="10">{title}</h1>
+        {byline && <p class="reference-hero__facts">{byline}</p>}
+        {lede && <p class="reference-hero__lede">{lede}</p>}
+      </div>
+    </header>
+
+    <div class="reference-shell">
+      {
+        coverSrc && (
+          <figure class="reference-cover">
+            <img src={coverSrc} alt="" />
+          </figure>
+        )
+      }
+
+      {
+        (threads.length > 0 || tags.length > 0 || sourceUrl) && (
+          <dl class="reference-meta">
+            {threads.length > 0 && (
+              <div class="reference-meta__row">
+                <dt>Research Thread</dt>
+                <dd>
+                  <ul>
+                    {threads.map((thread) => (
+                      <li>
+                        <a href={thread.href}>{thread.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )}
+            {tags.length > 0 && (
+              <div class="reference-meta__row">
+                <dt>Tags</dt>
+                <dd>
+                  <TagLinks tags={tags} />
+                </dd>
+              </div>
+            )}
+            {sourceUrl && (
+              <div class="reference-meta__row">
+                <dt>Source</dt>
+                <dd>
+                  <a href={sourceUrl} target="_blank" rel="noopener noreferrer">
+                    View source <span aria-hidden="true">↗</span>
+                  </a>
+                </dd>
+              </div>
+            )}
+          </dl>
+        )
+      }
+
+      <div class="reference-body prose">
+        <Content />
+      </div>
+
+      {
+        galleryItems.length > 0 && (
+          <div class="reference-gallery">
+            <ResearchGallery items={galleryItems} />
+          </div>
+        )
+      }
+
+      <RelatedEntries refs={data.related} from={`references/${entry.id}`} />
+      <RelatedEntries items={backlinks} heading="Referenced by" headingId="backlinks-heading" />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .reference {
+    overflow-x: hidden;
+  }
+
+  .reference-hero {
+    position: relative;
+    display: grid;
+    isolation: isolate;
+  }
+
+  .reference-hero__field,
+  .reference-hero__veil {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .reference-hero__field {
+    z-index: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: min(28rem, 70%);
+  }
+
+  @media (min-width: 40rem) {
+    .reference-hero__field {
+      left: 18%;
+      width: 92%;
+      height: 78%;
+    }
+  }
+
+  .reference-hero__veil {
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(
+        90deg,
+        var(--color-white) 0%,
+        color-mix(in srgb, var(--color-white) 88%, transparent) 22%,
+        color-mix(in srgb, var(--color-white) 32%, transparent) 48%,
+        transparent 68%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-white) 18%, transparent) 0%,
+        transparent 22%,
+        color-mix(in srgb, var(--color-white) 55%, transparent) 72%,
+        var(--color-white) 100%
+      );
+  }
+
+  @media (max-width: 39.99rem) {
+    .reference-hero__field {
+      height: 58%;
+    }
+
+    .reference-hero__veil {
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--color-white) 78%, transparent) 0%,
+          color-mix(in srgb, var(--color-white) 48%, transparent) 26%,
+          color-mix(in srgb, var(--color-white) 36%, transparent) 48%,
+          color-mix(in srgb, var(--color-white) 82%, transparent) 78%,
+          var(--color-white) 100%
+        ),
+        radial-gradient(
+          ellipse 95% 58% at 12% 22%,
+          color-mix(in srgb, var(--color-white) 84%, transparent) 0%,
+          transparent 72%
+        );
+    }
+  }
+
+  .reference-hero__stage {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-5) var(--page-gutter) var(--space-6);
+  }
+
+  .reference-hero__kicker {
+    width: max-content;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--fg-muted);
+  }
+
+  .reference-hero__title {
+    max-width: 16ch;
+    font-size: clamp(2.2rem, 5.8vw, 4.1rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+  }
+
+  .reference-hero__facts {
+    max-width: 42ch;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .reference-hero__lede {
+    max-width: 38ch;
+    margin-top: var(--space-2);
+    font-family: var(--font-title);
+    font-weight: var(--weight-title-light);
+    font-size: clamp(1.1rem, 1rem + 0.4vw, 1.4rem);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+
+  .reference-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0 var(--page-gutter) var(--space-7);
+  }
+
+  .reference-cover {
+    margin: 0;
+    min-width: 0;
+    max-width: 46rem;
+  }
+
+  .reference-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: min(70vh, 40rem);
+    object-fit: contain;
+    object-position: center;
+    background: color-mix(in srgb, var(--color-gray-green) 18%, var(--color-white));
+  }
+
+  .reference-meta {
+    display: grid;
+    gap: 0.85rem 1.75rem;
+    min-width: 0;
+    max-width: 40rem;
+    margin: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .reference-meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .reference-meta__row {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .reference-meta dt {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .reference-meta dd,
+  .reference-meta li {
+    max-width: none;
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
+  .reference-meta ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.7rem;
+  }
+
+  .reference-body {
+    max-width: 46ch;
+  }
+
+  .reference-gallery {
+    min-width: 0;
+    max-width: 52rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reference-hero__field {
+      opacity: 0.28;
+    }
+  }
+</style>

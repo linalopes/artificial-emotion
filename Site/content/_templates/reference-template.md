@@ -4,17 +4,14 @@ date:
 creator:
 year:
 referenceType:
+lede:
 url:
+cover:
+gallery: []
 
 threads: []
 tags: []
 related: []
 
-image:
-
 draft: true
 ---
-
-## Why it matters
-
-## Notes

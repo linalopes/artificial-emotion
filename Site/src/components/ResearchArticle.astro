@@ -11,6 +11,9 @@ import {
   formatDate,
   getPublishedByThread,
   isoDate,
+  referenceByline,
+  referenceCoverPath,
+  REFERENCE_CONTAIN_TYPES,
   THREADED_COLLECTIONS,
 } from '../lib/content';
 import {
@@ -104,16 +107,15 @@ const toCard = (item: CollectionEntry<CollectionName>): ThreadCard => {
     }
     case 'references': {
       const { data: reference } = item;
-      const byline = [reference.creator?.trim(), reference.year !== undefined ? String(reference.year) : undefined]
-        .filter(Boolean)
-        .join(', ');
+      const type = reference.referenceType?.trim().toLowerCase() || undefined;
+      const cover = referenceCoverPath(reference);
       return {
         href,
         title: reference.title,
-        cover: reference.image?.trim() ? mediaSrc(reference.image.trim()) : undefined,
-        coverFit: 'cover',
+        cover: cover ? mediaSrc(cover) : undefined,
+        coverFit: type && REFERENCE_CONTAIN_TYPES.has(type) ? 'contain' : 'cover',
         kicker: reference.referenceType?.trim().replace(/-/g, ' ') || undefined,
-        summary: byline || undefined,
+        summary: reference.lede?.trim() || referenceByline(reference.title, reference) || undefined,
       };
     }
     case 'events': {

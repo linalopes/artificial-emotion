@@ -1,20 +1,30 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPublished, sortByTitle } from '../../lib/content';
+import {
+  getPublished,
+  referenceByline,
+  referenceCoverPath,
+  sortByTitle,
+} from '../../lib/content';
 import { entryPath, mediaSrc } from '../../lib/paths';
 import { COLLECTION_LABELS, THREAD_LABELS } from '../../lib/vocabulary';
+
+/** Logos and marks should not be cropped in the listing. Portraits may be. */
+const CONTAIN_COVER_TYPES = new Set(['institution']);
 
 const title = COLLECTION_LABELS.references;
 const references = sortByTitle(await getPublished('references')).map((entry) => {
   const { data } = entry;
-  const year = data.year !== undefined && String(data.year).trim() ? String(data.year).trim() : undefined;
-  const byline = [data.creator?.trim() || undefined, year].filter(Boolean).join(' · ');
+  const type = data.referenceType?.trim().toLowerCase() || undefined;
+  const cover = referenceCoverPath(data);
   return {
     href: entryPath('references', entry.id),
     title: data.title,
-    image: data.image?.trim() ? mediaSrc(data.image.trim()) : undefined,
+    cover: cover ? mediaSrc(cover) : undefined,
+    coverFit: type && CONTAIN_COVER_TYPES.has(type) ? 'contain' : 'cover',
     typeLabel: data.referenceType?.trim().replace(/-/g, ' ') || undefined,
-    byline: byline || undefined,
+    byline: referenceByline(data.title, data),
+    lede: data.lede?.trim() || undefined,
     threads: data.threads.map((thread) => THREAD_LABELS[thread]),
   };
 });
@@ -24,6 +34,7 @@ const references = sortByTitle(await getPublished('references')).map((entry) => 
   <main class="container reference-index">
     <header class="reference-index__header">
       <h1>{title}</h1>
+      <p class="reference-index__lede">External sources entering the research.</p>
     </header>
 
     {
@@ -34,17 +45,26 @@ const references = sortByTitle(await getPublished('references')).map((entry) => 
           {references.map((reference) => (
             <li>
               <a class="reference-index__card" href={reference.href}>
-                {reference.image ? (
-                  <img class="reference-index__media" src={reference.image} alt="" />
-                ) : (
-                  <span class="reference-index__media reference-index__media--ph" aria-hidden="true"
-                  ></span>
-                )}
+                <span class="reference-index__media-wrap">
+                  {reference.cover ? (
+                    <img
+                      class:list={[
+                        'reference-index__media',
+                        reference.coverFit === 'contain' && 'reference-index__media--contain',
+                      ]}
+                      src={reference.cover}
+                      alt=""
+                    />
+                  ) : (
+                    <span class="reference-index__media reference-index__media--ph" aria-hidden="true"></span>
+                  )}
+                </span>
 
                 <span class="reference-index__body">
                   {reference.typeLabel && <span class="reference-index__type">{reference.typeLabel}</span>}
                   <span class="reference-index__name">{reference.title}</span>
                   {reference.byline && <span class="reference-index__byline">{reference.byline}</span>}
+                  {reference.lede && <span class="reference-index__summary">{reference.lede}</span>}
                   {reference.threads.length > 0 && (
                     <span class="reference-index__threads">{reference.threads.join(' · ')}</span>
                   )}
@@ -97,6 +117,13 @@ const references = sortByTitle(await getPublished('references')).map((entry) => 
     background: var(--color-pink);
   }
 
+  .reference-index__lede {
+    max-width: 34ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+  }
+
   .reference-index__list {
     display: grid;
     gap: var(--space-5);
@@ -112,8 +139,10 @@ const references = sortByTitle(await getPublished('references')).map((entry) => 
   .reference-index__card {
     display: grid;
     grid-template-columns: minmax(8.5rem, 0.35fr) minmax(0, 0.65fr);
+    grid-template-rows: minmax(12.5rem, auto);
     min-height: 12.5rem;
     min-width: 0;
+    align-items: stretch;
     text-decoration: none;
     color: inherit;
     background: color-mix(in srgb, var(--color-white) 86%, transparent);
@@ -132,13 +161,32 @@ const references = sortByTitle(await getPublished('references')).map((entry) => 
     outline-offset: 3px;
   }
 
+  .reference-index__media-wrap {
+    position: relative;
+    min-width: 0;
+    min-height: 12.5rem;
+    overflow: hidden;
+  }
+
   .reference-index__media {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
-    min-height: 12.5rem;
     object-fit: cover;
-    align-self: stretch;
+  }
+
+  .reference-index__media--contain {
+    object-fit: contain;
+    box-sizing: border-box;
+    padding: 1.15rem 1.25rem;
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--color-gray-green) 55%, var(--color-white)) 0%,
+        color-mix(in srgb, var(--color-turquoise) 12%, var(--color-white)) 100%
+      );
   }
 
   .reference-index__media--ph {
@@ -177,6 +225,17 @@ const references = sortByTitle(await getPublished('references')).map((entry) => 
     text-transform: none;
     letter-spacing: 0.02em;
     color: var(--fg-muted);
+  }
+
+  .reference-index__summary {
+    max-width: 42ch;
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--fg-muted);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
   }
 
   .reference-index__foot {
@@ -243,12 +302,12 @@ const references = sortByTitle(await getPublished('references')).map((entry) => 
   @media (max-width: 39.99rem) {
     .reference-index__card {
       grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
     }
 
-    .reference-index__media {
-      min-height: 11rem;
+    .reference-index__media-wrap {
+      min-height: 0;
       aspect-ratio: 16 / 10;
-      height: auto;
     }
 
     .reference-index__body {

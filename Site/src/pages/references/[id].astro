@@ -1,10 +1,7 @@
 ---
-import { render, type CollectionEntry } from 'astro:content';
-import EntryLayout from '../../layouts/EntryLayout.astro';
-import PagefindMeta from '../../components/PagefindMeta.astro';
-import { getPublished, isoDate, tagDisplayLabel, uniqueEntryTags } from '../../lib/content';
-import { tagPath } from '../../lib/paths';
-import { THREAD_LABELS } from '../../lib/vocabulary';
+import type { CollectionEntry } from 'astro:content';
+import ReferenceArticle from '../../components/ReferenceArticle.astro';
+import { getPublished } from '../../lib/content';
 
 export async function getStaticPaths() {
   const references = await getPublished('references');
@@ -16,32 +13,6 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { data } = entry;
-const { Content } = await render(entry);
-const tags = uniqueEntryTags(data.tags);
 ---
 
-<EntryLayout
-  collection="references"
-  id={entry.id}
-  title={data.title}
-  related={data.related}
-  meta={[
-    { label: 'Creator', value: data.creator },
-    { label: 'Year', value: data.year },
-    { label: 'Type', value: data.referenceType },
-    { label: 'Link', value: data.url, href: data.url },
-    { label: 'Threads', value: data.threads.map((t) => THREAD_LABELS[t]) },
-    { label: 'Tags', value: tags.map(tagDisplayLabel), hrefs: tags.map(tagPath) },
-  ]}
->
-  <PagefindMeta
-    type="reference"
-    title={data.title}
-    threads={data.threads.map((thread) => THREAD_LABELS[thread]).join(' · ') || undefined}
-    tags={tags.join(', ') || undefined}
-    date={isoDate(data.date)}
-    year={data.year !== undefined ? String(data.year) : undefined}
-  />
-  <Content />
-</EntryLayout>
+<ReferenceArticle entry={entry} />

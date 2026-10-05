@@ -32,7 +32,41 @@ const TYPE_LABELS: Record<string, string> = {
   event: 'Event',
 };
 
+const MAX_RESULT_TAGS = 4;
 const INITIAL_STATUS = 'Search across studies, notes, references, events and research threads.';
+
+const searchDateFormatter = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+function formatSearchDate(iso?: string, year?: string): string {
+  const raw = iso?.trim();
+  if (raw) {
+    const date = new Date(`${raw}T00:00:00Z`);
+    if (!Number.isNaN(date.getTime())) return searchDateFormatter.format(date);
+  }
+  return year?.trim() ?? '';
+}
+
+function formatSearchTags(raw?: string): string {
+  if (!raw) return '';
+  return raw
+    .split(/[,·|]/)
+    .map((tag) => tag.trim().replace(/-/g, ' '))
+    .filter(Boolean)
+    .slice(0, MAX_RESULT_TAGS)
+    .join(' · ');
+}
+
+function excerptHtml(raw: string): string {
+  return raw
+    .replace(/<\/?p[^>]*>/gi, '')
+    .replace(/<(?!\/?mark\b)[^>]+>/gi, '')
+    .trim();
+}
 
 let pagefindPromise: Promise<PagefindApi> | undefined;
 let lastQuery = '';
@@ -106,10 +140,10 @@ export function mountSiteSearch() {
     selectedIndex = links.length === 0 ? -1 : Math.max(0, Math.min(index, links.length - 1));
     links.forEach((link, i) => {
       const current = i === selectedIndex;
-      link.classList.toggle('is-active', current);
       link.setAttribute('aria-selected', String(current));
+      link.closest('.site-search__item')?.classList.toggle('is-active', current);
     });
-    links[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+    links[selectedIndex]?.closest('.site-search__item')?.scrollIntoView({ block: 'nearest' });
   };
 
   const close = () => {
@@ -158,36 +192,60 @@ export function mountSiteSearch() {
 
     for (const result of results) {
       const li = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = result.url;
-      link.dataset.searchItem = '';
-      link.setAttribute('role', 'option');
-      link.setAttribute('aria-selected', 'false');
+      li.className = 'site-search__item';
 
-      const type = document.createElement('span');
+      const type = document.createElement('p');
       type.className = 'site-search__type';
       type.textContent = TYPE_LABELS[result.meta.type ?? ''] ?? result.meta.type ?? '';
 
-      const title = document.createElement('span');
+      const title = document.createElement('a');
       title.className = 'site-search__title';
+      title.href = result.url;
+      title.dataset.searchItem = '';
+      title.setAttribute('role', 'option');
+      title.setAttribute('aria-selected', 'false');
       title.textContent = result.meta.title?.trim() || result.url;
 
       const excerpt = document.createElement('p');
       excerpt.className = 'site-search__excerpt';
-      excerpt.innerHTML = result.excerpt || '';
+      excerpt.innerHTML = excerptHtml(result.excerpt || '');
 
-      const metaBits = [result.meta.threads, result.meta.tags, result.meta.date || result.meta.year].filter(
-        (value): value is string => Boolean(value?.trim()),
-      );
-      link.append(type, title, excerpt);
-      if (metaBits.length > 0) {
-        const meta = document.createElement('p');
+      li.append(type, title, excerpt);
+
+      const thread = result.meta.threads?.trim();
+      const tags = formatSearchTags(result.meta.tags);
+      const date = formatSearchDate(result.meta.date, result.meta.year);
+      if (thread || tags || date) {
+        const meta = document.createElement('div');
         meta.className = 'site-search__meta';
-        meta.textContent = metaBits.join(' · ');
-        link.append(meta);
+        if (thread) {
+          const line = document.createElement('p');
+          line.className = 'site-search__thread';
+          line.textContent = thread;
+          meta.append(line);
+        }
+        if (tags) {
+          const line = document.createElement('p');
+          line.className = 'site-search__tags';
+          line.textContent = tags;
+          meta.append(line);
+        }
+        if (date) {
+          const line = document.createElement('p');
+          line.className = 'site-search__date';
+          if (result.meta.date?.trim()) {
+            const time = document.createElement('time');
+            time.dateTime = result.meta.date.trim();
+            time.textContent = date;
+            line.append(time);
+          } else {
+            line.textContent = date;
+          }
+          meta.append(line);
+        }
+        li.append(meta);
       }
 
-      li.append(link);
       list.append(li);
     }
 

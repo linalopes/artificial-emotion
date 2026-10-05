@@ -480,8 +480,8 @@ export function toListItem(entry: CollectionEntry<CollectionName>): ListItem {
         href,
         title: data.title,
         meta: [
-          data.creator,
-          data.year !== undefined ? String(data.year) : undefined,
+          referenceCreator(data.title, data.creator),
+          formatReferenceYear(data.year),
           data.referenceType,
           ...threadLabels(data.threads),
         ],
@@ -536,6 +536,39 @@ export function formatDateShort(date: Date): string {
 /** "2026-11-15", for <time datetime> attributes. */
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
+}
+
+/** Source types whose listing/detail images should not be cropped. */
+export const REFERENCE_CONTAIN_TYPES = new Set(['artwork', 'book', 'film', 'institution']);
+
+/** Display chronology of a source: "1907–1998", "1930s", "1962". */
+export function formatReferenceYear(year: string | number | undefined): string | undefined {
+  if (year === undefined || year === null) return undefined;
+  const raw = String(year).trim();
+  if (!raw) return undefined;
+  return raw.replace(/(\d)\s*-\s*(\d)/g, '$1–$2');
+}
+
+/** Creator line, omitted when empty or identical to the title. */
+export function referenceCreator(title: string, creator?: string): string | undefined {
+  const name = creator?.trim();
+  if (!name) return undefined;
+  if (name.localeCompare(title.trim(), undefined, { sensitivity: 'accent' }) === 0) return undefined;
+  return name;
+}
+
+/** Cover path, with legacy `image` as fallback. */
+export function referenceCoverPath(data: { cover?: string; image?: string }): string | undefined {
+  return data.cover?.trim() || data.image?.trim() || undefined;
+}
+
+/** Compact listing/header byline: creator (if distinct) and year. */
+export function referenceByline(
+  title: string,
+  data: { creator?: string; year?: string | number },
+): string | undefined {
+  const parts = [referenceCreator(title, data.creator), formatReferenceYear(data.year)].filter(Boolean);
+  return parts.length > 0 ? parts.join(' · ') : undefined;
 }
 
 /** "14:00–18:00", "14:00", or undefined. */
