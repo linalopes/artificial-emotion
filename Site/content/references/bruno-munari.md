@@ -80,7 +80,7 @@ He worked for Mondadori and directed the graphic/editorial area of *Il Tempo*. D
 
 His son, **Alberto**, was born in 1940. And the arrival of his son seems to have been decisive for Munari’s interest in children’s books. Between 1940 and 1945 he began producing books in which he was not simply the “author”: he was simultaneously **author, illustrator, and designer of the book-object**.
 
-That brings us to your other question.
+That brings us to other question: Was he a writer?
 
 ---
 
@@ -107,7 +107,7 @@ The rhythm of turning pages.
 
 All of this produces meaning.
 
-This is where things like the **Libri Illeggibili — Unreadable Books**, begun in the late 1940s, come from: books in which the material sequence itself replaces or nearly replaces textual narrative. [source](https://www.treccani.it/enciclopedia/bruno-munari_%28Enciclopedia-Italiana%29/)
+This is where things like the **Libri Illeggibili — Unreadable Books**, begun in the late 1940s, come from: books in which the material sequence itself replaces or nearly replaces textual narrative.
 
 It is almost impossible to say whether what we are seeing there is:
 
@@ -124,6 +124,8 @@ And later he did indeed write important theoretical texts, including:
 
 **Arte come mestiere** — 1966
 (*Design as Art* in the English edition)
+
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/EysmeN6CPII" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 **Design e comunicazione visiva** — 1968
 
