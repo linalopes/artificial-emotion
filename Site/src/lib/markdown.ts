@@ -96,12 +96,45 @@ function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function countChar(value: string, char: string): number {
+  return value.split(char).length - 1;
+}
+
+/** Peel trailing sentence punctuation off a matched URL. */
+function splitBareUrl(raw: string): { href: string; trail: string } {
+  let href = raw;
+  let trail = '';
+  while (/[.,;]$/.test(href)) {
+    trail = href.slice(-1) + trail;
+    href = href.slice(0, -1);
+  }
+  while (href.endsWith(')') && countChar(href, ')') > countChar(href, '(')) {
+    trail = `)${trail}`;
+    href = href.slice(0, -1);
+  }
+  return { href, trail };
+}
+
 function inline(value: string): string {
-  return escapeHtml(value)
-    .replace(/\[([^\]]+)\]\((https?:[^)\s]+|\/[^)\s]+)\)/g, '<a href="$2">$1</a>')
+  const held: string[] = [];
+  const hold = (html: string) => {
+    held.push(html);
+    return `\0${held.length - 1}\0`;
+  };
+
+  const withMarkup = escapeHtml(value)
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+|\/[^)\s]+)\)/g, (_match, label: string, href: string) =>
+      hold(`<a href="${href}">${label}</a>`))
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
+    .replace(/`([^`]+)`/g, (_match, code: string) => hold(`<code>${code}</code>`));
+
+  const withLinks = withMarkup.replace(/https?:\/\/[^\s<]+/g, (raw) => {
+    const { href, trail } = splitBareUrl(raw);
+    return href ? `${hold(`<a href="${href}">${href}</a>`)}${trail}` : raw;
+  });
+
+  return withLinks.replace(/\0(\d+)\0/g, (_match, index: string) => held[Number(index)] ?? '');
 }
 
 type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'other';
@@ -169,8 +202,8 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
- * Covers paragraphs, lists, blockquotes, links, emphasis, images,
- * and internal `::lab` embeds. Raw HTML is escaped.
+ * Covers paragraphs, lists, blockquotes, links, bare http(s) URLs, emphasis,
+ * images, and internal `::lab` embeds. Raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
   return markdownToParts(markdown)

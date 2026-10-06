@@ -31,8 +31,6 @@ draft: false
 ---
 
 
-# Heartbeat Slit Animation
-
 ## From clock movement to animation
 
 This study began while researching **Bruno Munari’s Ora X** and the possibility of using a standard clock mechanism not simply to indicate time, but to generate changing visual states.
@@ -195,6 +193,8 @@ The rotating layer needs a central hub that is:
 - removable;
 - capable of holding the mask without introducing wobble.
 
+![discs | 600](https://res.cloudinary.com/da1flkgyb/image/upload/v1791267492/IMG_6161.webp)
+
 ## What worked
 
 The basic animation principle works.
@@ -226,6 +226,7 @@ The issue is not necessarily the encoded animation itself.
 
 It is partly a masking problem.
 
+[](https://res.cloudinary.com/da1flkgyb/image/upload/v1791267492/IMG_6161.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791267492/IMG_6161.webp)
 ## Contrast and layer distance
 
 Two variables now appear critical:
