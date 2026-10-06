@@ -2,11 +2,28 @@ import { generateHeartbeatFrames, frameNames, contractionForFrame } from './hear
 import { DEFAULT_PARAMS, type SlitAnimationModel, type SlitAnimationParams } from './types';
 
 export function wedgeAngle(params: Pick<SlitAnimationParams, 'frames' | 'slices'>): number {
-  return (Math.PI * 2) / (params.frames * params.slices);
+  return (Math.PI * 2) / Math.max(1, params.frames * params.slices);
 }
 
 export function wedgeCount(params: Pick<SlitAnimationParams, 'frames' | 'slices'>): number {
-  return params.frames * params.slices;
+  return Math.max(1, params.frames * params.slices);
+}
+
+/**
+ * Complete source-frame cycles during one 360° mask revolution.
+ *
+ * Encoding walks the frame sequence sequentially around the disc:
+ *   frame = round(angle / wedgeAngle) % frames
+ * There are `frames * slices` wedges, so the sequence 0…frames-1
+ * repeats `slices` times. Therefore cyclesPerRevolution === slices.
+ */
+export function cyclesPerRevolution(slices: number): number {
+  return Math.max(1, slices);
+}
+
+/** Optical animation rate for a continuous motor, in cycles/min. */
+export function animationCyclesPerMin(motorRpm: number, slices: number): number {
+  return motorRpm * cyclesPerRevolution(slices);
 }
 
 /** Frame revealed when the mask is rotated by `angle` radians. */

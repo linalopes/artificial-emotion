@@ -1,13 +1,21 @@
 /**
  * Heartbeat Slit Animation — p5 instance-mode lab.
  * Preview and SVG export share src/lib/slit-animation geometry.
+ * Actuation (quartz clock vs DC motor) is motion metadata only.
  */
 import p5 from 'p5';
 import {
   CLOCK_TICK_DEG,
+  DEFAULT_MOTOR_RPM,
   DEFAULT_PARAMS,
+  MOTOR_RPM_MAX,
+  MOTOR_RPM_MIN,
+  SLICE_MAX,
+  SLICE_MIN,
+  animationCyclesPerMin,
   buildSlitAnimation,
   clockReport,
+  cyclesPerRevolution,
   downloadSvg,
   drawCheckerboard,
   drawEncodedBase,
@@ -23,6 +31,7 @@ import {
   frameAtAngle,
   snapAngle,
   wedgeAngle,
+  type ActuationMode,
   type SlitAnimationModel,
   type SlitAnimationParams,
   type PreviewMode,
@@ -38,6 +47,14 @@ function wrapTau(a: number): number {
 function readNumber(el: HTMLInputElement | HTMLSelectElement, fallback: number): number {
   const n = Number(el.value);
   return Number.isFinite(n) ? n : fallback;
+}
+
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
+
+function formatRate(n: number): string {
+  return Math.abs(n - Math.round(n)) < 1e-6 ? String(Math.round(n)) : formatCount(n);
 }
 
 export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
@@ -57,12 +74,17 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     slices: root.querySelector<HTMLInputElement>('[data-slit-slices]'),
     diameter: root.querySelector<HTMLInputElement>('[data-slit-diameter]'),
     guide: root.querySelector<HTMLInputElement>('[data-slit-guide]'),
+    rpm: root.querySelector<HTMLInputElement>('[data-slit-rpm]'),
     state: root.querySelector<HTMLElement>('[data-slit-state]'),
     slicesOut: root.querySelector<HTMLElement>('[data-slit-slices-out]'),
     diameterOut: root.querySelector<HTMLElement>('[data-slit-diameter-out]'),
     guideOut: root.querySelector<HTMLElement>('[data-slit-guide-out]'),
+    rpmOut: root.querySelector<HTMLElement>('[data-slit-rpm-out]'),
     positions: root.querySelector<HTMLElement>('[data-slit-positions]'),
     step: root.querySelector<HTMLElement>('[data-slit-step]'),
+    cycles: root.querySelector<HTMLElement>('[data-slit-cycles]'),
+    rate: root.querySelector<HTMLElement>('[data-slit-rate]'),
+    rateNote: root.querySelector<HTMLElement>('[data-slit-rate-note]'),
     clockTick: root.querySelector<HTMLElement>('[data-slit-clock-tick]'),
     clockStep: root.querySelector<HTMLElement>('[data-slit-clock-step]'),
     clockPositions: root.querySelector<HTMLElement>('[data-slit-clock-positions]'),
@@ -70,6 +92,12 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     clockStatus: root.querySelector<HTMLElement>('[data-slit-clock-status]'),
     clockNote: root.querySelector<HTMLElement>('[data-slit-clock-note]'),
     presets: root.querySelectorAll<HTMLButtonElement>('[data-slit-preset]'),
+    motorPresets: root.querySelectorAll<HTMLButtonElement>('[data-slit-motor-preset]'),
+    actuation: root.querySelectorAll<HTMLButtonElement>('[data-slit-actuation]'),
+    modeClock: root.querySelectorAll<HTMLElement>('[data-slit-mode-clock]'),
+    modeMotor: root.querySelectorAll<HTMLElement>('[data-slit-mode-motor]'),
+    motorPlay: root.querySelector<HTMLButtonElement>('[data-slit-motor-play]'),
+    motorPause: root.querySelector<HTMLButtonElement>('[data-slit-motor-pause]'),
     a4Fit: root.querySelector<HTMLElement>('[data-slit-a4-fit]'),
     exportA4: root.querySelector<HTMLButtonElement>('[data-slit-export-a4]'),
     exportBase: root.querySelector<HTMLButtonElement>('[data-slit-export-base]'),
@@ -79,15 +107,61 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
   const params: SlitAnimationParams = { ...DEFAULT_PARAMS };
   let model: SlitAnimationModel = buildSlitAnimation(params);
   let preview: PreviewMode = 'composite';
+  let actuation: ActuationMode = 'clock';
+  let motorRpm = DEFAULT_MOTOR_RPM;
+  let motorPlaying = false;
   let rotation = 0;
   let dragging = false;
   let lastPointerAngle = 0;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const setMotorPlaying = (next: boolean) => {
+    motorPlaying = next && actuation === 'motor' && !reducedMotion.matches;
+    ui.motorPlay?.setAttribute('aria-pressed', motorPlaying ? 'true' : 'false');
+    if (ui.motorPlay) ui.motorPlay.disabled = reducedMotion.matches;
+  };
+
+  const applyActuationUi = () => {
+    ui.actuation.forEach((btn) => {
+      btn.setAttribute('aria-pressed', btn.dataset.slitActuation === actuation ? 'true' : 'false');
+    });
+    ui.modeClock.forEach((el) => {
+      el.hidden = actuation !== 'clock';
+    });
+    ui.modeMotor.forEach((el) => {
+      el.hidden = actuation !== 'motor';
+    });
+    if (actuation !== 'motor') setMotorPlaying(false);
+    if (reducedMotion.matches && ui.motorPlay) ui.motorPlay.disabled = true;
+  };
+
+  const updateMotorReadouts = () => {
+    const cycles = cyclesPerRevolution(params.slices);
+    const rate = animationCyclesPerMin(motorRpm, params.slices);
+    if (ui.rpmOut) ui.rpmOut.textContent = `${motorRpm} RPM`;
+    if (ui.cycles) ui.cycles.textContent = String(cycles);
+    if (ui.rate) ui.rate.textContent = `${formatRate(rate)} cycles/min`;
+    if (ui.rateNote) ui.rateNote.textContent = `≈ ${formatRate(rate)} visual beats/min`;
+    ui.motorPresets.forEach((btn) => {
+      const slices = Number((btn.dataset.slitMotorPreset ?? '').split(',')[1]);
+      const label = btn.querySelector<HTMLElement>('[data-slit-motor-preset-rate]');
+      if (!Number.isFinite(slices) || !label) return;
+      label.textContent = `${formatRate(animationCyclesPerMin(motorRpm, slices))} cycles/min`;
+    });
+  };
 
   const syncParamsFromUi = () => {
     if (ui.frames) params.frames = readNumber(ui.frames, DEFAULT_PARAMS.frames);
-    if (ui.slices) params.slices = Math.round(readNumber(ui.slices, DEFAULT_PARAMS.slices));
+    if (ui.slices) {
+      params.slices = clamp(Math.round(readNumber(ui.slices, DEFAULT_PARAMS.slices)), SLICE_MIN, SLICE_MAX);
+      ui.slices.value = String(params.slices);
+    }
     if (ui.diameter) params.diameterMm = readNumber(ui.diameter, DEFAULT_PARAMS.diameterMm);
     if (ui.guide) params.guideMm = readNumber(ui.guide, DEFAULT_PARAMS.guideMm);
+    if (ui.rpm) {
+      motorRpm = clamp(Math.round(readNumber(ui.rpm, DEFAULT_MOTOR_RPM)), MOTOR_RPM_MIN, MOTOR_RPM_MAX);
+      ui.rpm.value = String(motorRpm);
+    }
     model = buildSlitAnimation(params);
     if (ui.slicesOut) ui.slicesOut.textContent = String(params.slices);
     if (ui.diameterOut) ui.diameterOut.textContent = `${params.diameterMm} mm`;
@@ -98,6 +172,10 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     }
     ui.presets.forEach((btn) => {
       const [f, s] = (btn.dataset.slitPreset ?? '').split(',').map(Number);
+      btn.setAttribute('aria-pressed', f === params.frames && s === params.slices ? 'true' : 'false');
+    });
+    ui.motorPresets.forEach((btn) => {
+      const [f, s] = (btn.dataset.slitMotorPreset ?? '').split(',').map(Number);
       btn.setAttribute('aria-pressed', f === params.frames && s === params.slices ? 'true' : 'false');
     });
     updateState();
@@ -119,6 +197,7 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
       ui.clockStatus.classList.add(`slit__status--${report.fit}`);
     }
     if (ui.clockNote) ui.clockNote.textContent = report.interpretation;
+    updateMotorReadouts();
   };
 
   const updateState = () => {
@@ -135,6 +214,12 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     updateClockReadouts();
   };
 
+  const applyGeometry = (frames: number, slices: number) => {
+    if (ui.frames) ui.frames.value = String(frames);
+    if (ui.slices) ui.slices.value = String(slices);
+    syncParamsFromUi();
+  };
+
   const setPreview = (next: PreviewMode) => {
     preview = next;
     ui.preview.forEach((btn) => {
@@ -143,10 +228,22 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     });
   };
 
+  const setActuation = (next: ActuationMode) => {
+    actuation = next;
+    applyActuationUi();
+  };
+
   ui.preview.forEach((btn) => {
     btn.addEventListener('click', () => {
       const mode = btn.dataset.slitPreview as PreviewMode;
       if (mode) setPreview(mode);
+    });
+  });
+
+  ui.actuation.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.slitActuation;
+      if (mode === 'clock' || mode === 'motor') setActuation(mode);
     });
   });
 
@@ -179,16 +276,29 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     btn.addEventListener('click', () => {
       const [f, s] = (btn.dataset.slitPreset ?? '').split(',').map(Number);
       if (!Number.isFinite(f) || !Number.isFinite(s)) return;
-      if (ui.frames) ui.frames.value = String(f);
-      if (ui.slices) ui.slices.value = String(s);
-      syncParamsFromUi();
+      applyGeometry(f, s);
     });
   });
 
-  for (const el of [ui.frames, ui.slices, ui.diameter, ui.guide]) {
+  ui.motorPresets.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const [f, s] = (btn.dataset.slitMotorPreset ?? '').split(',').map(Number);
+      if (!Number.isFinite(f) || !Number.isFinite(s)) return;
+      applyGeometry(f, s);
+    });
+  });
+
+  for (const el of [ui.frames, ui.slices, ui.diameter, ui.guide, ui.rpm]) {
     el?.addEventListener('input', syncParamsFromUi);
     el?.addEventListener('change', syncParamsFromUi);
   }
+
+  ui.motorPlay?.addEventListener('click', () => setMotorPlaying(true));
+  ui.motorPause?.addEventListener('click', () => setMotorPlaying(false));
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) setMotorPlaying(false);
+    applyActuationUi();
+  });
 
   ui.exportA4?.addEventListener('click', () => {
     downloadSvg('heartbeat-slit-animation-a4-test-sheet.svg', exportA4TestSheetSvg(model));
@@ -224,7 +334,7 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     };
 
     const layersFor = (size: number, cx: number, cy: number, radius: number) => {
-      const key = `${size}:${params.frames}:${params.slices}:${p.pixelDensity()}`;
+      const key = `${size}:${params.frames}:${params.slices}:${params.diameterMm}:${params.guideMm}:${p.pixelDensity()}`;
       if (cache?.key === key) return cache;
       cache = {
         key,
@@ -235,6 +345,12 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     };
 
     p.draw = () => {
+      if (motorPlaying && actuation === 'motor' && !dragging && !reducedMotion.matches) {
+        const dt = Math.min(0.05, p.deltaTime / 1000);
+        rotation += Math.PI * 2 * (motorRpm / 60) * dt;
+        updateState();
+      }
+
       const { size, cx, cy, radius } = layout();
       p.background(LAB_BG);
       const ctx = p.drawingContext as CanvasRenderingContext2D;
@@ -337,6 +453,7 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
   };
 
   new p5(sketch, canvasHost);
+  applyActuationUi();
   syncParamsFromUi();
   setPreview('composite');
 }
