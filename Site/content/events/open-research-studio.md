@@ -47,6 +47,10 @@ Rather than presenting a finished exhibition, the studio opens the research proc
 
 The event is part of the current research period of Artificial Emotion and brings together work across kinetic studies, soft mechanisms and biosignal experiments.
 
+As a Women Techmakers Ambassador, I also see this open studio as part of my ongoing work to create more visible spaces for experimentation, technology and shared learning.
+
+![Women Techmakers](/wtm.svg)
+
 ## Program
 
 During the afternoon, the studio remains open as a working research environment. Visitors can encounter prototypes in different stages of development, see mechanisms being tested, follow material and sensing experiments and discuss the questions guiding the project.
