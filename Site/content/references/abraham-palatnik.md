@@ -43,7 +43,6 @@ His father, **Tobias Palatnik**, and his uncles helped develop commercial and in
 I would not claim that his father's work *caused* his interest in kinetic art. But the proximity between making things, manufacturing, machinery, and artistic invention seems significant.
 
 
-
 ## He did begin as a painter. But he also studied engines.
 
 In **1932**, when he was four, his family moved to **Palestine, then under British mandate**, where he spent his childhood and adolescence.
@@ -309,6 +308,8 @@ I also love the idea that Palatnik continued to think of his experiments in rela
 
 I would like to continue from here with a very practical investigation: **which of Palatnik's Kinetic Object mechanisms could be reproduced as a small, low-cost physical study?** I am especially curious about the rods, linkages, rotational speed, and how one motor distributes movement among several visual elements.
 
+
+
 ---
 
 # Sources
@@ -319,3 +320,4 @@ I would like to continue from here with a very practical investigation: **which 
 - *Abraham Palatnik — A Reinvenção da Pintura / The Reinvention of Painting*. [Exhibition catalogue PDF](https://ccbb.com.br/wp-content/uploads/2021/06/AbrahamPalatnikAReinvencaodaPintura.pdf)
 - Getty Conservation Institute — *Keep It Moving? Conserving Kinetic Art*, chapter 9, “Engineering a Solution”. [Technical study](https://www.getty.edu/publications/keepitmoving/collections/9-gillies/)
 - Galeria Frente — Abraham Palatnik. [Artist biography](https://www.galeriafrente.com.br/en/artistas/abraham-palatnik)
+- Galeria Nara Roesler —  [Abraham Palatnik Oficial Portfolio](https://nararoesler.art/usr/library/documents/main/artists/29/nara-roesler_abraham-palatnik_portfolio_pt.pdf)
