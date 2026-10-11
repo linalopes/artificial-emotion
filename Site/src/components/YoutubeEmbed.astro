@@ -1,0 +1,13 @@
+---
+/**
+ * Privacy-enhanced YouTube iframe for the `::youtube` Markdown directive.
+ * Markup is shared with `youtubeEmbedHtml` so Notes / Events / Research match.
+ */
+import { youtubeEmbedHtml, type YoutubeEmbedProps } from '../lib/youtube-embed';
+
+interface Props extends YoutubeEmbedProps {}
+
+const html = youtubeEmbedHtml(Astro.props);
+---
+
+{html && <Fragment set:html={html} />}

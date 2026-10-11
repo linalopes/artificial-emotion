@@ -9,6 +9,7 @@ import GenerativeWaves from './GenerativeWaves.astro';
 import LabEmbed from './LabEmbed.astro';
 import ModelEmbed from './ModelEmbed.astro';
 import ModelViewerScript from './ModelViewerScript.astro';
+import YoutubeEmbed from './YoutubeEmbed.astro';
 import RelatedEntries from './RelatedEntries.astro';
 import ResearchGallery from './ResearchGallery.astro';
 import PagefindMeta from './PagefindMeta.astro';
@@ -46,7 +47,7 @@ const withParts = (sections: typeof intro) =>
     }))
     .filter((section) =>
       section.parts.some((part) =>
-        part.type === 'lab' || part.type === 'model'
+        part.type === 'lab' || part.type === 'model' || part.type === 'youtube'
           ? true
           : hasMarkdownContent(part.html.replace(/<[^>]+>/g, ' ')),
       ),
@@ -191,6 +192,8 @@ const backlinks = await getBacklinks('studies', entry.id);
                   <LabEmbed src={part.src} title={part.title} />
                 ) : part.type === 'model' ? (
                   <ModelEmbed src={part.src} title={part.title} caption={part.caption} />
+                ) : part.type === 'youtube' ? (
+                  <YoutubeEmbed src={part.src} title={part.title} />
                 ) : (
                   <Fragment set:html={part.html} />
                 ),
@@ -211,6 +214,8 @@ const backlinks = await getBacklinks('studies', entry.id);
                   <LabEmbed src={part.src} title={part.title} />
                 ) : part.type === 'model' ? (
                   <ModelEmbed src={part.src} title={part.title} caption={part.caption} />
+                ) : part.type === 'youtube' ? (
+                  <YoutubeEmbed src={part.src} title={part.title} />
                 ) : (
                   <Fragment set:html={part.html} />
                 ),
@@ -446,7 +451,8 @@ const backlinks = await getBacklinks('studies', entry.id);
 
   .study-block :global(.lab-embed),
   .study-block :global(.lab-embed__open),
-  .study-block :global(.model-embed) {
+  .study-block :global(.model-embed),
+  .study-block :global(.youtube-embed) {
     max-width: none;
   }
 

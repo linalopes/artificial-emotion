@@ -4,15 +4,18 @@
  * About / Program / Documentation / Reflection independently, and skip empty headings.
  *
  * Raw HTML is escaped on purpose. Internal labs use `::lab{src title}`;
- * repository STL files use `::model{src title caption?}`.
+ * repository STL files use `::model{src title caption?}`;
+ * YouTube videos use `::youtube{src title}`.
  */
 import { isLabDirectiveLine, labEmbedHtml, parseLabDirective } from './lab-embed';
 import { isModelDirectiveLine, modelEmbedHtml, parseModelDirective } from './model-embed';
+import { isYoutubeDirectiveLine, parseYoutubeDirective, youtubeEmbedHtml } from './youtube-embed';
 
 export type MarkdownPart =
   | { type: 'html'; html: string }
   | { type: 'lab'; src: string; title: string }
-  | { type: 'model'; src: string; title: string; caption?: string };
+  | { type: 'model'; src: string; title: string; caption?: string }
+  | { type: 'youtube'; src: string; title: string };
 
 export interface MarkdownSection {
   /** H2 title, or null for copy before the first H2. */
@@ -83,6 +86,7 @@ export function markdownSectionToHtml(section: MarkdownSection): string {
     .map((part) => {
       if (part.type === 'lab') return labEmbedHtml(part);
       if (part.type === 'model') return modelEmbedHtml(part);
+      if (part.type === 'youtube') return youtubeEmbedHtml(part);
       return part.html;
     })
     .join('');
@@ -155,13 +159,14 @@ function inline(value: string): string {
   return text.replace(/\u0001(\d+)\u0001/g, (_match, index: string) => held[Number(index)] ?? '');
 }
 
-type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'model' | 'table' | 'other';
+type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'model' | 'youtube' | 'table' | 'other';
 type CellAlign = 'left' | 'center' | 'right' | '';
 
 function lineKind(line: string): BlockKind {
   const text = line.trim();
   if (isLabDirectiveLine(text)) return 'lab';
   if (isModelDirectiveLine(text)) return 'model';
+  if (isYoutubeDirectiveLine(text)) return 'youtube';
   if (/^>/.test(text)) return 'quote';
   if (/^[-*]\s+\S/.test(text)) return 'ul';
   if (/^\d+\.\s+\S/.test(text)) return 'ol';
@@ -254,6 +259,11 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
     return parsed ? modelEmbedHtml(parsed) : `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
   }
 
+  if (kind === 'youtube') {
+    const parsed = parseYoutubeDirective(lines.map((line) => line.trim()).join(' '));
+    return parsed ? youtubeEmbedHtml(parsed) : `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
+  }
+
   if (kind === 'quote') return renderQuote(lines);
   if (kind === 'table') return renderTable(lines);
 
@@ -285,14 +295,15 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
  * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
- * emphasis, images, internal `::lab` embeds, and `::model` STL viewers.
- * Raw HTML is escaped.
+ * emphasis, images, internal `::lab` embeds, `::model` STL viewers,
+ * and `::youtube` embeds. Raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
   return markdownToParts(markdown)
     .map((part) => {
       if (part.type === 'lab') return labEmbedHtml(part);
       if (part.type === 'model') return modelEmbedHtml(part);
+      if (part.type === 'youtube') return youtubeEmbedHtml(part);
       return part.html;
     })
     .join('');
@@ -335,6 +346,13 @@ export function markdownToParts(markdown: string): MarkdownPart[] {
             title: parsed.title,
             ...(parsed.caption ? { caption: parsed.caption } : {}),
           });
+          continue;
+        }
+      }
+      if (run.kind === 'youtube') {
+        const parsed = parseYoutubeDirective(run.lines.map((line) => line.trim()).join(' '));
+        if (parsed) {
+          parts.push({ type: 'youtube', src: parsed.src, title: parsed.title });
           continue;
         }
       }
