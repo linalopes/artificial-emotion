@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
 import TagLinks from './TagLinks.astro';
 import {
@@ -15,6 +16,7 @@ import {
   markdownSectionToHtml,
   splitIntroAndRest,
 } from '../lib/markdown';
+import { hasModelViewerMarkup } from '../lib/model-embed';
 import { collectionPath, mediaSrc, threadPath } from '../lib/paths';
 import { COLLECTION_LABELS, THREAD_LABELS } from '../lib/vocabulary';
 
@@ -38,6 +40,7 @@ const introHtml = intro
   .filter((html) => hasMarkdownContent(html.replace(/<[^>]+>/g, ' ')))
   .join('');
 const restHtml = rest.map((section) => markdownSectionToHtml(section)).join('');
+const hasModels = hasModelViewerMarkup(introHtml + restHtml);
 
 const related = await resolveRelated(data.related, `notes/${entry.id}`);
 const backlinks = await getBacklinks('notes', entry.id);
@@ -221,6 +224,7 @@ const threads = data.threads.map((id) => ({
       }
     </div>
   </article>
+  {hasModels && <ModelViewerScript />}
 </BaseLayout>
 
 <style>
@@ -430,6 +434,11 @@ const threads = data.threads.map((id) => ({
   .note-body {
     max-width: var(--measure);
     min-width: 0;
+  }
+
+  .note-body:has(.md-table),
+  .note-body:has(.model-embed) {
+    max-width: min(100%, 54rem);
   }
 
   .note-body :global(h2) {

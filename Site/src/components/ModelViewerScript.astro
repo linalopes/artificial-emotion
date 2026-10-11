@@ -1,0 +1,11 @@
+---
+/**
+ * Loads the STL viewer boot script. Include only on pages that contain models.
+ * Three.js stays in a separate chunk until a viewer enters the viewport.
+ */
+---
+
+<script>
+  import { bootModelViewers } from '../scripts/model-viewer-client';
+  bootModelViewers();
+</script>

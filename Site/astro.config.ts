@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import { repoModelsPlugin } from './src/lib/repo-models';
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -9,4 +10,8 @@ export default defineConfig({
   // https://emotion.linalopes.info/, not a /artificial-emotion/ subpath.
   // Local `astro dev` still serves from http://localhost and `/`.
   site: 'https://emotion.linalopes.info',
+
+  vite: {
+    plugins: [repoModelsPlugin()],
+  },
 });

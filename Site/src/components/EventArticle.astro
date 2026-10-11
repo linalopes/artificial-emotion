@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import GenerativeWaves from './GenerativeWaves.astro';
+import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
 import RelatedEntries from './RelatedEntries.astro';
 import {
@@ -19,6 +20,7 @@ import {
   splitHtmlLists,
   splitMarkdownSections,
 } from '../lib/markdown';
+import { hasModelViewerMarkup } from '../lib/model-embed';
 import { collectionPath, mediaSrc } from '../lib/paths';
 import { COLLECTION_LABELS_SINGULAR, EVENT_TYPE_LABELS, THREAD_LABELS } from '../lib/vocabulary';
 
@@ -57,6 +59,9 @@ const documentationHtml = hasMarkdownContent(documentationSource)
 const reflectionHtml = hasMarkdownContent(reflectionSource)
   ? markdownToSafeHtml(reflectionSource)
   : '';
+const hasModels = [aboutHtml, programIntroHtml, documentationHtml, reflectionHtml].some(
+  hasModelViewerMarkup,
+);
 
 const galleryItems = data.gallery.filter((item) => item.src.trim());
 const galleryLayout = galleryItems.length <= 3 ? String(galleryItems.length) : '3';
@@ -300,6 +305,7 @@ const relatedCards = related.map((item) => {
     <RelatedEntries items={backlinks} heading="Referenced by" headingId="backlinks-heading" />
   </div>
 </article>
+{hasModels && <ModelViewerScript />}
 
 <style>
   .event {
@@ -507,6 +513,11 @@ const relatedCards = related.map((item) => {
     display: grid;
     gap: var(--space-3);
     max-width: 46ch;
+  }
+
+  .event-about__prose:has(.md-table),
+  .event-about__prose:has(.model-embed) {
+    max-width: min(100%, 54rem);
   }
 
   .event-about__prose :global(p) {

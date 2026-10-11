@@ -1,0 +1,13 @@
+---
+/**
+ * Interactive STL viewer for the `::model` Markdown directive.
+ * Markup is shared with `modelEmbedHtml` so Notes / Events / Research match.
+ */
+import { modelEmbedHtml, type ModelEmbedProps } from '../lib/model-embed';
+
+interface Props extends ModelEmbedProps {}
+
+const html = modelEmbedHtml(Astro.props);
+---
+
+{html && <Fragment set:html={html} />}

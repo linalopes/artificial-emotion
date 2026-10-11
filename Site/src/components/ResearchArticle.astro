@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import type { GalleryItem } from '../lib/cloudinary';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
 import ResearchGallery from './ResearchGallery.astro';
 import TagLinks from './TagLinks.astro';
@@ -22,6 +23,7 @@ import {
   splitIntroAndRest,
   type MarkdownSection,
 } from '../lib/markdown';
+import { hasModelViewerMarkup } from '../lib/model-embed';
 import { entryPath, mediaSrc, researchPath } from '../lib/paths';
 import {
   COLLECTION_LABELS,
@@ -75,6 +77,9 @@ const withHtml = (sections: typeof intro) =>
 
 const introSections = withHtml(intro);
 const restSections = withHtml(rest);
+const hasModels = [...introSections, ...restSections].some((section) =>
+  hasModelViewerMarkup(section.html),
+);
 
 const content = await getPublishedByThread(thread);
 const total = countThreadContent(content);
@@ -310,6 +315,7 @@ const questionCount = questions.length === 1 ? '1' : questions.length === 2 ? '2
       </div>
     </div>
   </article>
+  {hasModels && <ModelViewerScript />}
 </BaseLayout>
 
 <style>

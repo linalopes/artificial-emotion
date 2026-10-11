@@ -3,13 +3,16 @@
  * and rendering those fragments to HTML. Used when a page needs to show
  * About / Program / Documentation / Reflection independently, and skip empty headings.
  *
- * Raw HTML is escaped on purpose. Internal labs use the `::lab{src title}` directive.
+ * Raw HTML is escaped on purpose. Internal labs use `::lab{src title}`;
+ * repository STL files use `::model{src title caption?}`.
  */
 import { isLabDirectiveLine, labEmbedHtml, parseLabDirective } from './lab-embed';
+import { isModelDirectiveLine, modelEmbedHtml, parseModelDirective } from './model-embed';
 
 export type MarkdownPart =
   | { type: 'html'; html: string }
-  | { type: 'lab'; src: string; title: string };
+  | { type: 'lab'; src: string; title: string }
+  | { type: 'model'; src: string; title: string; caption?: string };
 
 export interface MarkdownSection {
   /** H2 title, or null for copy before the first H2. */
@@ -77,7 +80,11 @@ export function splitIntroAndRest(markdown: string): {
 /** Render one split section, restoring its H2 when present. */
 export function markdownSectionToHtml(section: MarkdownSection): string {
   return markdownSectionToParts(section)
-    .map((part) => (part.type === 'lab' ? labEmbedHtml(part) : part.html))
+    .map((part) => {
+      if (part.type === 'lab') return labEmbedHtml(part);
+      if (part.type === 'model') return modelEmbedHtml(part);
+      return part.html;
+    })
     .join('');
 }
 
@@ -137,15 +144,73 @@ function inline(value: string): string {
   return withLinks.replace(/\0(\d+)\0/g, (_match, index: string) => held[Number(index)] ?? '');
 }
 
-type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'other';
+type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'model' | 'table' | 'other';
+type CellAlign = 'left' | 'center' | 'right' | '';
 
 function lineKind(line: string): BlockKind {
   const text = line.trim();
   if (isLabDirectiveLine(text)) return 'lab';
+  if (isModelDirectiveLine(text)) return 'model';
   if (/^>/.test(text)) return 'quote';
   if (/^[-*]\s+\S/.test(text)) return 'ul';
   if (/^\d+\.\s+\S/.test(text)) return 'ol';
+  if (/^\|/.test(text)) return 'table';
   return 'other';
+}
+
+function splitTableCells(line: string): string[] {
+  let row = line.trim();
+  if (row.startsWith('|')) row = row.slice(1);
+  if (row.endsWith('|')) row = row.slice(0, -1);
+  return row.split('|').map((cell) => cell.trim());
+}
+
+function isSeparatorRow(line: string): boolean {
+  const cells = splitTableCells(line);
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
+function alignFromSeparator(cell: string): CellAlign {
+  const left = cell.startsWith(':');
+  const right = cell.endsWith(':');
+  if (left && right) return 'center';
+  if (right) return 'right';
+  if (left) return 'left';
+  return '';
+}
+
+function tableCell(tag: 'th' | 'td', value: string, align: CellAlign): string {
+  const style = align ? ` style="text-align:${align}"` : '';
+  return `<${tag}${style}>${inline(value)}</${tag}>`;
+}
+
+function renderTable(lines: readonly string[]): string {
+  if (lines.length < 2 || !isSeparatorRow(lines[1])) {
+    return `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
+  }
+
+  const headers = splitTableCells(lines[0]);
+  const aligns = splitTableCells(lines[1]).map(alignFromSeparator);
+  const columns = Math.max(headers.length, aligns.length);
+
+  const head = headers
+    .concat(Array.from({ length: Math.max(0, columns - headers.length) }, () => ''))
+    .slice(0, columns)
+    .map((cell, i) => tableCell('th', cell, aligns[i] ?? ''))
+    .join('');
+
+  const body = lines
+    .slice(2)
+    .map((line) => {
+      const cells = splitTableCells(line);
+      const row = Array.from({ length: columns }, (_, i) => tableCell('td', cells[i] ?? '', aligns[i] ?? ''));
+      return `<tr>${row.join('')}</tr>`;
+    })
+    .join('');
+
+  return `<div class="md-table"><table><thead><tr>${head}</tr></thead>${
+    body ? `<tbody>${body}</tbody>` : ''
+  }</table></div>`;
 }
 
 function renderQuote(lines: readonly string[]): string {
@@ -173,7 +238,13 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
     return parsed ? labEmbedHtml(parsed) : `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
   }
 
+  if (kind === 'model') {
+    const parsed = parseModelDirective(lines.map((line) => line.trim()).join(' '));
+    return parsed ? modelEmbedHtml(parsed) : `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
+  }
+
   if (kind === 'quote') return renderQuote(lines);
+  if (kind === 'table') return renderTable(lines);
 
   if (kind === 'ul') {
     const items = lines.map((line) => `<li>${inline(line.trim().replace(/^[-*]\s+/, ''))}</li>`);
@@ -202,12 +273,17 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
- * Covers paragraphs, lists, blockquotes, links, bare http(s) URLs, emphasis,
- * images, and internal `::lab` embeds. Raw HTML is escaped.
+ * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
+ * emphasis, images, internal `::lab` embeds, and `::model` STL viewers.
+ * Raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
   return markdownToParts(markdown)
-    .map((part) => (part.type === 'lab' ? labEmbedHtml(part) : part.html))
+    .map((part) => {
+      if (part.type === 'lab') return labEmbedHtml(part);
+      if (part.type === 'model') return modelEmbedHtml(part);
+      return part.html;
+    })
     .join('');
 }
 
@@ -236,6 +312,18 @@ export function markdownToParts(markdown: string): MarkdownPart[] {
         const parsed = parseLabDirective(run.lines.map((line) => line.trim()).join(' '));
         if (parsed) {
           parts.push({ type: 'lab', src: parsed.src, title: parsed.title });
+          continue;
+        }
+      }
+      if (run.kind === 'model') {
+        const parsed = parseModelDirective(run.lines.map((line) => line.trim()).join(' '));
+        if (parsed) {
+          parts.push({
+            type: 'model',
+            src: parsed.src,
+            title: parsed.title,
+            ...(parsed.caption ? { caption: parsed.caption } : {}),
+          });
           continue;
         }
       }

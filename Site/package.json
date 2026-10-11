@@ -17,11 +17,14 @@
   "dependencies": {
     "astro": "^7.3.5",
     "d3": "^7.9.0",
-    "p5": "^2.3.4"
+    "p5": "^2.3.4",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@types/d3": "^7.4.3",
+    "@types/node": "^26.6.5",
+    "@types/three": "^0.186.0",
     "pagefind": "^1.5.2",
     "typescript": "^5.9.3"
   }

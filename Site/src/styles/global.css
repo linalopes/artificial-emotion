@@ -272,6 +272,52 @@ hr {
   padding-left: 1.25em;
 }
 
+.prose .md-table,
+.event-about__prose .md-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  margin-block: var(--space-3);
+}
+
+.prose table,
+.event-about__prose table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+.prose th,
+.prose td,
+.event-about__prose th,
+.event-about__prose td {
+  padding: 0.55rem 0.85rem 0.55rem 0;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: break-word;
+  border-bottom: 1px solid var(--rule);
+}
+
+.prose th,
+.event-about__prose th {
+  font-family: var(--font-title);
+  font-weight: var(--weight-title-medium);
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.prose thead th,
+.event-about__prose thead th {
+  border-bottom-color: var(--fg-muted);
+}
+
+.prose td,
+.event-about__prose td {
+  color: var(--fg);
+}
+
 /* Internal lab embeds from the `::lab` Markdown directive */
 .lab-embed {
   display: grid;
@@ -299,6 +345,114 @@ hr {
   max-width: none;
   margin: 0;
   font-size: var(--text-sm);
+}
+
+/* Repository STL viewers from the `::model` Markdown directive */
+.model-embed {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: none;
+  margin-block: var(--space-2) 0;
+}
+
+.model-embed__stage {
+  position: relative;
+  width: 100%;
+  height: min(68dvh, 32rem);
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.model-embed__stage canvas {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.model-embed__status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  max-width: none;
+  padding: var(--space-3);
+  font-family: var(--font-title);
+  font-weight: var(--weight-title-light);
+  font-size: var(--text-sm);
+  letter-spacing: -0.01em;
+  color: var(--fg-muted);
+  text-align: center;
+}
+
+.model-embed__status[hidden] {
+  display: none;
+}
+
+.model-embed__caption,
+.model-embed__title,
+.model-embed__note,
+.model-embed__actions {
+  max-width: none;
+}
+
+.model-embed__caption {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.model-embed__title {
+  font-family: var(--font-title);
+  font-weight: var(--weight-title-medium);
+  font-size: var(--text-sm);
+  letter-spacing: -0.01em;
+}
+
+.model-embed__note {
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+}
+
+.model-embed__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1.1rem;
+  font-size: var(--text-sm);
+}
+
+.model-embed__actions button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--link-underline);
+  cursor: pointer;
+}
+
+.model-embed__actions button:hover,
+.model-embed__actions button:focus-visible {
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--color-link);
+}
+
+.model-embed__actions button:disabled {
+  cursor: default;
+  opacity: 0.45;
+  text-decoration-color: var(--rule);
+}
+
+@media (min-width: 40rem) {
+  .model-embed__stage {
+    height: min(68dvh, 36rem);
+  }
 }
 
 /* Small labels, metadata, mono accents */

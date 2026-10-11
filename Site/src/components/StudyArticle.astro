@@ -7,6 +7,8 @@ import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import LabEmbed from './LabEmbed.astro';
+import ModelEmbed from './ModelEmbed.astro';
+import ModelViewerScript from './ModelViewerScript.astro';
 import RelatedEntries from './RelatedEntries.astro';
 import ResearchGallery from './ResearchGallery.astro';
 import PagefindMeta from './PagefindMeta.astro';
@@ -44,7 +46,7 @@ const withParts = (sections: typeof intro) =>
     }))
     .filter((section) =>
       section.parts.some((part) =>
-        part.type === 'lab'
+        part.type === 'lab' || part.type === 'model'
           ? true
           : hasMarkdownContent(part.html.replace(/<[^>]+>/g, ' ')),
       ),
@@ -52,6 +54,9 @@ const withParts = (sections: typeof intro) =>
 
 const introSections = withParts(intro);
 const restSections = withParts(rest);
+const hasModels = [...introSections, ...restSections].some((section) =>
+  section.parts.some((part) => part.type === 'model'),
+);
 
 const threads = data.threads.map((id) => ({
   id,
@@ -184,6 +189,8 @@ const backlinks = await getBacklinks('studies', entry.id);
               {section.parts.map((part) =>
                 part.type === 'lab' ? (
                   <LabEmbed src={part.src} title={part.title} />
+                ) : part.type === 'model' ? (
+                  <ModelEmbed src={part.src} title={part.title} caption={part.caption} />
                 ) : (
                   <Fragment set:html={part.html} />
                 ),
@@ -202,6 +209,8 @@ const backlinks = await getBacklinks('studies', entry.id);
               {section.parts.map((part) =>
                 part.type === 'lab' ? (
                   <LabEmbed src={part.src} title={part.title} />
+                ) : part.type === 'model' ? (
+                  <ModelEmbed src={part.src} title={part.title} caption={part.caption} />
                 ) : (
                   <Fragment set:html={part.html} />
                 ),
@@ -214,6 +223,7 @@ const backlinks = await getBacklinks('studies', entry.id);
         <RelatedEntries items={backlinks} heading="Referenced by" headingId="backlinks-heading" />
     </div>
   </article>
+  {hasModels && <ModelViewerScript />}
 </BaseLayout>
 
 <style>
@@ -428,12 +438,15 @@ const backlinks = await getBacklinks('studies', entry.id);
     max-width: var(--measure);
   }
 
-  .study-block:has(.lab-embed) {
+  .study-block:has(.lab-embed),
+  .study-block:has(.model-embed),
+  .study-block:has(.md-table) {
     max-width: min(100%, 54rem);
   }
 
   .study-block :global(.lab-embed),
-  .study-block :global(.lab-embed__open) {
+  .study-block :global(.lab-embed__open),
+  .study-block :global(.model-embed) {
     max-width: none;
   }
 

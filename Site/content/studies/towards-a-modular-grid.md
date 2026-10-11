@@ -6,7 +6,7 @@ type: study
 lede: An ongoing study of a 20 mm modular grid, M3 connections and 3D-printed interfaces for mounting, combining and exhibiting the physical mechanisms of Artificial Emotion.
 threads:
   - kinetic-studies
-cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791703553/IMG_6314.webp
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_6327.webp
 gallery: []
 tags:
   - modular-design
@@ -97,6 +97,8 @@ That dimension does not fall on a 20 mm grid. It would not fall directly on the 
 
 The initial temptation was to look for a grid that matched the motor. But the motor is only one component in a much larger family of mechanisms, sensors, spools, supports and housings. Other commercial parts will bring other dimensions.
 
+![motor grid | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791704922/IMG_6325.webp)
+
 The decision is therefore to **keep the 20 mm modular grid** and develop a motor bracket whose external mounting points follow that system while its internal geometry accommodates the 35 mm motor pattern.
 
 This distinction is fundamental:
@@ -180,7 +182,10 @@ This changed the next design decision. Rather than adding material below the hou
 
 This small test illustrates why the modular system must develop through physical assembly, not only through diagrams.
 
+![long U | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_2347.webp)
+
 ## Clamp geometry: OS20 version 0.4
+
 
 Version 0.4 preserves the tube diameter, the four mounting holes, the rounded external corners and the general clamp shape.
 
@@ -193,6 +198,8 @@ The 4 mm thickness of the flat wings remains part of the geometry; it is not sub
 This is a proposed correction based on the physical test, **not yet a validated final connector**. The printed v0.4 still needs to be tested on the MITTZON tube with the MauMau housing, checking fit, stability, fastener access and PLA deformation under load.
 
 > The grid makes the mounting pattern repeatable. The physical test makes the connector usable.
+
+![clamp on grid | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_6327.webp)
 
 ## Parametric fabrication
 
@@ -207,14 +214,12 @@ Two working model versions are documented:
 
 **Model files**:
 
-- [OS20 clamp v0.4 — OpenSCAD](#todo-os20-v04.scad)
-- [OS20 clamp v0.4 — STL](#todo-os20-v04.stl)
+- [OS20 clamp v0.4 — OpenSCAD](https://github.com/linalopes/artificial-emotion/blob/main/fixation-hackings/mittzon_pipe_clamp_OS20_M3_v04_short_U.scad)
+- [OS20 clamp v0.4 — STL](https://github.com/linalopes/artificial-emotion/blob/main/fixation-hackings/mittzon_pipe_clamp_OS20_M3_v04_short_U.stl)
 
 The STL is useful for printing or sharing a particular iteration. The OpenSCAD file is more useful for adapting the connector as the system evolves.
 
-An interactive 3D viewer embedded in the research website would make this documentation more accessible: readers could rotate the object, examine the profile and understand how its holes relate to the tube and the mounting surface. This is a **proposed website feature**, not an existing lab or viewer.
-
-For the Astro site, a possible later implementation would load hosted STL files into a client-side viewer, for example using Three.js and its STLLoader. The viewer should be treated as an addition to — not a replacement for — the downloadable fabrication files.
+::model{src="fixation-hackings/mittzon_pipe_clamp_OS20_M3_v04_short_U.stl" title="MITTZON Clamp — OS20 v0.4"}
 
 ## What worked
 
@@ -233,8 +238,6 @@ The most significant result is not yet a finished clamp. It is the decision to t
 
 Several questions are still open:
 
-- Does the shortened v0.4 saddle make the MauMau housing sufficiently stable?
-- How should the clamp be tightened so that it does not shift or rotate around the tube during movement?
 - Which mounting-hole configurations work best for small MDF housings without weakening their surfaces?
 - How will the 35 mm mounting pattern of the 28BYJ-48 connect to an OS20 exterior?
 - How can components on a 20 mm grid attach neatly and reversibly to a commercially available 25 mm pegboard?
@@ -276,4 +279,4 @@ It is an underlying rule that allows different kinetic behaviors to coexist, be 
 - [JUMBO — Hartfaserplatte weiss gelocht 3 mm](https://www.jumbo.ch/de/bauen-renovieren/holz/holzzuschnitt/hartfaserplatten/hartfaserplatte-weiss-gelocht-3-mm/p/3464452)
 - [Mottez — perforated Isorel panel, a French commercial reference](https://www.mottez.com/en/produits/panneau-perfore-en-isorel/)
 - [28BYJ-48 — example technical mounting dimensions](https://www.jakelectronics.com/subject/28byj-48-5v-stepper-motor-28byj-48-datasheet-pinout-wiring)
-- [IKEA — MITTZON furniture range](https://www.ikea.com/)
+- [IKEA — MITTZON](https://www.ikea.com/ch/en/p/mittzon-frame-with-castors-white-10528633/)
