@@ -455,7 +455,22 @@ hr {
   }
 }
 
-/* Privacy-enhanced YouTube embeds from the `::youtube` Markdown directive */
+/* Sanitized HTTPS iframes from ordinary Markdown HTML */
+.iframe-embed {
+  width: 100%;
+  max-width: none;
+  margin-block: var(--space-2) 0;
+  aspect-ratio: var(--iframe-aspect, 16 / 9);
+}
+
+.iframe-embed iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Compatibility alias for the `::youtube` Markdown directive */
 .youtube-embed {
   width: 100%;
   max-width: none;

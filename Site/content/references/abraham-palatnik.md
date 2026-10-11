@@ -82,14 +82,8 @@ He began moving away from figurative painting and toward a freer investigation o
 
 And the route he found drew on something else he already knew: **mechanics**.
 
-
-
-<iframe
-  src="https://artsandculture.google.com/story/abraham-palatnik-ccbb-rio/4QXhXk2Xd4r6KQ"
-  style="width: 100&#37;; height: 600px; border: 0;"
-  allowfullscreen
-  loading="lazy"
-></iframe>
+![](https://res.cloudinary.com/da1flkgyb/image/upload/v1791717548/Screenshot_2026-10-11_at_13.17.42.webp)
+[Check Google Arts & Culture ↗](https://artsandculture.google.com/story/abraham-palatnik-ccbb-rio/4QXhXk2Xd4r6KQ)
 
 
 ---

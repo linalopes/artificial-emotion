@@ -3,10 +3,12 @@
  * and rendering those fragments to HTML. Used when a page needs to show
  * About / Program / Documentation / Reflection independently, and skip empty headings.
  *
- * Raw HTML is escaped on purpose. Internal labs use `::lab{src title}`;
- * repository STL files use `::model{src title caption?}`;
- * YouTube videos use `::youtube{src title}`.
+ * Raw HTML is escaped on purpose. Complete `<iframe>` blocks are rebuilt from
+ * an attribute allowlist. Internal labs use `::lab{src title}`;
+ * repository STL files use `::model{src title caption?}`.
+ * `::youtube` remains a compatibility alias; prefer ordinary iframe HTML.
  */
+import { findCompleteIframes, iframeEmbedHtml, parseIframeMarkup } from './iframe-embed';
 import { isLabDirectiveLine, labEmbedHtml, parseLabDirective } from './lab-embed';
 import { isModelDirectiveLine, modelEmbedHtml, parseModelDirective } from './model-embed';
 import { isYoutubeDirectiveLine, parseYoutubeDirective, youtubeEmbedHtml } from './youtube-embed';
@@ -295,8 +297,9 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
  * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
- * emphasis, images, internal `::lab` embeds, `::model` STL viewers,
- * and `::youtube` embeds. Raw HTML is escaped.
+ * emphasis, images, sanitized HTTPS iframes, internal `::lab` embeds,
+ * `::model` STL viewers, and a `::youtube` compatibility alias.
+ * Other raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
   return markdownToParts(markdown)
@@ -309,6 +312,50 @@ export function markdownToSafeHtml(markdown: string): string {
     .join('');
 }
 
+function appendMarkdownLines(parts: MarkdownPart[], text: string): void {
+  const lines = text.split('\n').filter((line) => line.trim().length > 0);
+  if (lines.length === 0) return;
+
+  const runs: { kind: BlockKind; lines: string[] }[] = [];
+  for (const line of lines) {
+    const kind = lineKind(line);
+    const current = runs[runs.length - 1];
+    if (current && current.kind === kind) current.lines.push(line);
+    else runs.push({ kind, lines: [line] });
+  }
+
+  for (const run of runs) {
+    if (run.kind === 'lab') {
+      const parsed = parseLabDirective(run.lines.map((line) => line.trim()).join(' '));
+      if (parsed) {
+        parts.push({ type: 'lab', src: parsed.src, title: parsed.title });
+        continue;
+      }
+    }
+    if (run.kind === 'model') {
+      const parsed = parseModelDirective(run.lines.map((line) => line.trim()).join(' '));
+      if (parsed) {
+        parts.push({
+          type: 'model',
+          src: parsed.src,
+          title: parsed.title,
+          ...(parsed.caption ? { caption: parsed.caption } : {}),
+        });
+        continue;
+      }
+    }
+    if (run.kind === 'youtube') {
+      const parsed = parseYoutubeDirective(run.lines.map((line) => line.trim()).join(' '));
+      if (parsed) {
+        parts.push({ type: 'youtube', src: parsed.src, title: parsed.title });
+        continue;
+      }
+    }
+    const html = renderRun(run.kind, run.lines);
+    if (html) parts.push({ type: 'html', html });
+  }
+}
+
 export function markdownToParts(markdown: string): MarkdownPart[] {
   const normalized = markdown
     .replace(/^\uFEFF/, '')
@@ -318,46 +365,29 @@ export function markdownToParts(markdown: string): MarkdownPart[] {
   const parts: MarkdownPart[] = [];
 
   for (const block of normalized.split(/\n{2,}/)) {
-    const lines = block.split('\n').filter((line) => line.trim().length > 0);
-    if (lines.length === 0) continue;
+    const matches = findCompleteIframes(block);
+    let cursor = 0;
+    const segments: { kind: 'md' | 'iframe'; text: string }[] = [];
 
-    const runs: { kind: BlockKind; lines: string[] }[] = [];
-    for (const line of lines) {
-      const kind = lineKind(line);
-      const current = runs[runs.length - 1];
-      if (current && current.kind === kind) current.lines.push(line);
-      else runs.push({ kind, lines: [line] });
+    for (const match of matches) {
+      const start = match.index ?? 0;
+      if (start > cursor) segments.push({ kind: 'md', text: block.slice(cursor, start) });
+      segments.push({ kind: 'iframe', text: match[0] });
+      cursor = start + match[0].length;
+    }
+    if (cursor < block.length || segments.length === 0) {
+      segments.push({ kind: 'md', text: block.slice(cursor) });
     }
 
-    for (const run of runs) {
-      if (run.kind === 'lab') {
-        const parsed = parseLabDirective(run.lines.map((line) => line.trim()).join(' '));
+    for (const segment of segments) {
+      if (segment.kind === 'iframe') {
+        const parsed = parseIframeMarkup(segment.text);
         if (parsed) {
-          parts.push({ type: 'lab', src: parsed.src, title: parsed.title });
+          parts.push({ type: 'html', html: iframeEmbedHtml(parsed) });
           continue;
         }
       }
-      if (run.kind === 'model') {
-        const parsed = parseModelDirective(run.lines.map((line) => line.trim()).join(' '));
-        if (parsed) {
-          parts.push({
-            type: 'model',
-            src: parsed.src,
-            title: parsed.title,
-            ...(parsed.caption ? { caption: parsed.caption } : {}),
-          });
-          continue;
-        }
-      }
-      if (run.kind === 'youtube') {
-        const parsed = parseYoutubeDirective(run.lines.map((line) => line.trim()).join(' '));
-        if (parsed) {
-          parts.push({ type: 'youtube', src: parsed.src, title: parsed.title });
-          continue;
-        }
-      }
-      const html = renderRun(run.kind, run.lines);
-      if (html) parts.push({ type: 'html', html });
+      appendMarkdownLines(parts, segment.text);
     }
   }
 
