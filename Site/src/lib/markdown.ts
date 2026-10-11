@@ -122,26 +122,37 @@ function splitBareUrl(raw: string): { href: string; trail: string } {
   return { href, trail };
 }
 
+const HOLD = '\u0001';
+
+function applyEmphasis(value: string): string {
+  return value
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+}
+
 function inline(value: string): string {
   const held: string[] = [];
   const hold = (html: string) => {
     held.push(html);
-    return `\0${held.length - 1}\0`;
+    return `${HOLD}${held.length - 1}${HOLD}`;
   };
 
-  const withMarkup = escapeHtml(value)
-    .replace(/\[([^\]]+)\]\((https?:[^)\s]+|\/[^)\s]+)\)/g, (_match, label: string, href: string) =>
-      hold(`<a href="${href}">${label}</a>`))
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, (_match, code: string) => hold(`<code>${code}</code>`));
+  // Code first so `[not a link](url)` inside backticks stays literal.
+  // Then links, with emphasis applied to the label so [**bold**](url) works.
+  // Remaining **bold** / *italic* still wrap those held links: **[Obsidian](url)**.
+  let text = escapeHtml(value).replace(/`([^`]+)`/g, (_match, code: string) => hold(`<code>${code}</code>`));
 
-  const withLinks = withMarkup.replace(/https?:\/\/[^\s<]+/g, (raw) => {
+  text = text.replace(/\[([^\]]+)\]\((https?:[^)\s]+|\/[^)\s]+)\)/g, (_match, label: string, href: string) =>
+    hold(`<a href="${href}">${applyEmphasis(label)}</a>`));
+
+  text = applyEmphasis(text);
+
+  text = text.replace(/https?:\/\/[^\s<]+/g, (raw) => {
     const { href, trail } = splitBareUrl(raw);
     return href ? `${hold(`<a href="${href}">${href}</a>`)}${trail}` : raw;
   });
 
-  return withLinks.replace(/\0(\d+)\0/g, (_match, index: string) => held[Number(index)] ?? '');
+  return text.replace(/\u0001(\d+)\u0001/g, (_match, index: string) => held[Number(index)] ?? '');
 }
 
 type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'model' | 'table' | 'other';

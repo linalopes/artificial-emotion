@@ -33,7 +33,15 @@ const markdownIn = (folder: CollectionName | ResearchCollectionName) =>
    -------------------------------------------------------------------------- */
 const unset = (value: unknown) => (value === null || value === '' ? undefined : value);
 
+/** Obsidian often writes a single select as a one-item YAML list. */
+const unsetScalar = (value: unknown) => {
+  const raw = unset(value);
+  return Array.isArray(raw) ? raw[0] : raw;
+};
+
 const optional = <T extends z.ZodType>(schema: T) => z.preprocess(unset, schema.optional());
+
+const optionalString = () => z.preprocess(unsetScalar, z.string().optional());
 
 const withDefault = <T extends z.ZodType>(
   schema: T,
@@ -185,7 +193,7 @@ const notes = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    type: optional(z.string()),
+    type: optionalString(),
     lede: optional(z.string()),
     url: optional(z.url()),
     cover: optional(mediaRef),
