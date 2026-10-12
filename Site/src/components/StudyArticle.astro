@@ -7,6 +7,8 @@ import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import LabEmbed from './LabEmbed.astro';
+import MermaidEmbed from './MermaidEmbed.astro';
+import MermaidScript from './MermaidScript.astro';
 import ModelEmbed from './ModelEmbed.astro';
 import ModelViewerScript from './ModelViewerScript.astro';
 import YoutubeEmbed from './YoutubeEmbed.astro';
@@ -47,9 +49,9 @@ const withParts = (sections: typeof intro) =>
     }))
     .filter((section) =>
       section.parts.some((part) =>
-        part.type === 'lab' || part.type === 'model' || part.type === 'youtube'
-          ? true
-          : hasMarkdownContent(part.html.replace(/<[^>]+>/g, ' ')),
+        part.type === 'html'
+          ? hasMarkdownContent(part.html.replace(/<[^>]+>/g, ' '))
+          : true,
       ),
     );
 
@@ -57,6 +59,9 @@ const introSections = withParts(intro);
 const restSections = withParts(rest);
 const hasModels = [...introSections, ...restSections].some((section) =>
   section.parts.some((part) => part.type === 'model'),
+);
+const hasMermaid = [...introSections, ...restSections].some((section) =>
+  section.parts.some((part) => part.type === 'mermaid'),
 );
 
 const threads = data.threads.map((id) => ({
@@ -194,6 +199,8 @@ const backlinks = await getBacklinks('studies', entry.id);
                   <ModelEmbed src={part.src} title={part.title} caption={part.caption} />
                 ) : part.type === 'youtube' ? (
                   <YoutubeEmbed src={part.src} title={part.title} />
+                ) : part.type === 'mermaid' ? (
+                  <MermaidEmbed source={part.source} />
                 ) : (
                   <Fragment set:html={part.html} />
                 ),
@@ -216,6 +223,8 @@ const backlinks = await getBacklinks('studies', entry.id);
                   <ModelEmbed src={part.src} title={part.title} caption={part.caption} />
                 ) : part.type === 'youtube' ? (
                   <YoutubeEmbed src={part.src} title={part.title} />
+                ) : part.type === 'mermaid' ? (
+                  <MermaidEmbed source={part.source} />
                 ) : (
                   <Fragment set:html={part.html} />
                 ),
@@ -229,6 +238,7 @@ const backlinks = await getBacklinks('studies', entry.id);
     </div>
   </article>
   {hasModels && <ModelViewerScript />}
+  {hasMermaid && <MermaidScript />}
 </BaseLayout>
 
 <style>
@@ -445,7 +455,8 @@ const backlinks = await getBacklinks('studies', entry.id);
 
   .study-block:has(.lab-embed),
   .study-block:has(.model-embed),
-  .study-block:has(.md-table) {
+  .study-block:has(.md-table),
+  .study-block:has(.mermaid-embed) {
     max-width: min(100%, 54rem);
   }
 

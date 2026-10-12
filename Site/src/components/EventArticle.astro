@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import GalleryImage from './GalleryImage.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import MermaidScript from './MermaidScript.astro';
 import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
 import RelatedEntries from './RelatedEntries.astro';
@@ -21,6 +22,7 @@ import {
   splitHtmlLists,
   splitMarkdownSections,
 } from '../lib/markdown';
+import { hasMermaidMarkup } from '../lib/mermaid-embed';
 import { hasModelViewerMarkup } from '../lib/model-embed';
 import { collectionPath, mediaSrc } from '../lib/paths';
 import { COLLECTION_LABELS_SINGULAR, EVENT_TYPE_LABELS, THREAD_LABELS } from '../lib/vocabulary';
@@ -60,9 +62,9 @@ const documentationHtml = hasMarkdownContent(documentationSource)
 const reflectionHtml = hasMarkdownContent(reflectionSource)
   ? markdownToSafeHtml(reflectionSource)
   : '';
-const hasModels = [aboutHtml, programIntroHtml, documentationHtml, reflectionHtml].some(
-  hasModelViewerMarkup,
-);
+const articleHtml = [aboutHtml, programHtml, documentationHtml, reflectionHtml].join('');
+const hasModels = hasModelViewerMarkup(articleHtml);
+const hasMermaid = hasMermaidMarkup(articleHtml);
 
 const galleryItems = data.gallery.filter((item) => item.src.trim());
 const galleryLayout = galleryItems.length <= 3 ? String(galleryItems.length) : '3';
@@ -307,6 +309,7 @@ const relatedCards = related.map((item) => {
   </div>
 </article>
 {hasModels && <ModelViewerScript />}
+{hasMermaid && <MermaidScript />}
 
 <style>
   .event {
@@ -517,7 +520,8 @@ const relatedCards = related.map((item) => {
   }
 
   .event-about__prose:has(.md-table),
-  .event-about__prose:has(.model-embed) {
+  .event-about__prose:has(.model-embed),
+  .event-about__prose:has(.mermaid-embed) {
     max-width: min(100%, 54rem);
   }
 

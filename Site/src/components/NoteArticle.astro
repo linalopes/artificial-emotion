@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
+import MermaidScript from './MermaidScript.astro';
 import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
 import GalleryImage from './GalleryImage.astro';
@@ -17,6 +18,7 @@ import {
   markdownSectionToHtml,
   splitIntroAndRest,
 } from '../lib/markdown';
+import { hasMermaidMarkup } from '../lib/mermaid-embed';
 import { hasModelViewerMarkup } from '../lib/model-embed';
 import { collectionPath, mediaSrc, threadPath } from '../lib/paths';
 import { COLLECTION_LABELS, THREAD_LABELS } from '../lib/vocabulary';
@@ -41,8 +43,9 @@ const introHtml = intro
   .filter((html) => hasMarkdownContent(html.replace(/<[^>]+>/g, ' ')))
   .join('');
 const restHtml = rest.map((section) => markdownSectionToHtml(section)).join('');
-const hasModels = hasModelViewerMarkup(introHtml + restHtml);
-
+const articleHtml = introHtml + restHtml;
+const hasModels = hasModelViewerMarkup(articleHtml);
+const hasMermaid = hasMermaidMarkup(articleHtml);
 const related = await resolveRelated(data.related, `notes/${entry.id}`);
 const backlinks = await getBacklinks('notes', entry.id);
 
@@ -227,6 +230,7 @@ const threads = data.threads.map((id) => ({
   </article>
   {hasModels && <ModelViewerScript />}
 </BaseLayout>
+  {hasMermaid && <MermaidScript />}
 
 <style>
   .note {
@@ -438,7 +442,8 @@ const threads = data.threads.map((id) => ({
   }
 
   .note-body:has(.md-table),
-  .note-body:has(.model-embed) {
+  .note-body:has(.model-embed),
+  .note-body:has(.mermaid-embed) {
     max-width: min(100%, 54rem);
   }
 

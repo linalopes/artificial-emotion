@@ -1,0 +1,13 @@
+---
+/**
+ * Shared Mermaid wrapper for article galleries of Markdown parts.
+ * Markup matches `mermaidEmbedHtml` so Notes / Events / Research stay identical.
+ */
+import { mermaidEmbedHtml, type MermaidEmbedProps } from '../lib/mermaid-embed';
+
+interface Props extends MermaidEmbedProps {}
+
+const html = mermaidEmbedHtml(Astro.props);
+---
+
+{html && <Fragment set:html={html} />}

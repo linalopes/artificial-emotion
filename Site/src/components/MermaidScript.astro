@@ -1,0 +1,11 @@
+---
+/**
+ * Loads the Mermaid boot script. Include only on pages that contain diagrams.
+ * The mermaid package stays in a separate chunk until this script runs.
+ */
+---
+
+<script>
+  import { bootMermaid } from '../scripts/mermaid-client';
+  bootMermaid();
+</script>

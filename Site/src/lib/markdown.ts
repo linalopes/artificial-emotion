@@ -4,12 +4,14 @@
  * About / Program / Documentation / Reflection independently, and skip empty headings.
  *
  * Raw HTML is escaped on purpose. Complete `<iframe>` blocks are rebuilt from
- * an attribute allowlist. Internal labs use `::lab{src title}`;
- * repository STL files use `::model{src title caption?}`.
+ * an attribute allowlist. Complete ```mermaid fences become typed parts
+ * (the diagram source is never treated as trusted HTML). Internal labs use
+ * `::lab{src title}`; repository STL files use `::model{src title caption?}`.
  * `::youtube` remains a compatibility alias; prefer ordinary iframe HTML.
  */
 import { findCompleteIframes, iframeEmbedHtml, parseIframeMarkup } from './iframe-embed';
 import { isLabDirectiveLine, labEmbedHtml, parseLabDirective } from './lab-embed';
+import { mermaidEmbedHtml } from './mermaid-embed';
 import { isModelDirectiveLine, modelEmbedHtml, parseModelDirective } from './model-embed';
 import { isYoutubeDirectiveLine, parseYoutubeDirective, youtubeEmbedHtml } from './youtube-embed';
 
@@ -17,7 +19,8 @@ export type MarkdownPart =
   | { type: 'html'; html: string }
   | { type: 'lab'; src: string; title: string }
   | { type: 'model'; src: string; title: string; caption?: string }
-  | { type: 'youtube'; src: string; title: string };
+  | { type: 'youtube'; src: string; title: string }
+  | { type: 'mermaid'; source: string };
 
 export interface MarkdownSection {
   /** H2 title, or null for copy before the first H2. */
@@ -82,16 +85,17 @@ export function splitIntroAndRest(markdown: string): {
   return { intro: [sections[0]], rest: sections.slice(1) };
 }
 
+function embedPart(part: MarkdownPart): string {
+  if (part.type === 'lab') return labEmbedHtml(part);
+  if (part.type === 'model') return modelEmbedHtml(part);
+  if (part.type === 'youtube') return youtubeEmbedHtml(part);
+  if (part.type === 'mermaid') return mermaidEmbedHtml(part);
+  return part.html;
+}
+
 /** Render one split section, restoring its H2 when present. */
 export function markdownSectionToHtml(section: MarkdownSection): string {
-  return markdownSectionToParts(section)
-    .map((part) => {
-      if (part.type === 'lab') return labEmbedHtml(part);
-      if (part.type === 'model') return modelEmbedHtml(part);
-      if (part.type === 'youtube') return youtubeEmbedHtml(part);
-      return part.html;
-    })
-    .join('');
+  return markdownSectionToParts(section).map(embedPart).join('');
 }
 
 /** Same as `markdownSectionToHtml`, but keeps lab directives as typed parts. */
@@ -103,6 +107,23 @@ export function markdownSectionToParts(section: MarkdownSection): MarkdownPart[]
     return [{ type: 'html', html: heading + parts[0].html }, ...parts.slice(1)];
   }
   return [{ type: 'html', html: heading }, ...parts];
+}
+
+const MERMAID_FENCE =
+  /^[ \t]*```mermaid[ \t]*\r?\n([\s\S]*?)^[ \t]*```[ \t]*\r?$/gim;
+
+/** Complete ```mermaid fences only. Unclosed or non-mermaid fences are left alone. */
+function findCompleteMermaidFences(markdown: string): Array<{
+  index: number;
+  length: number;
+  source: string;
+}> {
+  const pattern = new RegExp(MERMAID_FENCE.source, MERMAID_FENCE.flags);
+  return [...markdown.matchAll(pattern)].map((match) => ({
+    index: match.index ?? 0,
+    length: match[0].length,
+    source: match[1] ?? '',
+  }));
 }
 
 function escapeHtml(value: string): string {
@@ -297,19 +318,12 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
  * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
- * emphasis, images, sanitized HTTPS iframes, internal `::lab` embeds,
- * `::model` STL viewers, and a `::youtube` compatibility alias.
- * Other raw HTML is escaped.
+ * emphasis, images, sanitized HTTPS iframes, ordinary ```mermaid fences,
+ * internal `::lab` embeds, `::model` STL viewers, and a `::youtube`
+ * compatibility alias. Other raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
-  return markdownToParts(markdown)
-    .map((part) => {
-      if (part.type === 'lab') return labEmbedHtml(part);
-      if (part.type === 'model') return modelEmbedHtml(part);
-      if (part.type === 'youtube') return youtubeEmbedHtml(part);
-      return part.html;
-    })
-    .join('');
+  return markdownToParts(markdown).map(embedPart).join('');
 }
 
 function appendMarkdownLines(parts: MarkdownPart[], text: string): void {
@@ -356,13 +370,8 @@ function appendMarkdownLines(parts: MarkdownPart[], text: string): void {
   }
 }
 
-export function markdownToParts(markdown: string): MarkdownPart[] {
-  const normalized = markdown
-    .replace(/^\uFEFF/, '')
-    .trim()
-    .replace(/^[ \t]+$/gm, '');
-
-  const parts: MarkdownPart[] = [];
+function appendMarkdownBlocks(parts: MarkdownPart[], markdown: string): void {
+  const normalized = markdown.replace(/^[ \t]+$/gm, '');
 
   for (const block of normalized.split(/\n{2,}/)) {
     const matches = findCompleteIframes(block);
@@ -389,6 +398,22 @@ export function markdownToParts(markdown: string): MarkdownPart[] {
       }
       appendMarkdownLines(parts, segment.text);
     }
+  }
+}
+
+export function markdownToParts(markdown: string): MarkdownPart[] {
+  const prepared = markdown.replace(/^\uFEFF/, '').trim();
+  const parts: MarkdownPart[] = [];
+  const fences = findCompleteMermaidFences(prepared);
+  let cursor = 0;
+
+  for (const fence of fences) {
+    if (fence.index > cursor) appendMarkdownBlocks(parts, prepared.slice(cursor, fence.index));
+    parts.push({ type: 'mermaid', source: fence.source });
+    cursor = fence.index + fence.length;
+  }
+  if (cursor < prepared.length || fences.length === 0) {
+    appendMarkdownBlocks(parts, prepared.slice(cursor));
   }
 
   return parts;
