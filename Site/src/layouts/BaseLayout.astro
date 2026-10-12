@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import GalleryLightbox from '../components/GalleryLightbox.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteSearch from '../components/SiteSearch.astro';
@@ -94,6 +95,7 @@ const googleFonts =
     <slot />
     {!isEmbed && <SiteFooter />}
     {!isEmbed && <SiteSearch />}
+    <GalleryLightbox />
   </body>
 </html>
 

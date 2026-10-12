@@ -1,6 +1,7 @@
 ---
 import { cloudinaryVideoPoster, type GalleryItem } from '../lib/cloudinary';
 import { mediaSrc } from '../lib/paths';
+import GalleryImage from './GalleryImage.astro';
 
 interface Props {
   items: GalleryItem[];
@@ -27,6 +28,7 @@ const thumbSrc = (item: GalleryItem) => {
     <section
       class="research-gallery"
       data-pagefind-ignore
+      data-gallery-lightbox
       data-research-gallery={interactive ? '' : undefined}
       data-count={total}
       tabindex={interactive ? 0 : undefined}
@@ -46,7 +48,7 @@ const thumbSrc = (item: GalleryItem) => {
                 aria-hidden={index !== 0 ? true : undefined}
               >
                 {item.type === 'image' ? (
-                  <img src={mediaSrc(item.src)} alt={item.alt} />
+                  <GalleryImage src={item.src} alt={item.alt} caption={caption} />
                 ) : (
                   <video
                     src={mediaSrc(item.src)}

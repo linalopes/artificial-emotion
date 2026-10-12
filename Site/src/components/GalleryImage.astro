@@ -1,0 +1,30 @@
+---
+import { cloudinaryGalleryImageUrl, cloudinaryLargeImageUrl } from '../lib/cloudinary-url';
+import { mediaSrc } from '../lib/paths';
+
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+const displaySrc = mediaSrc(src.trim());
+const gallerySrc = cloudinaryGalleryImageUrl(displaySrc);
+const largeSrc = cloudinaryLargeImageUrl(displaySrc);
+const captionText = caption?.trim() || undefined;
+const enlargeLabel = alt.trim() ? `Enlarge image: ${alt.trim()}` : 'Enlarge image';
+---
+
+<button
+  type="button"
+  class="gallery-zoom"
+  data-lightbox-image
+  data-lightbox-src={largeSrc}
+  data-lightbox-caption={captionText}
+  aria-haspopup="dialog"
+  aria-controls="gallery-lightbox"
+  aria-label={enlargeLabel}
+>
+  <img src={gallerySrc} alt={alt} />
+</button>

@@ -1,0 +1,211 @@
+---
+/**
+ * One site-wide image lightbox. Gallery stills opt in with
+ * `[data-gallery-lightbox]` + `[data-lightbox-image]`.
+ */
+---
+
+<dialog
+  class="gallery-lightbox"
+  id="gallery-lightbox"
+  data-gallery-lightbox-dialog
+  role="dialog"
+  aria-modal="true"
+  aria-label="Enlarged image"
+>
+  <button type="button" class="gallery-lightbox__close" data-lightbox-close aria-label="Close">
+    <span aria-hidden="true">×</span>
+  </button>
+  <button
+    type="button"
+    class="gallery-lightbox__nav gallery-lightbox__prev"
+    data-lightbox-prev
+    aria-label="Previous image"
+    hidden
+  >
+    Previous
+  </button>
+  <button
+    type="button"
+    class="gallery-lightbox__nav gallery-lightbox__next"
+    data-lightbox-next
+    aria-label="Next image"
+    hidden
+  >
+    Next
+  </button>
+  <figure class="gallery-lightbox__figure">
+    <div class="gallery-lightbox__media">
+      <img class="gallery-lightbox__image" data-lightbox-media alt="" />
+    </div>
+    <figcaption class="gallery-lightbox__caption" data-lightbox-caption hidden></figcaption>
+  </figure>
+</dialog>
+
+<script>
+  import { mountGalleryLightbox } from '../scripts/gallery-lightbox';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-gallery-lightbox-dialog]');
+  if (dialog) mountGalleryLightbox(dialog);
+</script>
+
+<style is:global>
+  html.is-lightbox-open,
+  body.is-lightbox-open {
+    overflow: hidden;
+  }
+
+  button[data-lightbox-image] {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    font: inherit;
+    color: inherit;
+  }
+
+  button[data-lightbox-image]:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+
+  .gallery-lightbox {
+    position: fixed;
+    inset: 0;
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    padding: clamp(2.75rem, 7vh, 4rem) clamp(3.25rem, 8vw, 5.5rem) clamp(1.5rem, 5vh, 2.5rem);
+    border: 0;
+    background: color-mix(in srgb, var(--color-deep-purple) 78%, transparent);
+    color: var(--color-white);
+  }
+
+  .gallery-lightbox[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gallery-lightbox::backdrop {
+    background: color-mix(in srgb, var(--color-deep-purple) 78%, transparent);
+  }
+
+  .gallery-lightbox__figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+
+  .gallery-lightbox__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    width: 100%;
+  }
+
+  .gallery-lightbox__image {
+    display: block;
+    max-width: 100%;
+    max-height: min(100%, calc(100dvh - 9rem));
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+
+  .gallery-lightbox__image.is-loaded {
+    opacity: 1;
+  }
+
+  .gallery-lightbox__caption {
+    flex: 0 0 auto;
+    max-width: min(60ch, 100%);
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+    text-align: center;
+    color: color-mix(in srgb, var(--color-white) 82%, var(--color-gray-green));
+  }
+
+  .gallery-lightbox__caption[hidden] {
+    display: none;
+  }
+
+  .gallery-lightbox__close,
+  .gallery-lightbox__nav {
+    position: absolute;
+    z-index: 1;
+    margin: 0;
+    padding: 0.35rem 0.5rem;
+    border: 0;
+    background: none;
+    color: color-mix(in srgb, var(--color-white) 88%, var(--color-gray-green));
+    cursor: pointer;
+  }
+
+  .gallery-lightbox__close {
+    top: 0.65rem;
+    right: 0.65rem;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+
+  .gallery-lightbox__nav {
+    top: 50%;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: var(--weight-mono-regular);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transform: translateY(-50%);
+  }
+
+  .gallery-lightbox__prev {
+    left: 0.75rem;
+  }
+
+  .gallery-lightbox__next {
+    right: 0.75rem;
+  }
+
+  .gallery-lightbox__close:hover,
+  .gallery-lightbox__nav:hover,
+  .gallery-lightbox__close:focus-visible,
+  .gallery-lightbox__nav:focus-visible {
+    color: var(--color-white);
+  }
+
+  .gallery-lightbox__close:focus-visible,
+  .gallery-lightbox__nav:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 39.99rem) {
+    .gallery-lightbox {
+      padding: 3.25rem 0.85rem 4.75rem;
+    }
+
+    .gallery-lightbox__nav {
+      top: auto;
+      bottom: 0.55rem;
+      transform: none;
+    }
+  }
+</style>

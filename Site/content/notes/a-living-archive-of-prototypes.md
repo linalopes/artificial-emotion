@@ -9,6 +9,7 @@ gallery: []
 threads:
   - kinetic-studies
   - soft-mechanisms
+  - heartbeat-biosignals
 tags:
   - research-infrastructure
   - studio-practice

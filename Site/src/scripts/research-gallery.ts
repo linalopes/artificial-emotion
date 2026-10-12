@@ -325,6 +325,11 @@ export function mountResearchGallery(root: HTMLElement): void {
     else scheduleAdvance();
   });
 
+  document.addEventListener('gallery-lightbox-change', () => {
+    if (lightboxOpen()) stopAdvance();
+    else scheduleAdvance();
+  });
+
   const onMotionChange = () => {
     if (prefersReducedMotion()) {
       stopAdvance();

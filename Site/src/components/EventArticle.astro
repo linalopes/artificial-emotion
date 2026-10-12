@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import GalleryImage from './GalleryImage.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
@@ -237,14 +238,14 @@ const relatedCards = related.map((item) => {
 
     {
       galleryItems.length > 0 && (
-        <section class="event-gallery-section" aria-label="Gallery" data-pagefind-ignore>
+        <section class="event-gallery-section" aria-label="Gallery" data-pagefind-ignore data-gallery-lightbox>
           <ul class:list={['event-gallery', `event-gallery--${galleryLayout}`]}>
             {
               galleryItems.map((item) => (
                 <li>
                   <figure>
                     {item.type === 'image' ? (
-                      <img src={mediaSrc(item.src)} alt={item.alt} />
+                      <GalleryImage src={item.src} alt={item.alt} caption={item.caption} />
                     ) : (
                       <video
                         src={mediaSrc(item.src)}

@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import GenerativeWaves from './GenerativeWaves.astro';
 import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
+import GalleryImage from './GalleryImage.astro';
 import TagLinks from './TagLinks.astro';
 import {
   formatDate,
@@ -137,13 +138,13 @@ const threads = data.threads.map((id) => ({
 
       {
         galleryItems.length > 0 && (
-          <section class="note-gallery" aria-label="Gallery">
+          <section class="note-gallery" aria-label="Gallery" data-gallery-lightbox>
             <ul class:list={['note-gallery__list', `note-gallery__list--${galleryCount}`]}>
               {galleryItems.map((item) => (
                 <li>
                   <figure>
                     {item.type === 'image' ? (
-                      <img src={mediaSrc(item.src)} alt={item.alt} />
+                      <GalleryImage src={item.src} alt={item.alt} caption={item.caption} />
                     ) : (
                       <video
                         src={mediaSrc(item.src)}

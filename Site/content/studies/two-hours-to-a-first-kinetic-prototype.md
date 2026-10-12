@@ -137,7 +137,7 @@ More importantly, it showed that a useful kinetic study did not need to begin wi
 
 ## What this prototype established
 
-This first cardboard module became the starting point for the later **Mau Mau** kinetic module.
+This first cardboard module became the starting point for the later **MauMau** kinetic module.
 
 It established several working assumptions that could then be refined:
 
