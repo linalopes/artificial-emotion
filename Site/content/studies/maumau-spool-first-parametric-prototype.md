@@ -171,6 +171,7 @@ The spool was small, but it contained several of the questions that would contin
 ::model{src="kinetic-module-maumau/spool.stl" title="MauMau Spool" caption="First 3D-printed spool developed for the MauMau kinetic module."}
 
 [Download / view spool STL](https://github.com/linalopes/artificial-emotion/blob/main/kinetic-module-maumau/spool.stl)
+[Download / view spool Grasshopper File](https://github.com/linalopes/artificial-emotion/blob/main/kinetic-module-maumau/DESIGNS/spool-3dprinting.gh)
 
 ## Update — 2 October 2026
 

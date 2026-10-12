@@ -89,13 +89,12 @@ These adjustments should not be confused with a validated improvement. **V01 has
 
 The editable OpenSCAD source is the working definition of the connector. The STL records a specific printable iteration.
 
-**Fabrication files — links to be added after the models are committed to the repository:**
+**Fabrication files:**
 
-- **V02 — OpenSCAD:** [ADD_GITHUB_URL_FOR_V02_SCAD]
-- **V02 — STL:** [ADD_GITHUB_URL_FOR_V02_STL]
+- **V02 — OpenSCAD:** [View / download source](https://github.com/linalopes/artificial-emotion/blob/main/fixation-hackings/artificial_emotion_28BYJ48_grid_adapter_v02.scad)
+- **V02 — STL:** [View / download STL](https://github.com/linalopes/artificial-emotion/blob/main/fixation-hackings/artificial_emotion_28BYJ48_grid_adapter_v02.stl)
 
-
-<!-- ::model{src="ACTUAL_REPOSITORY_PATH_TO_V02.stl" title="28BYJ-48 OS20 Motor Adapter — V02"} -->
+::model{src="fixation-hackings/artificial_emotion_28BYJ48_grid_adapter_v02.stl" title="28BYJ-48 OS20 Motor Adapter — V02" caption="V02 parametric motor adapter for the 28BYJ-48 and OS20 grid."}
 
 The model is designed for **FDM printing in PLA**. Final printing orientation, clearances and clip tolerances should be documented after the V02 test rather than assumed from the digital geometry alone.
 
