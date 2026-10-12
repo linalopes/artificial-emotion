@@ -12,7 +12,7 @@ gallery:
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791791825/IMG_5723.webp
     alt: Detail of the cardboard heart mechanism with DC motor and eccentric shaft
-    caption: Detail of the first heart mechanism: a small DC motor with an eccentric shaft striking the cardboard structure from inside.
+    caption: "Detail of the first heart mechanism: a small DC motor with an eccentric shaft striking the cardboard structure from inside."
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791789673/DSCF4836.remini-enhanced.webp
     alt: Group at the Institute for Future Technologies during the Sensitive Machines hackathon
