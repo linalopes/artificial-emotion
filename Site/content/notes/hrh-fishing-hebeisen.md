@@ -17,7 +17,8 @@ gallery:
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791714562/IMG_6055.webp
     alt: Package of CAMO Force Beads, 8 mm, Green Pumpkin
     caption: CAMO Force Beads, 8 mm, Green Pumpkin — magnetic metal beads used in fishing rigs.
-threads: []
+threads:
+  - kinetic-studies
 tags:
   - fishing
   - braided-line
