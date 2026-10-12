@@ -15,6 +15,9 @@ cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797079/IMG_6336.we
 gallery:
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797003/Screenshot_2026-10-01_at_14.12.23.webp
+    alt: Raven used with Grasshopper to develop the MauMau spool
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791798957/Screenshot_2026-09-18_at_17.51.25.webp
     alt: Grasshopper parametric definition used to develop the MauMau spool
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797003/IMG_6334.webp
@@ -162,7 +165,12 @@ It confirmed that:
 
 The spool was small, but it contained several of the questions that would continue through the MauMau module: motor coupling, line management, fabrication constraints, tolerances and the relationship between a digital definition and a physical mechanism.
 
+
 ---
+
+::model{src="kinetic-module-maumau/spool.stl" title="MauMau Spool" caption="First 3D-printed spool developed for the MauMau kinetic module."}
+
+[Download / view spool STL](https://github.com/linalopes/artificial-emotion/blob/main/kinetic-module-maumau/spool.stl)
 
 ## Update — 2 October 2026
 

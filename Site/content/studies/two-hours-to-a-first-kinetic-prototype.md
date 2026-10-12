@@ -1,7 +1,6 @@
 ---
 title: Two Hours to a First Kinetic Prototype
 date: 2026-09-18
-type: prototype
 subtitle: Building a first single-movement kinetic module from cardboard and available materials
 lede: A rapid cardboard prototype used to test whether one simple kinetic idea could become a working physical module in only a few hours.
 status: prototype

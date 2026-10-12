@@ -2,8 +2,8 @@
 title: Heartbeat Slit Animation
 subtitle: A rotational barrier-grid experiment driven by a quartz clock
 date: 2026-10-05
-type: study
 lede: A physical animation study using an interlaced anatomical heart and a rotating slit mask driven by the seconds axis of a quartz clock mechanism.
+status: prototype
 threads:
   - kinetic-studies
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791225483/Screenshot_2026-10-05_at_20.33.59.webp

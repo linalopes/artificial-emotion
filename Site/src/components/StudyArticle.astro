@@ -35,7 +35,6 @@ const { data } = entry;
 const title = data.title.trim();
 const subtitle = data.subtitle?.trim() || undefined;
 const lede = data.lede?.trim() || undefined;
-const typeLabel = data.type?.trim().replace(/-/g, ' ') || undefined;
 const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
 const galleryItems = data.gallery.filter((item) => item.src.trim());
 const youtube = data.youtube?.trim() ? youtubeUrl(data.youtube.trim()) : undefined;
@@ -125,14 +124,6 @@ const backlinks = await getBacklinks('studies', entry.id);
             <dt>Status</dt>
             <dd>{data.status}</dd>
           </div>
-          {
-            typeLabel && (
-              <div class="study-meta__row">
-                <dt>Type</dt>
-                <dd>{typeLabel}</dd>
-              </div>
-            )
-          }
           {
             threads.length > 0 && (
               <div class="study-meta__row">

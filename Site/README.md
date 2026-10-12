@@ -98,6 +98,9 @@ institutions, places, tools, or materials.
 
 Shared tags do **not** mean two entries are related.
 
+Editorial authoring rules (collections, fields, Markdown, Obsidian) live in
+[`content/_templates/README.md`](content/_templates/README.md).
+
 ### Authoring rules
 
 Frontmatter is plain YAML, editable in Obsidian's Properties panel.
@@ -114,9 +117,9 @@ Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 
 | Collection   | Required        | Optional / defaults |
 | ------------ | --------------- | ------------------- |
-| `studies`    | title, date     | status (`seed` · experiment · prototype · integrated), threads, tags, materials, related, cover, youtube, draft |
+| `studies`    | title, date, status (`seed` · experiment · prototype · integrated) | subtitle, lede, threads, tags, materials, related, cover, gallery, youtube, draft. No `type`. |
 | `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
-| `references` | title, date     | creator, year, referenceType, url, threads, tags, related, image, draft. `year` is the chronology of the referenced work, not the notebook date. |
+| `references` | title, date     | creator, year, referenceType, lede, url, cover, gallery, threads, tags, related, image (legacy; prefer `cover`), draft. `year` is the chronology of the referenced work, not the notebook date. |
 | `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |
 | `research`   | title, date     | subtitle, lede, questions, process, cover, gallery, galleryFolder, tags, draft. No `status`, `threads`, or `related`. Filename must be the canonical thread id. |
 

@@ -2,8 +2,8 @@
 title: Paper Heart
 subtitle: Folding a flexible surface into a moving volume
 date: 2026-10-04
-type: workshop
 lede: A paper study exploring how folding transforms a flat, flexible material into a three-dimensional form capable of movement.
+status: experiment
 threads:
   - soft-mechanisms
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791121982/IMG_6154.webp

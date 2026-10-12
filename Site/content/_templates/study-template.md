@@ -2,9 +2,9 @@
 title:
 subtitle:
 date:
-type:
 lede:
-status: seed
+
+status:
 
 threads: []
 tags: []
