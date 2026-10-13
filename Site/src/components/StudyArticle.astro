@@ -69,7 +69,6 @@ const threads = data.threads.map((id) => ({
   href: threadPath(id),
 }));
 
-const materials = data.materials.map((item) => item.trim()).filter(Boolean);
 const tags = data.tags.map((item) => item.trim()).filter(Boolean);
 const backlinks = await getBacklinks('studies', entry.id);
 ---
@@ -134,20 +133,6 @@ const backlinks = await getBacklinks('studies', entry.id);
                       <li>
                         <a href={thread.href}>{thread.label}</a>
                       </li>
-                    ))}
-                  </ul>
-                </dd>
-              </div>
-            )
-          }
-          {
-            materials.length > 0 && (
-              <div class="study-meta__row">
-                <dt>Materials</dt>
-                <dd>
-                  <ul>
-                    {materials.map((item) => (
-                      <li>{item}</li>
                     ))}
                   </ul>
                 </dd>

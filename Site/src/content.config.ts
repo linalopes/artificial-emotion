@@ -173,7 +173,6 @@ const studies = defineCollection({
     status: z.preprocess(unsetScalar, z.enum(STUDY_STATUSES)),
     threads,
     tags,
-    materials: withDefault(z.array(z.string()), []),
     related,
     cover: optional(z.string()),
     gallery,

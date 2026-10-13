@@ -42,12 +42,8 @@ tags:
   - mechanical-connections
   - 28byj-48
   - rapid-prototyping
-
-materials:
-  - acrylic
-  - M3 fasteners
-  - 28BYJ-48 stepper motor
-  - braided fishing line
+  - m3
+  - braided-line
 
 related:
   - studies/two-hours-to-a-first-kinetic-prototype
@@ -144,6 +140,13 @@ The enclosure could be taken apart again.
 Individual faces could be modified.
 
 The same parametric definition could generate another version.
+
+::model{src="kinetic-module-maumau/DESIGNS/archive/box-3d-assembly.glb" title="MauMau Acrylic Enclosure" caption="First parametric 3D assembly of the laser-cut MauMau kinetic module."}
+
+**Design files:**
+
+- **3D assembly — Grasshopper:** [View / download definition](https://github.com/linalopes/artificial-emotion/blob/main/kinetic-module-maumau/DESIGNS/archive/box-3d-assembly.gh)
+- **Laser-cut enclosure — SVG:** [View / download cutting file](https://github.com/linalopes/artificial-emotion/blob/main/kinetic-module-maumau/DESIGNS/archive/box-lasercutting.svg)
 
 ## Observation — 26 September 2026
 

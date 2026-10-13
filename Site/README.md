@@ -117,7 +117,7 @@ Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 
 | Collection   | Required        | Optional / defaults |
 | ------------ | --------------- | ------------------- |
-| `studies`    | title, date, status (`seed` · experiment · prototype · integrated) | subtitle, lede, threads, tags, materials, related, cover, gallery, youtube, draft. No `type`. |
+| `studies`    | title, date, status (`seed` · experiment · prototype · integrated) | subtitle, lede, threads, tags, related, cover, gallery, youtube, draft. No `type`. |
 | `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
 | `references` | title, date     | creator, year, referenceType, lede, url, cover, gallery, threads, tags, related, image (legacy; prefer `cover`), draft. `year` is the chronology of the referenced work, not the notebook date. |
 | `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |

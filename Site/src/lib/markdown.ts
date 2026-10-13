@@ -6,7 +6,7 @@
  * Raw HTML is escaped on purpose. Complete `<iframe>` and `<video>` blocks
  * are rebuilt from an attribute allowlist. Complete ```mermaid fences become
  * typed parts (the diagram source is never treated as trusted HTML). Internal
- * labs use `::lab{src title}`; repository STL files use `::model{src title caption?}`.
+ * labs use `::lab{src title}`; repository STL/GLB files use `::model{src title caption?}`.
  * `::youtube` remains a compatibility alias; prefer ordinary iframe HTML.
  */
 import { findCompleteIframes, iframeEmbedHtml, parseIframeMarkup } from './iframe-embed';
@@ -320,7 +320,7 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
  * Render a Markdown fragment (no frontmatter) to HTML.
  * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
  * emphasis, images, sanitized HTTPS iframes and videos, ordinary ```mermaid
- * fences, internal `::lab` embeds, `::model` STL viewers, and a `::youtube`
+ * fences, internal `::lab` embeds, `::model` STL/GLB viewers, and a `::youtube`
  * compatibility alias. Other raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {

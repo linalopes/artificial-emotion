@@ -200,13 +200,18 @@ Membership in one or more canonical Research Threads:
 
 ### tags
 
-Shared characteristics / facets.
+Shared characteristics / facets used for discovery across the archive.
 
 A tag answers: “Why would I want to find other entries sharing this
 characteristic?”
 
-Examples: `cardboard`, `3d-printing`, `grasshopper`, `kinetic-mechanisms`,
-`folding`, `wetzikon`.
+Examples: `cardboard`, `pla`, `acrylic`, `3d-printing`, `grasshopper`,
+`kinetic-mechanisms`, `folding`, `wetzikon`.
+
+Physical substances that are useful for finding other work belong here.
+Detailed parts lists, dimensions, and fabrication specifications belong
+in the Study body (Setup / Fabrication), not in a separate frontmatter
+field.
 
 Tags are **not** explicit relationships.
 
@@ -229,11 +234,6 @@ the institution connected to this work; this reference informed this
 experiment.
 
 Shared tag ≠ related.
-
-### materials
-
-Study-only field for physical / material components (`PLA`, `cardboard`,
-braided fishing line).
 
 ### gallery
 
@@ -353,7 +353,7 @@ Keep these because Obsidian has no native equivalent:
 ::model{src="kinetic-module-maumau/spool.stl" title="MauMau Spool" caption="Optional caption"}
 ```
 
-`src` is a repository-relative STL path. Do not move the file into `Site/`.
+`src` is a repository-relative STL or GLB path. Do not move the file into `Site/`.
 
 ```md
 ::lab{src="/lab/heartbeat-slit-animation/" title="Heartbeat Slit Animation Lab"}

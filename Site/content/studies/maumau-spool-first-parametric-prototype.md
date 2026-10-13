@@ -34,10 +34,7 @@ tags:
   - braided-line
   - kinetic-mechanisms
   - line-fixation
-
-materials:
-  - PLA
-  - braided fishing line
+  - pla
 
 related:
   - studies/two-hours-to-a-first-kinetic-prototype

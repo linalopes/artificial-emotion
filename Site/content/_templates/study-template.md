@@ -8,7 +8,6 @@ status:
 
 threads: []
 tags: []
-materials: []
 related: []
 
 cover:

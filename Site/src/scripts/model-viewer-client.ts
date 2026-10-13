@@ -1,5 +1,5 @@
 /**
- * Boot STL viewers only on pages that already contain [data-model-viewer].
+ * Boot STL/GLB viewers only on pages that already contain [data-model-viewer].
  * Three.js is a dynamic import, deferred until a viewer is near the viewport.
  */
 

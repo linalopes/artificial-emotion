@@ -19,12 +19,6 @@ gallery:
     caption: Detail of the improvised structure and line-guiding mechanism.
 threads:
   - kinetic-studies
-materials:
-  - cardboard
-  - braided fishing line
-  - fishing weight
-  - plastic hook fastener
-  - cardboard fasteners
 tags:
   - cardboard
   - rapid-prototyping

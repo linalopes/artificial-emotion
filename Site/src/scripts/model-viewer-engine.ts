@@ -1,5 +1,5 @@
 /**
- * Three.js STL viewer. Loaded only after a [data-model-viewer] enters view.
+ * Three.js STL/GLB viewer. Loaded only after a [data-model-viewer] enters view.
  * Renders on demand (resize / orbit), not on a continuous loop.
  */
 import {
@@ -11,12 +11,14 @@ import {
   HemisphereLight,
   Mesh,
   MeshStandardMaterial,
+  Object3D,
   PerspectiveCamera,
   Scene,
   Vector3,
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
 const MESH_COLOR = 0x8f92a2;
@@ -34,11 +36,14 @@ function setStatus(root: HTMLElement, message: string | null): void {
   status.textContent = '';
 }
 
-function disposeObject(mesh: Mesh): void {
-  mesh.geometry.dispose();
-  const { material } = mesh;
-  if (Array.isArray(material)) material.forEach((item) => item.dispose());
-  else material.dispose();
+function disposeTree(object: Object3D): void {
+  object.traverse((child) => {
+    if (!(child instanceof Mesh)) return;
+    child.geometry.dispose();
+    const { material } = child;
+    if (Array.isArray(material)) material.forEach((item) => item.dispose());
+    else material.dispose();
+  });
 }
 
 export function mountModelViewer(root: HTMLElement): void {
@@ -83,7 +88,7 @@ export function mountModelViewer(root: HTMLElement): void {
 
   const homePosition = new Vector3();
   const homeTarget = new Vector3();
-  let mesh: Mesh | null = null;
+  let model: Object3D | null = null;
   let disposed = false;
 
   const render = () => {
@@ -92,8 +97,8 @@ export function mountModelViewer(root: HTMLElement): void {
   };
 
   const fit = () => {
-    if (!mesh) return;
-    const box = new Box3().setFromObject(mesh);
+    if (!model) return;
+    const box = new Box3().setFromObject(model);
     const size = box.getSize(new Vector3());
     const center = box.getCenter(new Vector3());
     const radius = Math.max(size.length() * 0.5, 0.001);
@@ -134,9 +139,9 @@ export function mountModelViewer(root: HTMLElement): void {
     observer.disconnect();
     controls.dispose();
     renderer.domElement.removeEventListener('webglcontextlost', onLost);
-    if (mesh) {
-      scene.remove(mesh);
-      disposeObject(mesh);
+    if (model) {
+      scene.remove(model);
+      disposeTree(model);
     }
     renderer.dispose();
     renderer.domElement.remove();
@@ -158,8 +163,30 @@ export function mountModelViewer(root: HTMLElement): void {
   reset?.addEventListener('click', onReset);
   window.addEventListener('pagehide', dispose);
 
-  const loader = new STLLoader();
-  loader.load(
+  const show = (object: Object3D) => {
+    if (disposed) {
+      disposeTree(object);
+      return;
+    }
+    model = object;
+    scene.add(model);
+    fit();
+    resize();
+    setStatus(root, null);
+    if (reset) reset.disabled = false;
+  };
+
+  const fail = () => {
+    if (disposed) return;
+    setStatus(root, 'This model could not be loaded.');
+  };
+
+  if (/\.glb(?:$|\?)/i.test(src)) {
+    new GLTFLoader().load(src, (gltf) => show(gltf.scene), undefined, fail);
+    return;
+  }
+
+  new STLLoader().load(
     src,
     (geometry: BufferGeometry) => {
       if (disposed) {
@@ -168,24 +195,18 @@ export function mountModelViewer(root: HTMLElement): void {
       }
       geometry.computeVertexNormals();
       geometry.center();
-      mesh = new Mesh(
-        geometry,
-        new MeshStandardMaterial({
-          color: MESH_COLOR,
-          roughness: 0.42,
-          metalness: 0.08,
-        }),
+      show(
+        new Mesh(
+          geometry,
+          new MeshStandardMaterial({
+            color: MESH_COLOR,
+            roughness: 0.42,
+            metalness: 0.08,
+          }),
+        ),
       );
-      scene.add(mesh);
-      fit();
-      resize();
-      setStatus(root, null);
-      if (reset) reset.disabled = false;
     },
     undefined,
-    () => {
-      if (disposed) return;
-      setStatus(root, 'This model could not be loaded.');
-    },
+    fail,
   );
 }

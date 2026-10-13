@@ -1,6 +1,7 @@
 /**
  * Markdown `::model{src title caption?}` directive.
- * `src` is a repository-relative STL path (e.g. fixation-hackings/part.stl).
+ * `src` is a repository-relative STL or GLB path
+ * (e.g. kinetic-module-maumau/DESIGNS/archive/box-3d-assembly.glb).
  * Public URLs are served from `/repo-models/` by the Vite plugin in repo-models.ts.
  */
 import { href } from './paths';
@@ -14,7 +15,7 @@ export type ModelEmbedProps = {
 const MODEL_DIRECTIVE = /^::model\{([^}]*)\}\s*$/;
 const ATTR = /([a-zA-Z][\w-]*)\s*=\s*"([^"]*)"/g;
 const SEGMENT = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
-const STL_NAME = /\.stl$/i;
+const MODEL_NAME = /\.(stl|glb)$/i;
 const BLOCKED = new Set(['.git', 'node_modules', 'Site', 'dist']);
 
 export const REPO_MODELS_PREFIX = '/repo-models/';
@@ -29,7 +30,7 @@ export function hasModelViewerMarkup(html: string): boolean {
 
 /**
  * Normalize a Markdown `src` to a repo-relative POSIX path, or null if unsafe.
- * Rejects absolute paths, traversal, hidden segments, and non-STL files.
+ * Rejects absolute paths, traversal, hidden segments, and non-STL/GLB files.
  */
 export function normalizeRepoStlRef(src: string): string | null {
   const trimmed = src.trim().replace(/\\/g, '/');
@@ -41,7 +42,7 @@ export function normalizeRepoStlRef(src: string): string | null {
   if (parts.some((part) => !SEGMENT.test(part) || part === '.' || BLOCKED.has(part))) return null;
 
   const file = parts[parts.length - 1];
-  if (!file || !STL_NAME.test(file)) return null;
+  if (!file || !MODEL_NAME.test(file)) return null;
   return parts.join('/');
 }
 
@@ -50,7 +51,11 @@ export function modelFilename(src: string): string {
   return ref?.split('/').pop() ?? 'model.stl';
 }
 
-/** Public same-origin URL for a validated repo-relative STL, or null. */
+export function modelDownloadLabel(src: string): string {
+  return /\.glb$/i.test(modelFilename(src)) ? 'Download GLB' : 'Download STL';
+}
+
+/** Public same-origin URL for a validated repo-relative STL or GLB, or null. */
 export function internalModelHref(src: string): string | null {
   const ref = normalizeRepoStlRef(src);
   if (!ref) return null;
@@ -106,7 +111,7 @@ export function modelEmbedHtml({ src, title, caption }: ModelEmbedProps): string
     captionHtml +
     `<p class="model-embed__actions">` +
     `<button type="button" data-model-reset disabled>Reset view</button>` +
-    `<a href="${safeUrl}" download="${safeFile}">Download STL</a>` +
+    `<a href="${safeUrl}" download="${safeFile}">${escapeHtml(modelDownloadLabel(src))}</a>` +
     `</p></figcaption></figure>`
   );
 }
