@@ -14,9 +14,9 @@ gallery:
     alt: Detail of the cardboard heart mechanism with DC motor and eccentric shaft
     caption: "Detail of the first heart mechanism: a small DC motor with an eccentric shaft striking the cardboard structure from inside."
   - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791789673/DSCF4836.remini-enhanced.webp
-    alt: Group at the Institute for Future Technologies during the Sensitive Machines hackathon
-    caption: The wider group at IFT during the week in Paris.
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791874193/WhatsApp_Image_2026-10-12_at_12.33.00.webp
+    alt: The heart shape made from 4 pieces of crumpled aluminum foil
+    caption: the heart shape made from 4 pieces of crumpled aluminum foil 
 threads: []
 tags:
   - sensitive-machines
@@ -137,4 +137,6 @@ At IFT, Mariana Tamashiro works across creative learning, design and technology,
 
 The environment around the hackathon — engineers prototyping quickly, physical materials mixed with code, and permission to make incomplete things — became one of the conditions from which *Artificial Emotion* emerged.
 
+![](https://res.cloudinary.com/da1flkgyb/image/upload/v1791789673/DSCF4836.remini-enhanced.webp)
 
+Photo: The wider group at IFT during the week in Paris.

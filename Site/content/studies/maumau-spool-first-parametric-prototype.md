@@ -208,3 +208,13 @@ The update was small, but it made the part much more usable as an actual kinetic
 The spool was no longer only able to **hold** line.
 
 It now had a deliberate way to **begin** the line.
+
+<video
+  src="https://res.cloudinary.com/da1flkgyb/video/upload/v1791873334/IMG_6059.mp4"
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="metadata"
+  style="width: 100%; height: auto;"
+></video>

@@ -289,6 +289,7 @@ Prefer:
 - blockquotes
 - Mermaid fenced blocks
 - ordinary iframe HTML when an embed is needed and allowed
+- ordinary video HTML when a hosted HTTPS file is needed
 
 ### Mermaid
 
@@ -320,6 +321,29 @@ Use HTTPS sources only.
 
 Some remote providers may refuse embedding even if the iframe works in
 Obsidian.
+
+### video
+
+Ordinary `<video>` HTML is allowed through the site’s controlled sanitizer.
+Use a complete `<video …></video>` block and an HTTPS `src` only.
+Inline `style` may be kept for Obsidian; the site drops it and sizes the
+video with CSS.
+
+```html
+<video
+  src="https://res.cloudinary.com/example/video/upload/clip.mp4"
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="metadata"
+  style="width: 100%; height: auto;"
+></video>
+```
+
+Allowed attributes: `src`, `controls`, `autoplay`, `muted`, `loop`,
+`playsinline`, `preload`, `poster`, `width`, `height`, `aria-label`.
+If `autoplay` is present, the site also requires `muted` and `playsinline`.
 
 ### Project-specific directives
 

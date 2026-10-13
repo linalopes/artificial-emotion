@@ -447,7 +447,8 @@ const backlinks = await getBacklinks('studies', entry.id);
   .study-block:has(.lab-embed),
   .study-block:has(.model-embed),
   .study-block:has(.md-table),
-  .study-block:has(.mermaid-embed) {
+  .study-block:has(.mermaid-embed),
+  .study-block:has(.video-embed) {
     max-width: min(100%, 54rem);
   }
 
@@ -455,7 +456,8 @@ const backlinks = await getBacklinks('studies', entry.id);
   .study-block :global(.lab-embed__open),
   .study-block :global(.model-embed),
   .study-block :global(.youtube-embed),
-  .study-block :global(.iframe-embed) {
+  .study-block :global(.iframe-embed),
+  .study-block :global(.video-embed) {
     max-width: none;
   }
 

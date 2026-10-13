@@ -3,16 +3,17 @@
  * and rendering those fragments to HTML. Used when a page needs to show
  * About / Program / Documentation / Reflection independently, and skip empty headings.
  *
- * Raw HTML is escaped on purpose. Complete `<iframe>` blocks are rebuilt from
- * an attribute allowlist. Complete ```mermaid fences become typed parts
- * (the diagram source is never treated as trusted HTML). Internal labs use
- * `::lab{src title}`; repository STL files use `::model{src title caption?}`.
+ * Raw HTML is escaped on purpose. Complete `<iframe>` and `<video>` blocks
+ * are rebuilt from an attribute allowlist. Complete ```mermaid fences become
+ * typed parts (the diagram source is never treated as trusted HTML). Internal
+ * labs use `::lab{src title}`; repository STL files use `::model{src title caption?}`.
  * `::youtube` remains a compatibility alias; prefer ordinary iframe HTML.
  */
 import { findCompleteIframes, iframeEmbedHtml, parseIframeMarkup } from './iframe-embed';
 import { isLabDirectiveLine, labEmbedHtml, parseLabDirective } from './lab-embed';
 import { mermaidEmbedHtml } from './mermaid-embed';
 import { isModelDirectiveLine, modelEmbedHtml, parseModelDirective } from './model-embed';
+import { findCompleteVideos, parseVideoMarkup, videoEmbedHtml } from './video-embed';
 import { isYoutubeDirectiveLine, parseYoutubeDirective, youtubeEmbedHtml } from './youtube-embed';
 
 export type MarkdownPart =
@@ -318,8 +319,8 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
  * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
- * emphasis, images, sanitized HTTPS iframes, ordinary ```mermaid fences,
- * internal `::lab` embeds, `::model` STL viewers, and a `::youtube`
+ * emphasis, images, sanitized HTTPS iframes and videos, ordinary ```mermaid
+ * fences, internal `::lab` embeds, `::model` STL viewers, and a `::youtube`
  * compatibility alias. Other raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
@@ -370,29 +371,54 @@ function appendMarkdownLines(parts: MarkdownPart[], text: string): void {
   }
 }
 
+type EmbedKind = 'md' | 'iframe' | 'video';
+
+function embedSegments(block: string): { kind: EmbedKind; text: string }[] {
+  const hits = [
+    ...findCompleteIframes(block).map((match) => ({
+      kind: 'iframe' as const,
+      start: match.index ?? 0,
+      text: match[0],
+    })),
+    ...findCompleteVideos(block).map((match) => ({
+      kind: 'video' as const,
+      start: match.index ?? 0,
+      text: match[0],
+    })),
+  ]
+    .filter((hit) => hit.start >= 0)
+    .sort((a, b) => a.start - b.start);
+
+  const segments: { kind: EmbedKind; text: string }[] = [];
+  let cursor = 0;
+  for (const hit of hits) {
+    if (hit.start < cursor) continue;
+    if (hit.start > cursor) segments.push({ kind: 'md', text: block.slice(cursor, hit.start) });
+    segments.push({ kind: hit.kind, text: hit.text });
+    cursor = hit.start + hit.text.length;
+  }
+  if (cursor < block.length || segments.length === 0) {
+    segments.push({ kind: 'md', text: block.slice(cursor) });
+  }
+  return segments;
+}
+
 function appendMarkdownBlocks(parts: MarkdownPart[], markdown: string): void {
   const normalized = markdown.replace(/^[ \t]+$/gm, '');
 
   for (const block of normalized.split(/\n{2,}/)) {
-    const matches = findCompleteIframes(block);
-    let cursor = 0;
-    const segments: { kind: 'md' | 'iframe'; text: string }[] = [];
-
-    for (const match of matches) {
-      const start = match.index ?? 0;
-      if (start > cursor) segments.push({ kind: 'md', text: block.slice(cursor, start) });
-      segments.push({ kind: 'iframe', text: match[0] });
-      cursor = start + match[0].length;
-    }
-    if (cursor < block.length || segments.length === 0) {
-      segments.push({ kind: 'md', text: block.slice(cursor) });
-    }
-
-    for (const segment of segments) {
+    for (const segment of embedSegments(block)) {
       if (segment.kind === 'iframe') {
         const parsed = parseIframeMarkup(segment.text);
         if (parsed) {
           parts.push({ type: 'html', html: iframeEmbedHtml(parsed) });
+          continue;
+        }
+      }
+      if (segment.kind === 'video') {
+        const parsed = parseVideoMarkup(segment.text);
+        if (parsed) {
+          parts.push({ type: 'html', html: videoEmbedHtml(parsed) });
           continue;
         }
       }

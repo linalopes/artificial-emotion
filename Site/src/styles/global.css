@@ -455,6 +455,20 @@ hr {
   }
 }
 
+/* Sanitized HTTPS videos from ordinary Markdown HTML */
+.video-embed {
+  width: 100%;
+  max-width: none;
+  margin-block: var(--space-2) 0;
+}
+
+.video-embed video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
 /* Sanitized HTTPS iframes from ordinary Markdown HTML */
 .iframe-embed {
   width: 100%;
