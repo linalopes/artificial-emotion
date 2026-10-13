@@ -17,7 +17,6 @@ eventUrl:
 
 cover:
 gallery: []
-youtube:
 
 threads: []
 tags: []

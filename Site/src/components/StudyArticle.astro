@@ -16,7 +16,7 @@ import RelatedEntries from './RelatedEntries.astro';
 import ResearchGallery from './ResearchGallery.astro';
 import PagefindMeta from './PagefindMeta.astro';
 import TagLinks from './TagLinks.astro';
-import { formatDate, getBacklinks, isoDate, youtubeUrl } from '../lib/content';
+import { formatDate, getBacklinks, isoDate } from '../lib/content';
 import {
   hasMarkdownContent,
   markdownSectionToParts,
@@ -37,7 +37,6 @@ const subtitle = data.subtitle?.trim() || undefined;
 const lede = data.lede?.trim() || undefined;
 const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
 const galleryItems = data.gallery.filter((item) => item.src.trim());
-const youtube = data.youtube?.trim() ? youtubeUrl(data.youtube.trim()) : undefined;
 
 const { intro, rest } = splitIntroAndRest(entry.body ?? '');
 const withParts = (sections: typeof intro) =>
@@ -145,18 +144,6 @@ const backlinks = await getBacklinks('studies', entry.id);
                 <dt>Tags</dt>
                 <dd>
                   <TagLinks tags={tags} />
-                </dd>
-              </div>
-            )
-          }
-          {
-            youtube && (
-              <div class="study-meta__row">
-                <dt>Video</dt>
-                <dd>
-                  <a href={youtube} target="_blank" rel="noopener noreferrer">
-                    Watch
-                  </a>
                 </dd>
               </div>
             )

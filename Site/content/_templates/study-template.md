@@ -12,7 +12,6 @@ related: []
 
 cover:
 gallery: []
-youtube:
 
 draft: true
 ---

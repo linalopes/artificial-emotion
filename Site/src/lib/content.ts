@@ -577,8 +577,3 @@ export function formatEventTime(start?: string, end?: string): string | undefine
   if (start) return start;
   return undefined;
 }
-
-/** Accepts a full YouTube URL or a bare video id. */
-export function youtubeUrl(value: string): string {
-  return /^https?:\/\//.test(value) ? value : `https://www.youtube.com/watch?v=${value}`;
-}

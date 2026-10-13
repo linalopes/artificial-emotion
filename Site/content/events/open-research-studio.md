@@ -23,7 +23,6 @@ gallery:
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1790891129/IMG_6106.mp4
     alt: Kinetic Module working
-youtube:
 
 threads:
   - soft-mechanisms

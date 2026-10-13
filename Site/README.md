@@ -117,14 +117,15 @@ Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 
 | Collection   | Required        | Optional / defaults |
 | ------------ | --------------- | ------------------- |
-| `studies`    | title, date, status (`seed` · experiment · prototype · integrated) | subtitle, lede, threads, tags, related, cover, gallery, youtube, draft. No `type`. |
+| `studies`    | title, date, status (`seed` · experiment · prototype · integrated) | subtitle, lede, threads, tags, related, cover, gallery, draft. No `type`. |
 | `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
 | `references` | title, date     | creator, year, referenceType, lede, url, cover, gallery, threads, tags, related, image (legacy; prefer `cover`), draft. `year` is the chronology of the referenced work, not the notebook date. |
-| `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, youtube, threads, tags, related, draft |
+| `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, threads, tags, related, draft |
 | `research`   | title, date     | subtitle, lede, questions, process, cover, gallery, galleryFolder, tags, draft. No `status`, `threads`, or `related`. Filename must be the canonical thread id. |
 
-Suggested Note `type` values (any string is accepted):
-`person` · `institution` · `place` · `tool` · `software` · `material` · `concept` · `process` · `collaboration` · `other`.
+Note `type` is an open string, not a controlled vocabulary. New values may
+appear without a code change. Examples from current notes:
+`person` · `institution` · `software` · `project-origin` · `store-resource` · `infrastructure` · `information-architecture` · `observation`.
 
 Body headings are an editorial convention, not validated:
 Studies `## Question / ## Setup / ## Observation / ## Next` ·
@@ -322,7 +323,6 @@ A bare path is treated as an image. Remote values must be `https://` URLs.
 | `eventUrl`  | Official event page, if different from RSVP. |
 | `threads`   | Canonical ids: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. |
 | `cover` / `gallery` | Local site-root path (`/images/...`) or HTTPS (Cloudinary or other). |
-| `youtube`   | Primary documentation video, if any. |
 
 Copy `content/_templates/event-template.md` for each new event.
 
@@ -340,7 +340,6 @@ rsvp: https://luma.com/piaavgin
 eventUrl:
 cover: https://res.cloudinary.com/example/image/upload/cover.webp
 gallery: []
-youtube:
 threads:
   - soft-mechanisms
 tags:

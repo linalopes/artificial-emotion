@@ -13,7 +13,6 @@ import {
   getPublishedByDate,
   isoDate,
   resolveRelated,
-  youtubeUrl,
 } from '../lib/content';
 import {
   hasMarkdownContent,
@@ -164,18 +163,6 @@ const relatedCards = related.map((item) => {
               <p class="event-meta__value">
                 <a href={data.eventUrl} target="_blank" rel="noopener noreferrer">
                   Official page
-                </a>
-              </p>
-            </div>
-          )
-        }
-        {
-          data.youtube?.trim() && (
-            <div class="event-meta__item">
-              <p class="event-meta__label">Video</p>
-              <p class="event-meta__value">
-                <a href={youtubeUrl(data.youtube.trim())} target="_blank" rel="noopener noreferrer">
-                  Watch on YouTube
                 </a>
               </p>
             </div>

@@ -83,11 +83,11 @@ Template: `study-template.md`
 
 A generic knowledge object that is not a Study, Reference, or Event.
 
-`type` is a lightweight semantic hint, not a strict taxonomy. The schema
-accepts any string. Common values include `person`, `institution`, `place`,
-`software`, `tool`, `material`, `concept`, `process`, `collaboration`,
-`observation`, `local resource`, and `information architecture`. New values
-may appear without a code change.
+`type` is a lightweight semantic hint, not a closed vocabulary. The schema
+accepts any string. Examples in kebab-case: `person`, `institution`,
+`software`, `project-origin`, `store-resource`, `infrastructure`,
+`information-architecture`, `observation`. New values may appear without
+a code change.
 
 Notes have no required body structure.
 

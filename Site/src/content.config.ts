@@ -174,9 +174,8 @@ const studies = defineCollection({
     threads,
     tags,
     related,
-    cover: optional(z.string()),
+    cover: optional(mediaRef),
     gallery,
-    youtube: optional(z.string()),
     draft,
   }),
 });
@@ -247,7 +246,6 @@ const events = defineCollection({
     eventUrl: optional(z.url()),
     cover: optional(mediaRef),
     gallery,
-    youtube: optional(z.string()),
     threads,
     tags,
     related,
