@@ -8,7 +8,7 @@ This repository is the working archive of the project. It brings together physic
 
 The project currently develops through three connected research threads:
 
-- **Soft Mechanics**
+- **Soft Mechanisms**
 - **Kinetic Studies**
 - **Heartbeat & Biosignals**
 
@@ -31,6 +31,12 @@ artificial-emotion/
 │
 ├── fixation-hackings/
 │   └── Experimental mounting and attachment systems
+│
+├── homages/
+│   └── Physical studies after existing kinetic works
+│
+├── little-heart-machine/
+│   └── Folded paper heart and crank-plate fabrication files
 │
 └── README.md
 ```
@@ -98,6 +104,23 @@ See [`kinetic-module-maumau/README.md`](kinetic-module-maumau/README.md) for the
 This area collects experimental mounting, clamping and attachment solutions developed as the project begins to require a shared physical infrastructure for suspending, rearranging and exhibiting prototypes.
 
 These parts are treated as research objects too: small fabrication decisions can determine how modular, adaptable or reusable the larger installation becomes.
+
+## Homages
+
+[`homages/`](homages/)
+
+Physical studies that begin from existing kinetic works and then become independent experiments inside Artificial Emotion. Fabrication files stay here; the editorial Studies live in `Site/content/studies/`.
+
+Current folders:
+
+- [`homages/ora-x-homage/`](homages/ora-x-homage/) — after Bruno Munari’s *Ora X*
+- [`homages/c-15-homage/`](homages/c-15-homage/) — after Abraham Palatnik’s *Objeto Cinético C-15*
+
+## Little Heart Machine
+
+[`little-heart-machine/`](little-heart-machine/)
+
+Cutting templates and a 3D-printed crank plate for the folded paper heart study.
 
 ## Documentation as part of the research
 
