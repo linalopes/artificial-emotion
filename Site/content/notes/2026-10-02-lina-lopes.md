@@ -1,6 +1,7 @@
 ---
 title: Lina Lopes
 date: 2026-10-02
+slug: lina-lopes
 type: person
 lede: Brazilian artist, creative technologist and educator based in Switzerland, working across kinetic systems, physical computing, artificial intelligence, interactive environments and experimental forms of learning.
 url: https://www.linalopes.info/

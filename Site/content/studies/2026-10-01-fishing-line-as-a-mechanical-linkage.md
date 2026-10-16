@@ -2,6 +2,7 @@
 title: Fishing Line as a Mechanical Linkage
 subtitle: Adapting braided fishing line, knots and swivels for a small kinetic system
 date: 2026-10-01
+slug: fishing-line-as-a-mechanical-linkage
 lede: A study of braided fishing line as a mechanical transmission element in MauMau, comparing line diameter, spool behavior, knotting and rotational attachment.
 
 status: experiment

@@ -1,6 +1,7 @@
 ---
 title: HRH Fishing Hebeisen
 date: 2026-10-01
+slug: hrh-fishing-hebeisen
 type: store-resource
 lede: A fishing-supply store in Wetzikon that has become a nearby source for braided line, swivels, beads, knots and small mechanical techniques useful to kinetic work.
 url: https://hebeisen.ch/

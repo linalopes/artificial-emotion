@@ -105,22 +105,22 @@ Editorial authoring rules (collections, fields, Markdown, Obsidian) live in
 
 Frontmatter is plain YAML, editable in Obsidian's Properties panel.
 
-- The **filename is the stable slug / URL**. `content/notes/institute-for-future-technologies.md` → `/notes/institute-for-future-technologies/`. `content/research/soft-mechanisms.md` → `/research/soft-mechanisms/`. The title may change; the URL does not. Name files in kebab-case. Do not derive URLs from titles.
+- The **`slug` is the stable public URL**. `content/notes/2026-09-16-institute-for-future-technologies.md` with `slug: institute-for-future-technologies` → `/notes/institute-for-future-technologies/`. The filename may carry a `YYYY-MM-DD-` prefix for chronological sorting; it is not the URL. Do not change `slug` after publishing. Do not derive slugs from titles. Research Thread filenames remain the canonical thread id (`content/research/soft-mechanisms.md` → `/research/soft-mechanisms/`).
 - Frontmatter is structured data. The Markdown body is narrative.
 - Anything whose file or folder name starts with `_` is ignored by Astro (`content/_templates/` is never loaded).
 - Empty properties (`cover:`) count as "not set". Lists may be omitted entirely.
 - `draft` defaults to `true`; set `draft: false` to publish.
 - Every authored Markdown entry carries a `date`. Meaning depends on the collection (see Date below).
 - `threads` accepts only: `soft-mechanisms`, `kinetic-studies`, `heartbeat-biosignals`. This is how a Study, Note, Reference or Event attaches to a Research Thread. Do not list those entries inside the research Markdown.
-- `related` uses `collection/id` among the four primary collections only, e.g. `notes/when-does-movement-look-hesitant`. Research Threads are not `related` targets. Targets do not have to exist yet.
+- `related` uses `collection/slug` among the four primary collections only, e.g. `notes/when-does-movement-look-hesitant`. Research Threads are not `related` targets. Targets do not have to exist yet.
 - Media fields accept a local site-root path (`/images/...`) or an HTTPS URL (Cloudinary or other). The site does not download remote files.
 
 | Collection   | Required        | Optional / defaults |
 | ------------ | --------------- | ------------------- |
-| `studies`    | title, date, status (`seed` · experiment · prototype · integrated) | subtitle, lede, threads, tags, related, cover, gallery, draft. No `type`. |
-| `notes`      | title, date     | type, lede, url, cover, gallery, threads, tags, related, draft |
-| `references` | title, date     | creator, year, referenceType, lede, url, cover, gallery, threads, tags, related, image (legacy; prefer `cover`), draft. `year` is the chronology of the referenced work, not the notebook date. |
-| `events`     | title, date     | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, threads, tags, related, draft |
+| `studies`    | title, date, slug, status (`seed` · experiment · prototype · integrated) | subtitle, lede, threads, tags, related, cover, gallery, draft. No `type`. |
+| `notes`      | title, date, slug | type, lede, url, cover, gallery, threads, tags, related, draft |
+| `references` | title, date, slug | creator, year, referenceType, lede, url, cover, gallery, threads, tags, related, image (legacy; prefer `cover`), draft. `year` is the chronology of the referenced work, not the notebook date. |
+| `events`     | title, date, slug | startTime, endTime, timezone (`Europe/Zurich`), eventType, status (`upcoming` · ongoing · past · cancelled), location, lede, rsvp, eventUrl, cover, gallery, threads, tags, related, draft |
 | `research`   | title, date     | subtitle, lede, questions, process, cover, gallery, galleryFolder, tags, draft. No `status`, `threads`, or `related`. Filename must be the canonical thread id. |
 
 Note `type` is an open string, not a controlled vocabulary. New values may
@@ -136,7 +136,7 @@ Notes have a free-form body.
 Empty event headings are not rendered.
 
 Copy the matching file from `content/_templates/` into the collection folder,
-rename it to the kebab-case slug, and fill in the properties.
+name it `YYYY-MM-DD-slug.md`, set `slug`, and fill in the other properties.
 
 ### Research Threads
 
@@ -329,6 +329,7 @@ Copy `content/_templates/event-template.md` for each new event.
 ```yaml
 title: Open Research Studio
 date: 2026-11-15
+slug: open-research-studio
 startTime: "14:00"
 endTime: "18:00"
 timezone: Europe/Zurich
@@ -536,3 +537,9 @@ pages that render the component.
 
 Target: GitHub Pages. Set `site` (and `base` for a project repo) in
 `astro.config.ts`, then add the official Astro GitHub Pages action.
+
+Former date-prefixed public paths are listed in `src/lib/legacy-urls.ts` and
+emitted as static HTML redirect pages (`<meta http-equiv="refresh">`). GitHub
+Pages does not send HTTP 301/302 for these; crawlers and browsers still follow
+the HTML redirect. New entries must not rely on that list — set `slug` from
+the start.

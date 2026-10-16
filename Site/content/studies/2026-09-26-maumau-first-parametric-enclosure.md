@@ -2,6 +2,7 @@
 title: MauMau — First Parametric Enclosure
 subtitle: From an intuitive cardboard box to a laser-cut kinetic module
 date: 2026-09-26
+slug: maumau-first-parametric-enclosure
 lede: The first fabricated MauMau enclosure translated an intuitive cardboard prototype into a parametric, laser-cut acrylic module with removable mechanical joints and dedicated mounting for the kinetic system.
 
 status: prototype

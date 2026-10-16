@@ -1,6 +1,7 @@
 ---
 title: A Living Archive of Prototypes
 date: 2026-10-07
+slug: a-living-archive-of-prototypes
 type: infrastructure
 lede: A mobile, adaptable archive for the physical experiments of Artificial Emotion — designed to keep prototypes visible, accessible and part of an ongoing research process.
 url:

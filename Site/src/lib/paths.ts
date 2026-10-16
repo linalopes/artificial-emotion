@@ -21,7 +21,10 @@ export function collectionPath(collection: CollectionName): string {
   return href(`/${collection}/`);
 }
 
-/** Canonical detail page for an entry: /studies/breathing-textile/ */
+/**
+ * Canonical detail page for an entry: /studies/breathing-textile/
+ * `id` is the public slug, not the dated Markdown filename.
+ */
 export function entryPath(collection: CollectionName, id: string): string {
   return href(`/${collection}/${id}/`);
 }

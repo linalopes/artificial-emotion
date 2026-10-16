@@ -1,6 +1,7 @@
 ---
 title: Objeto Cinético C-15 — Abraham Palatnik
 date: 2026-10-11
+slug: objeto-cinetico-c-15-abraham-palatnik
 creator: Abraham Palatnik
 year: 1969–2001
 referenceType: artwork
@@ -8,6 +9,7 @@ lede: A kinetic object in which guided metal elements, motors, magnets, layered 
 url: https://nararoesler.art/exhibitions/306/
 cover: https://static-assets.artlogic.net/w_1200,h_900,c_limit,f_auto,fl_lossy/ws-nararoesler/usr/exhibitions/images/exhibitions/306/11889_ap_flaviofreire_high_1.jpg
 gallery: []
+
 threads:
   - kinetic-studies
 tags:
@@ -21,6 +23,7 @@ tags:
   - time
 related:
   - references/abraham-palatnik
+
 draft: false
 ---
 _Photo: Abraham Palatnik, Objeto Cinético C-15, 1969/2001. Source: [Nara Roesler](https://nararoesler.art/en/exhibitions/306/works/)._

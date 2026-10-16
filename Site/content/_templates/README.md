@@ -45,8 +45,12 @@ A Research Thread is not a Study, Note, Reference, or Event.
 
 1. Copy the matching template into `studies/`, `notes/`, `references/`,
    `events/`, or `research/`.
-2. Name the file in lowercase kebab-case. The filename is the stable URL.
-3. Fill frontmatter in Obsidian’s Properties panel.
+2. For Studies, Notes, References and Events, set `slug` to the public
+   identifier (lowercase kebab-case) and name the file
+   `YYYY-MM-DD-slug.md` using the entry `date`. The slug is the URL;
+   do not change it after publishing. Research Thread filenames stay the
+   canonical thread id.
+3. Fill the remaining frontmatter in Obsidian’s Properties panel.
 4. Write the body as narrative Markdown.
 5. Keep `draft: true` until the entry should be public. Set `draft: false`
    to publish.
@@ -177,6 +181,18 @@ Every authored Markdown entry has a date. Meaning depends on collection:
 
 Reference chronology of the work itself stays in `year`, not `date`.
 
+### slug
+
+Studies, Notes, References and Events: the public URL identity.
+
+`content/studies/2026-10-15-paper-heart.md` with `slug: paper-heart`
+→ `/studies/paper-heart/`.
+
+Do not derive `slug` from `title`. Do not change it after the entry is
+public. `related` targets use this slug: `studies/paper-heart`.
+
+Research Threads have no `slug`; the filename is the canonical thread id.
+
 ### status
 
 Only lifecycle / state. Do not confuse with content type.
@@ -217,7 +233,7 @@ Tags are **not** explicit relationships.
 
 ### related
 
-A strong artist-declared relationship, written as `collection/id`:
+A strong artist-declared relationship, written as `collection/slug`:
 
 ```yaml
 related:
@@ -366,7 +382,8 @@ ordinary HTTPS iframe instead.
 
 ## Naming / style
 
-- Filenames: lowercase kebab-case. The filename is the URL.
+- Filenames: `YYYY-MM-DD-slug.md` for Studies, Notes, References and
+  Events. Research Threads keep the canonical thread id.
 - Tags: lowercase kebab-case
 - Thread ids: canonical ids only
 - Titles: editorial, human-readable

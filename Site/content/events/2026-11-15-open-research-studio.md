@@ -1,6 +1,7 @@
 ---
 title: Open Research Studio
 date: 2026-11-15
+slug: open-research-studio
 
 startTime: "14:00"
 endTime: "18:00"

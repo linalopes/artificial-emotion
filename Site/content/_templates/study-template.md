@@ -2,6 +2,7 @@
 title:
 subtitle:
 date:
+slug:
 lede:
 
 status:

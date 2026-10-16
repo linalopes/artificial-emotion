@@ -1,6 +1,7 @@
 ---
 title: Documenting Artificial Emotion on the Web
 date: 2026-09-28
+slug: documenting-artificial-emotion-on-the-web
 type:
   - information-architecture
 lede: A note on how Markdown, Astro, GitHub, Cloudinary and browser-based creative coding became part of the documentation process of Artificial Emotion.

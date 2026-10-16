@@ -2,6 +2,7 @@
 title: Kinetic Planes — After Abraham Palatnik
 subtitle: Flexible elements, oscillating movement and improvised mechanical connections
 date: 2026-10-13
+slug: kinetic-planes-after-palatnik
 lede: Inspired by Abraham Palatnik's C-15, this study uses a reused wooden frame, an OS20 construction grid, nylon rods and a 28BYJ-48 stepper motor to investigate how a simple reversing rotation can produce flexible, layered motion—and how improvised connections can become reusable parametric parts.
 
 status: experiment

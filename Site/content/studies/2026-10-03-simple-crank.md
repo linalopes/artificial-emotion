@@ -2,6 +2,7 @@
 title: A Simple Crank
 subtitle: Revisiting a wood-and-wire mechanism for small kinetic experiments
 date: 2026-10-03
+slug: simple-crank
 lede: A small wood-and-wire crank mechanism revisited from an earlier automata workshop, used here as a simple introduction to rotational and reciprocating movement.
 
 status: prototype

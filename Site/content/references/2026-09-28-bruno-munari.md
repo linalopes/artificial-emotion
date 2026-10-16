@@ -1,6 +1,7 @@
 ---
 title: Bruno Munari
 date: 2026-09-28
+slug: bruno-munari
 creator:
 year: 1907–1998
 referenceType: artist
@@ -8,6 +9,7 @@ lede: An artist, designer and educator whose experiments with movement, machines
 url:
 cover: https://www.lavanguardia.com/files/content_image_desktop_filter/uploads/2022/03/23/623b0cf714435.jpeg
 gallery: []
+
 threads:
   - kinetic-studies
 tags:
@@ -19,6 +21,7 @@ tags:
   - design
   - pedagogy
 related: []
+
 draft: false
 ---
 

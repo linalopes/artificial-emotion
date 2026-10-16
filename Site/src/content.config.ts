@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { contentGenerateId, SLUG_PATTERN } from './lib/slugs';
 import {
   COLLECTIONS,
   EVENT_STATUSES,
@@ -10,7 +11,6 @@ import {
   RESEARCH_THREADS,
   STUDY_STATUSES,
   type CollectionName,
-  type ResearchCollectionName,
 } from './lib/vocabulary';
 
 /* --------------------------------------------------------------------------
@@ -19,10 +19,12 @@ import {
    Anything whose name starts with "_" is never loaded: /content/_templates,
    private scratch files, etc.
    -------------------------------------------------------------------------- */
-const markdownIn = (folder: CollectionName | ResearchCollectionName) =>
+const markdownIn = (folder: CollectionName) =>
   glob({
     base: `./content/${folder}`,
     pattern: ['**/*.md', '!**/_*', '!**/_*/**'],
+    generateId: ({ entry, data }) =>
+      contentGenerateId(folder, { entry, data: data ?? {} }),
   });
 
 /* --------------------------------------------------------------------------
@@ -70,7 +72,16 @@ export const processSchema = withDefault(z.array(z.string()), []);
 const draft = withDefault(z.boolean(), true);
 
 /**
- * Cross-collection link written in frontmatter as "collection/id",
+ * Public URL identity. Independent of the Markdown filename, which may be
+ * `YYYY-MM-DD-slug.md`. Never derived from `title`.
+ */
+const slug = z.preprocess(
+  unsetScalar,
+  z.string().regex(SLUG_PATTERN, 'Use lowercase kebab-case, e.g. paper-heart'),
+);
+
+/**
+ * Cross-collection link written in frontmatter as "collection/slug",
  * e.g. "notes/when-does-movement-look-hesitant".
  * Only the four primary collections are valid targets. Research Threads
  * are reached through `threads: [soft-mechanisms]`, not `related`.
@@ -83,7 +94,7 @@ export const relatedRef = z
   .string()
   .regex(
     relatedPattern,
-    `Use "collection/id" where collection is one of: ${COLLECTIONS.join(', ')}`,
+    `Use "collection/slug" where collection is one of: ${COLLECTIONS.join(', ')}`,
   )
   .transform((value) => {
     const slash = value.indexOf('/');
@@ -169,6 +180,7 @@ const studies = defineCollection({
     title: z.string(),
     subtitle: optional(z.string()),
     date: z.coerce.date(),
+    slug,
     lede: optional(z.string()),
     status: z.preprocess(unsetScalar, z.enum(STUDY_STATUSES)),
     threads,
@@ -190,6 +202,7 @@ const notes = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    slug,
     type: optionalString(),
     lede: optional(z.string()),
     url: optional(z.url()),
@@ -213,6 +226,7 @@ const references = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    slug,
     creator: optional(z.string()),
     year: optional(z.union([z.number().int(), z.string()])),
     referenceType: optional(z.string()),
@@ -235,6 +249,7 @@ const events = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    slug,
     startTime: optional(clockTime),
     endTime: optional(clockTime),
     timezone: withDefault(z.string(), EVENT_TIMEZONE_DEFAULT),

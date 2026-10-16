@@ -1,6 +1,7 @@
 ---
 title: School of Tomorrow's AI
 date: 2026-10-02
+slug: school-of-tomorrows-ai
 type: institution
 lede: An independent art, technology and creative-learning initiative founded by Lina Lopes in Wetzikon, Greater Zurich — and the main Swiss research base of Artificial Emotion.
 url: https://schoolai.linalopes.info/

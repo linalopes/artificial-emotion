@@ -2,6 +2,7 @@
 title: 28BYJ-48 — An OS20 Motor Adapter
 subtitle: A 3D-printed interface between a 35 mm motor mount and the 20 mm modular grid
 date: 2026-10-12
+slug: 28byj48-os20-motor-adapter
 lede: A small U-shaped bracket adapts the mounting holes of a 28BYJ-48 stepper motor to a 40 mm connection span, testing how commercial components can join the shared 20 mm grid of Artificial Emotion.
 
 status: prototype

@@ -2,6 +2,7 @@
 title: Paper Heart
 subtitle: Folding a flexible surface into a moving volume
 date: 2026-10-04
+slug: paper-heart
 lede: A paper study exploring how folding transforms a flat, flexible material into a three-dimensional form capable of movement.
 
 status: experiment

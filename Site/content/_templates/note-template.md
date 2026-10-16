@@ -1,6 +1,7 @@
 ---
 title:
 date:
+slug:
 type:
 lede:
 url:

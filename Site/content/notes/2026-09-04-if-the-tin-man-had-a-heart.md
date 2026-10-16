@@ -1,6 +1,7 @@
 ---
 title: If the Tin Man Had a Heart
 date: 2026-09-04
+slug: if-the-tin-man-had-a-heart
 type: project-origin
 lede: A one-hour cardboard, foil and motor prototype made during the Sensitive Machines hackathon at IFT in Paris, before Artificial Emotion had a name.
 url:

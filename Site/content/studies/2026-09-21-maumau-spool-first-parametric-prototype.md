@@ -2,6 +2,7 @@
 title: MauMau Spool — First Parametric Prototype
 subtitle: A parametric spool for the first MauMau kinetic module
 date: 2026-09-21
+slug: maumau-spool-first-parametric-prototype
 lede: A first parametric spool for the MauMau kinetic module, designed to couple a 28BYJ-48 stepper motor to braided fishing line and refined for FDM printing and line fixation.
 
 status: prototype

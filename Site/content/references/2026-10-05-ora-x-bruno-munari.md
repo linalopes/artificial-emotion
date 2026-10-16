@@ -1,6 +1,7 @@
 ---
 title: Ora X — Bruno Munari
 date: 2026-10-05
+slug: ora-x-bruno-munari
 creator: Bruno Munari
 year: 1945–1963
 referenceType: artwork
@@ -8,6 +9,7 @@ lede: A kinetic clock experiment in which transparent colored elements attached 
 url: https://www.moma.org/collection/works/3696
 cover: https://www.moma.org/media/W1siZiIsIjIyOTQ3NSJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA5MCAtcmVzaXplIDIwMDB4MTQ0MFx1MDAzZSJdXQ.jpg?sha=31f87e023f48fbd1
 gallery: []
+
 threads:
   - kinetic-studies
 tags:
@@ -20,6 +22,7 @@ tags:
   - danese
 related:
   - references/bruno-munari
+
 draft: false
 ---
 

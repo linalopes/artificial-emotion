@@ -1,6 +1,7 @@
 ---
 title: Abraham Palatnik
 date: 2026-10-08
+slug: abraham-palatnik
 creator:
 year: 1928–2020
 referenceType: artist
@@ -8,6 +9,7 @@ lede: A Brazilian artist and inventor whose experiments with motors, light, mech
 url: https://www.galeriafrente.com.br/en/artistas/abraham-palatnik
 cover: https://versatille.com/wp-content/uploads/2020/10/trezhome_116667525_183389783159352_8743749602081444642_n-1.jpg
 gallery: []
+
 threads:
   - kinetic-studies
 tags:
@@ -20,6 +22,7 @@ tags:
   - perception
   - design
 related: []
+
 draft: false
 ---
 
