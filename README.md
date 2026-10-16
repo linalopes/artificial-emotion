@@ -38,6 +38,9 @@ artificial-emotion/
 ├── little-heart-machine/
 │   └── Folded paper heart and crank-plate fabrication files
 │
+├── artificial-emotion-controller-v1/
+│   └── ESP32-S3 motor controller for kinetic experiments
+│
 └── README.md
 ```
 
@@ -96,6 +99,14 @@ Its folder contains work including:
 - an experimental KiCad PCB
 
 See [`kinetic-module-maumau/README.md`](kinetic-module-maumau/README.md) for the detailed technical documentation.
+
+## Controller v1
+
+[`artificial-emotion-controller-v1/`](artificial-emotion-controller-v1/)
+
+A modular **ESP32-S3** board for driving one 28BYJ-48 stepper motor and connecting sensors during kinetic experiments.
+
+The first revision is through-hole, so it can be assembled, repaired and modified by hand. See [`artificial-emotion-controller-v1/README.md`](artificial-emotion-controller-v1/README.md) for the hardware notes, KiCad sources and fabrication checklist.
 
 ## Fixation Hackings
 

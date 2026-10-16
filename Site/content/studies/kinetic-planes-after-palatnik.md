@@ -93,9 +93,10 @@ The **shaft coupler** accepts the 28BYJ-48's nominal **5 mm double-flat profile*
 
 ![Detail of the coupler fabrication or fitting test | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6367.webp)
 
+![Documentation of the flange development | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6368.webp)
+
 The **flange** preserves that motor-side connection but replaces the 2 mm output with a circular mounting face. It has **four M2 clearance holes**, making it possible to attach disks, arms or other experimental elements without redesigning the motor interface each time.
 
-![Documentation of the flange development | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6368.webp)
 
 ![Detail of the printed connector studies | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6364.webp)
 
