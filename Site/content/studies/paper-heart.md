@@ -3,9 +3,23 @@ title: Paper Heart
 subtitle: Folding a flexible surface into a moving volume
 date: 2026-10-04
 lede: A paper study exploring how folding transforms a flat, flexible material into a three-dimensional form capable of movement.
+
 status: experiment
+
 threads:
   - soft-mechanisms
+tags:
+  - paper
+  - folding
+  - heart
+  - movement
+  - silhouette-cameo
+  - digital-cutting
+  - 3d-printing
+related:
+  - events/open-research-studio
+  - studies/simple-crank
+
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791121982/IMG_6154.webp
 gallery:
   - type: image
@@ -23,17 +37,7 @@ gallery:
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791128924/IMG_6135.webp
     alt: papers on table
-tags:
-  - paper
-  - folding
-  - heart
-  - movement
-  - silhouette-cameo
-  - digital-cutting
-  - 3d-printing
-related:
-  - events/open-research-studio
-  - studies/simple-crank
+
 draft: false
 ---
 

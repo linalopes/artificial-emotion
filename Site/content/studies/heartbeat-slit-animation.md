@@ -3,17 +3,11 @@ title: Heartbeat Slit Animation
 subtitle: A rotational barrier-grid experiment driven by a quartz clock
 date: 2026-10-05
 lede: A physical animation study using an interlaced anatomical heart and a rotating slit mask driven by the seconds axis of a quartz clock mechanism.
+
 status: prototype
+
 threads:
   - kinetic-studies
-cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791225483/Screenshot_2026-10-05_at_20.33.59.webp
-gallery:
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791225307/IMG_6157.webp
-    alt: first physical heartbeat slit animation prototype
-  - type: video
-    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791225352/IMG_6158.mp4
-    alt: rotating slit mask revealing the heartbeat animation
 tags:
   - barrier-grid-animation
   - slit-animation
@@ -27,6 +21,16 @@ tags:
   - svg
 related:
   - references/ora-x-bruno-munari
+
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791225483/Screenshot_2026-10-05_at_20.33.59.webp
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791225307/IMG_6157.webp
+    alt: first physical heartbeat slit animation prototype
+  - type: video
+    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791225352/IMG_6158.mp4
+    alt: rotating slit mask revealing the heartbeat animation
+
 draft: false
 ---
 

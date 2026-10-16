@@ -3,11 +3,11 @@ title: Towards a Modular Grid
 subtitle: Developing a shared mounting language for kinetic prototypes
 date: 2026-10-10
 lede: An ongoing study of a 20 mm modular grid, M3 connections and 3D-printed interfaces for mounting, combining and exhibiting the physical mechanisms of Artificial Emotion.
+
 status: experiment
+
 threads:
   - kinetic-studies
-cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_6327.webp
-gallery: []
 tags:
   - modular-design
   - openstructures
@@ -21,6 +21,10 @@ tags:
   - fabrication
 related:
   - notes/a-living-archive-of-prototypes
+
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_6327.webp
+gallery: []
+
 draft: false
 ---
 

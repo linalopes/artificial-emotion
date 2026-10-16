@@ -3,9 +3,24 @@ title: A Simple Crank
 subtitle: Revisiting a wood-and-wire mechanism for small kinetic experiments
 date: 2026-10-03
 lede: A small wood-and-wire crank mechanism revisited from an earlier automata workshop, used here as a simple introduction to rotational and reciprocating movement.
+
 status: prototype
+
 threads:
   - kinetic-studies
+tags:
+  - crank
+  - automata
+  - wood
+  - wire
+  - movement
+  - mechanisms
+  - hand-tools
+  - creative-learning
+related:
+  - events/open-research-studio
+  - studies/paper-heart
+
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791131557/IMG_6141.webp
 gallery:
   - type: video
@@ -26,18 +41,7 @@ gallery:
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791131555/IMG_6122.webp
     alt: crank mechanism prototype
-tags:
-  - crank
-  - automata
-  - wood
-  - wire
-  - movement
-  - mechanisms
-  - hand-tools
-  - creative-learning
-related:
-  - events/open-research-studio
-  - studies/paper-heart
+
 draft: false
 ---
 

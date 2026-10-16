@@ -1,9 +1,24 @@
 ---
 title: Two Hours to a First Kinetic Prototype
-date: 2026-09-18
 subtitle: Building a first single-movement kinetic module from cardboard and available materials
+date: 2026-09-18
 lede: A rapid cardboard prototype used to test whether one simple kinetic idea could become a working physical module in only a few hours.
+
 status: prototype
+
+threads:
+  - kinetic-studies
+tags:
+  - cardboard
+  - rapid-prototyping
+  - kinetic-mechanisms
+  - 28byj-48
+  - esp32-s3
+  - braided-line
+  - fishing-materials
+  - improvised-hardware
+related: []
+
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1790960073/IMG_5960.webp
 gallery:
   - type: video
@@ -17,18 +32,7 @@ gallery:
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791786058/IMG_6330.webp
     alt: Detail of the cardboard kinetic prototype and improvised mechanism
     caption: Detail of the improvised structure and line-guiding mechanism.
-threads:
-  - kinetic-studies
-tags:
-  - cardboard
-  - rapid-prototyping
-  - kinetic-mechanisms
-  - 28byj-48
-  - esp32-s3
-  - braided-line
-  - fishing-materials
-  - improvised-hardware
-related: []
+
 draft: false
 ---
 

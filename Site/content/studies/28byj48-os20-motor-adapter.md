@@ -3,17 +3,11 @@ title: 28BYJ-48 — An OS20 Motor Adapter
 subtitle: A 3D-printed interface between a 35 mm motor mount and the 20 mm modular grid
 date: 2026-10-12
 lede: A small U-shaped bracket adapts the mounting holes of a 28BYJ-48 stepper motor to a 40 mm connection span, testing how commercial components can join the shared 20 mm grid of Artificial Emotion.
+
 status: prototype
+
 threads:
   - kinetic-studies
-cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791808337/IMG_6340.webp
-gallery:
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791808337/IMG_6337.webp
-    alt: 3D-printed OS20 motor adapter prototype during the first fabrication tests
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791808337/IMG_6339.webp
-    alt: Detail of the printed U-shaped mounting adapter for the 28BYJ-48 stepper motor
 tags:
   - 28byj-48
   - stepper-motor
@@ -28,6 +22,16 @@ tags:
   - mechanical-connections
 related:
   - studies/towards-a-modular-grid
+
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791808337/IMG_6340.webp
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791808337/IMG_6337.webp
+    alt: 3D-printed OS20 motor adapter prototype during the first fabrication tests
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791808337/IMG_6339.webp
+    alt: Detail of the printed U-shaped mounting adapter for the 28BYJ-48 stepper motor
+
 draft: false
 ---
 

@@ -1,9 +1,11 @@
 ---
 title: Artificial Emotion Controller — Designing a Dedicated PCB
-date: 2026-10-15
 subtitle: From repeatedly assembled motor circuits to a modular controller for kinetic studies
+date: 2026-10-15
 lede: Designing the first dedicated Artificial Emotion controller in KiCad, a manually assembled, through-hole PCB built around an ESP32-S3 SuperMini, a ULN2003A driver, one 28BYJ-48 stepper motor and configurable sensor connections. The aim is to make the electronics easier to reuse so each new kinetic experiment can begin with movement rather than wiring.
+
 status: experiment
+
 threads:
   - kinetic-studies
 tags:
@@ -22,8 +24,10 @@ tags:
 related:
   - studies/kinetic-planes-after-palatnik
   - studies/two-hours-to-a-first-kinetic-prototype
+
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1792137732/Screenshot_2026-10-16_at_09.59.45.webp
 gallery: []
+
 draft: false
 ---
 

@@ -3,28 +3,11 @@ title: Kinetic Planes — After Abraham Palatnik
 subtitle: Flexible elements, oscillating movement and improvised mechanical connections
 date: 2026-10-13
 lede: Inspired by Abraham Palatnik's C-15, this study uses a reused wooden frame, an OS20 construction grid, nylon rods and a 28BYJ-48 stepper motor to investigate how a simple reversing rotation can produce flexible, layered motion—and how improvised connections can become reusable parametric parts.
+
 status: experiment
+
 threads:
   - kinetic-studies
-cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6360.webp
-gallery:
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6373.webp
-    alt: Documentation of the kinetic planes experiment
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6374.webp
-    alt: Another view of the experimental construction
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6372.webp
-    alt: Detail of the kinetic study
-  - type: video
-    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791979040/IMG_6351.mp4
-    poster: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6360.webp
-    caption: Motion test with the reversing stepper motor
-  - type: video
-    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791978981/IMG_6361.mp4
-    poster: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6360.webp
-    caption: Exploring the movement of flexible elements
 tags:
   - kinetic-mechanisms
   - abraham-palatnik
@@ -44,6 +27,27 @@ tags:
 related:
   - references/abraham-palatnik
   - references/objeto-cinetico-c-15-abraham-palatnik
+
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6360.webp
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6373.webp
+    alt: Documentation of the kinetic planes experiment
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6374.webp
+    alt: Another view of the experimental construction
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6372.webp
+    alt: Detail of the kinetic study
+  - type: video
+    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791979040/IMG_6351.mp4
+    poster: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6360.webp
+    caption: Motion test with the reversing stepper motor
+  - type: video
+    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791978981/IMG_6361.mp4
+    poster: https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6360.webp
+    caption: Exploring the movement of flexible elements
+
 draft: false
 ---
 

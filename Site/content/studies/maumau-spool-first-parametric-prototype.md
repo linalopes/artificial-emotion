@@ -2,27 +2,12 @@
 title: MauMau Spool — First Parametric Prototype
 subtitle: A parametric spool for the first MauMau kinetic module
 date: 2026-09-21
-
 lede: A first parametric spool for the MauMau kinetic module, designed to couple a 28BYJ-48 stepper motor to braided fishing line and refined for FDM printing and line fixation.
 
 status: prototype
 
 threads:
   - kinetic-studies
-
-cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797079/IMG_6336.webp
-
-gallery:
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797003/Screenshot_2026-10-01_at_14.12.23.webp
-    alt: Raven used with Grasshopper to develop the MauMau spool
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791798957/Screenshot_2026-09-18_at_17.51.25.webp
-    alt: Grasshopper parametric definition used to develop the MauMau spool
-  - type: image
-    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797003/IMG_6334.webp
-    alt: 3D-printed MauMau spool prototype
-
 tags:
   - spool
   - maumau
@@ -35,10 +20,21 @@ tags:
   - kinetic-mechanisms
   - line-fixation
   - pla
-
 related:
   - studies/two-hours-to-a-first-kinetic-prototype
   - notes/raven
+
+cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797079/IMG_6336.webp
+gallery:
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797003/Screenshot_2026-10-01_at_14.12.23.webp
+    alt: Raven used with Grasshopper to develop the MauMau spool
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791798957/Screenshot_2026-09-18_at_17.51.25.webp
+    alt: Grasshopper parametric definition used to develop the MauMau spool
+  - type: image
+    src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791797003/IMG_6334.webp
+    alt: 3D-printed MauMau spool prototype
 
 draft: false
 ---

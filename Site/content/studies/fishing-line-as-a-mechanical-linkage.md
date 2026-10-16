@@ -3,13 +3,28 @@ title: Fishing Line as a Mechanical Linkage
 subtitle: Adapting braided fishing line, knots and swivels for a small kinetic system
 date: 2026-10-01
 lede: A study of braided fishing line as a mechanical transmission element in MauMau, comparing line diameter, spool behavior, knotting and rotational attachment.
+
 status: experiment
 
 threads:
   - kinetic-studies
+tags:
+  - braided-line
+  - fishing-materials
+  - knots
+  - swivel
+  - spool
+  - maumau
+  - kinetic-mechanisms
+  - line-fixation
+  - mechanical-connections
+  - crochet-hook
+related:
+  - studies/maumau-spool-first-parametric-prototype
+  - studies/maumau-first-parametric-enclosure
+  - notes/hrh-fishing-hebeisen
 
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791881069/IMG_6064.webp
-
 gallery:
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791881068/IMG_6068.webp
@@ -22,23 +37,6 @@ gallery:
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791881085/IMG_6057.mp4
     caption: Testing the fishing line as part of the kinetic transmission.
-
-tags:
-  - braided-line
-  - fishing-materials
-  - knots
-  - swivel
-  - spool
-  - maumau
-  - kinetic-mechanisms
-  - line-fixation
-  - mechanical-connections
-  - crochet-hook
-
-related:
-  - studies/maumau-spool-first-parametric-prototype
-  - studies/maumau-first-parametric-enclosure
-  - notes/hrh-fishing-hebeisen
 
 draft: false
 ---

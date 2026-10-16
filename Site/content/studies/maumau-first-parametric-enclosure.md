@@ -3,13 +3,31 @@ title: MauMau — First Parametric Enclosure
 subtitle: From an intuitive cardboard box to a laser-cut kinetic module
 date: 2026-09-26
 lede: The first fabricated MauMau enclosure translated an intuitive cardboard prototype into a parametric, laser-cut acrylic module with removable mechanical joints and dedicated mounting for the kinetic system.
+
 status: prototype
 
 threads:
   - kinetic-studies
+tags:
+  - maumau
+  - kinetic-module
+  - laser-cutting
+  - acrylic
+  - parametric-design
+  - grasshopper
+  - raven
+  - t-slot
+  - mechanical-connections
+  - 28byj-48
+  - rapid-prototyping
+  - m3
+  - braided-line
+related:
+  - studies/two-hours-to-a-first-kinetic-prototype
+  - studies/maumau-spool-first-parametric-prototype
+  - notes/raven
 
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791875303/IMG_6052.webp
-
 gallery:
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791873734/Screenshot_2026-09-26_at_15.49.31.webp
@@ -29,26 +47,6 @@ gallery:
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791875304/IMG_6053.webp
     alt: Detail of the first MauMau acrylic enclosure and internal mounting structure
     caption: Detail of the internal structure and mounting arrangement.
-
-tags:
-  - maumau
-  - kinetic-module
-  - laser-cutting
-  - acrylic
-  - parametric-design
-  - grasshopper
-  - raven
-  - t-slot
-  - mechanical-connections
-  - 28byj-48
-  - rapid-prototyping
-  - m3
-  - braided-line
-
-related:
-  - studies/two-hours-to-a-first-kinetic-prototype
-  - studies/maumau-spool-first-parametric-prototype
-  - notes/raven
 
 draft: false
 ---
