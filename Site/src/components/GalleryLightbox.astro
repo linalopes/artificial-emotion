@@ -1,7 +1,8 @@
 ---
 /**
  * One site-wide image lightbox. Gallery stills opt in with
- * `[data-gallery-lightbox]` + `[data-lightbox-image]`.
+ * `[data-gallery-lightbox]` + `[data-lightbox-image]`. Markdown article
+ * images use `[data-lightbox-image]` alone and open without prev/next.
  */
 ---
 
@@ -35,11 +36,19 @@
     Next
   </button>
   <figure class="gallery-lightbox__figure">
-    <div class="gallery-lightbox__media">
-      <img class="gallery-lightbox__image" data-lightbox-media alt="" />
+    <div class="gallery-lightbox__media" data-lightbox-viewport>
+      <div class="gallery-lightbox__stage" data-lightbox-stage>
+        <img class="gallery-lightbox__image" data-lightbox-media alt="" draggable="false" />
+      </div>
     </div>
     <figcaption class="gallery-lightbox__caption" data-lightbox-caption hidden></figcaption>
   </figure>
+  <div class="gallery-lightbox__tools">
+    <button type="button" data-lightbox-zoom-out aria-label="Zoom out">−</button>
+    <span class="gallery-lightbox__zoom-label" data-lightbox-zoom-label aria-live="polite" aria-atomic="true">100%</span>
+    <button type="button" data-lightbox-zoom-in aria-label="Zoom in">+</button>
+    <button type="button" data-lightbox-zoom-reset aria-label="Fit image to screen">Fit</button>
+  </div>
 </dialog>
 
 <script>
@@ -53,6 +62,7 @@
   html.is-lightbox-open,
   body.is-lightbox-open {
     overflow: hidden;
+    overscroll-behavior: none;
   }
 
   button[data-lightbox-image] {
@@ -80,10 +90,12 @@
     height: auto;
     max-height: none;
     margin: 0;
-    padding: clamp(2.75rem, 7vh, 4rem) clamp(3.25rem, 8vw, 5.5rem) clamp(1.5rem, 5vh, 2.5rem);
+    padding: clamp(2.75rem, 7vh, 4rem) clamp(3.25rem, 8vw, 5.5rem) 3.25rem;
     border: 0;
     background: color-mix(in srgb, var(--color-deep-purple) 78%, transparent);
     color: var(--color-white);
+    overscroll-behavior: none;
+    user-select: none;
   }
 
   .gallery-lightbox[open] {
@@ -109,22 +121,43 @@
   }
 
   .gallery-lightbox__media {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 1 auto;
+    position: relative;
+    display: block;
+    flex: 1 1 auto;
     min-height: 0;
-    max-height: 100%;
     width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    cursor: zoom-in;
+  }
+
+  .gallery-lightbox__media.is-zoomed {
+    cursor: grab;
+  }
+
+  .gallery-lightbox__media.is-panning {
+    cursor: grabbing;
+  }
+
+  .gallery-lightbox__stage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    line-height: 0;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    will-change: transform;
   }
 
   .gallery-lightbox__image {
     display: block;
-    max-width: 100%;
-    max-height: min(100%, calc(100dvh - 9rem));
+    max-width: none;
     width: auto;
     height: auto;
-    object-fit: contain;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
     opacity: 0;
     transition: opacity 160ms ease;
   }
@@ -136,7 +169,7 @@
   .gallery-lightbox__caption {
     flex: 0 0 auto;
     max-width: min(60ch, 100%);
-    margin: var(--space-2) 0 0;
+    margin: 0;
     font-size: var(--text-xs);
     line-height: var(--leading-snug);
     text-align: center;
@@ -145,6 +178,45 @@
 
   .gallery-lightbox__caption[hidden] {
     display: none;
+  }
+
+  .gallery-lightbox__tools {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem 0.45rem;
+    flex: 0 0 auto;
+    margin-top: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: var(--weight-mono-regular);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .gallery-lightbox__tools button,
+  .gallery-lightbox__zoom-label {
+    margin: 0;
+    padding: 0.35rem 0.5rem;
+    border: 0;
+    background: none;
+    color: color-mix(in srgb, var(--color-white) 88%, var(--color-gray-green));
+  }
+
+  .gallery-lightbox__tools button {
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+
+  .gallery-lightbox__zoom-label {
+    min-width: 4.5ch;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 
   .gallery-lightbox__close,
@@ -186,15 +258,23 @@
 
   .gallery-lightbox__close:hover,
   .gallery-lightbox__nav:hover,
+  .gallery-lightbox__tools button:hover,
   .gallery-lightbox__close:focus-visible,
-  .gallery-lightbox__nav:focus-visible {
+  .gallery-lightbox__nav:focus-visible,
+  .gallery-lightbox__tools button:focus-visible {
     color: var(--color-white);
   }
 
   .gallery-lightbox__close:focus-visible,
-  .gallery-lightbox__nav:focus-visible {
+  .gallery-lightbox__nav:focus-visible,
+  .gallery-lightbox__tools button:focus-visible {
     outline: 2px solid var(--color-white);
     outline-offset: 3px;
+  }
+
+  .gallery-lightbox__tools button:disabled {
+    cursor: default;
+    opacity: 0.45;
   }
 
   @media (max-width: 39.99rem) {
@@ -206,6 +286,22 @@
       top: auto;
       bottom: 0.55rem;
       transform: none;
+    }
+
+    .gallery-lightbox__tools {
+      position: absolute;
+      left: 50%;
+      bottom: 2.45rem;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100% - 8.5rem);
+      margin-top: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-lightbox__image {
+      transition: none;
     }
   }
 </style>

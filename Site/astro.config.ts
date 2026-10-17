@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import { LEGACY_HTML_REDIRECTS } from './src/lib/legacy-urls';
 import { repoModelsPlugin } from './src/lib/repo-models';
+import { repoSvgPlugin } from './src/lib/repo-svg';
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -14,6 +15,6 @@ export default defineConfig({
   site: 'https://emotion.linalopes.info',
 
   vite: {
-    plugins: [repoModelsPlugin()],
+    plugins: [repoModelsPlugin(), repoSvgPlugin()],
   },
 });

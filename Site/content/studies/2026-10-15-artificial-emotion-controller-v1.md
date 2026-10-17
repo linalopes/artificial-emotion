@@ -64,9 +64,7 @@ The board also includes four optional LEDs to indicate motor-phase activation. T
 
 ### Illustrated connection diagram
 
-<!-- TODO: Replace this placeholder with the final Excalidraw SVG or site-compatible embed. -->
-
-**[PLACEHOLDER — Artificial Emotion Controller v1 / Excalidraw connection diagram]**
+![[Artificial Emotion Controller - Drawing 2026-10-16 09.57.34.excalidraw.svg]]
 
 *An illustrated wiring diagram will show the ESP32-S3 at the center, with visible connections to sensor banks, the USER button, ULN2003A, 28BYJ-48 motor and power distribution.*
 

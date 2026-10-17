@@ -12,7 +12,25 @@ import {
   REPO_MODELS_PREFIX,
 } from './model-embed';
 
-export function siteRepoRoot(siteRoot = process.cwd()): string {
+/** Astro site root (`Site/`), even after Markdown is bundled into `dist/`. */
+export function resolveSiteRoot(start = process.cwd()): string {
+  let dir = resolve(start);
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(join(dir, 'astro.config.ts')) && existsSync(join(dir, 'content'))) {
+      return dir;
+    }
+    const nested = join(dir, 'Site');
+    if (existsSync(join(nested, 'astro.config.ts')) && existsSync(join(nested, 'content'))) {
+      return nested;
+    }
+    const parent = resolve(dir, '..');
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return resolve(start);
+}
+
+export function siteRepoRoot(siteRoot = resolveSiteRoot()): string {
   return resolve(siteRoot, '..');
 }
 

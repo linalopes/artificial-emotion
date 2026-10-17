@@ -361,6 +361,20 @@ Allowed attributes: `src`, `controls`, `autoplay`, `muted`, `loop`,
 `playsinline`, `preload`, `poster`, `width`, `height`, `aria-label`.
 If `autoplay` is present, the site also requires `muted` and `playsinline`.
 
+### Obsidian SVG embeds
+
+Use a native Obsidian wikilink. The SVG stays in its research folder; the
+site copies it at build time. Do not move or convert the original file.
+
+```md
+![[drawing.excalidraw.svg]]
+![[drawing.excalidraw.svg|Illustrated wiring diagram]]
+```
+
+The filename must be unique in the repository, or the embed must use a
+repo-relative path (`folder/drawing.excalidraw.svg`). Missing or duplicate
+filenames fail the build instead of picking an arbitrary file.
+
 ### Project-specific directives
 
 Keep these because Obsidian has no native equivalent:

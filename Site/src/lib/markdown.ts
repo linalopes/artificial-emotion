@@ -7,12 +7,21 @@
  * are rebuilt from an attribute allowlist. Complete ```mermaid fences become
  * typed parts (the diagram source is never treated as trusted HTML). Internal
  * labs use `::lab{src title}`; repository STL/GLB files use `::model{src title caption?}`.
+ * Obsidian SVG embeds use `![[file.svg]]` / `![[file.svg|alt]]`.
  * `::youtube` remains a compatibility alias; prefer ordinary iframe HTML.
  */
 import { findCompleteIframes, iframeEmbedHtml, parseIframeMarkup } from './iframe-embed';
+import { lightboxImageHtml } from './lightbox-image';
 import { isLabDirectiveLine, labEmbedHtml, parseLabDirective } from './lab-embed';
 import { mermaidEmbedHtml } from './mermaid-embed';
 import { isModelDirectiveLine, modelEmbedHtml, parseModelDirective } from './model-embed';
+import { siteRepoRoot } from './repo-models';
+import {
+  isSvgWikiEmbedLine,
+  parseSvgWikiEmbed,
+  svgEmbedHtml,
+  svgWikiEmbedProps,
+} from './svg-embed';
 import { findCompleteVideos, parseVideoMarkup, videoEmbedHtml } from './video-embed';
 import { isYoutubeDirectiveLine, parseYoutubeDirective, youtubeEmbedHtml } from './youtube-embed';
 
@@ -183,7 +192,7 @@ function inline(value: string): string {
   return text.replace(/\u0001(\d+)\u0001/g, (_match, index: string) => held[Number(index)] ?? '');
 }
 
-type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'model' | 'youtube' | 'table' | 'other';
+type BlockKind = 'quote' | 'ul' | 'ol' | 'lab' | 'model' | 'youtube' | 'svg' | 'table' | 'other';
 type CellAlign = 'left' | 'center' | 'right' | '';
 
 function lineKind(line: string): BlockKind {
@@ -191,6 +200,7 @@ function lineKind(line: string): BlockKind {
   if (isLabDirectiveLine(text)) return 'lab';
   if (isModelDirectiveLine(text)) return 'model';
   if (isYoutubeDirectiveLine(text)) return 'youtube';
+  if (isSvgWikiEmbedLine(text)) return 'svg';
   if (/^>/.test(text)) return 'quote';
   if (/^[-*]\s+\S/.test(text)) return 'ul';
   if (/^\d+\.\s+\S/.test(text)) return 'ol';
@@ -288,6 +298,17 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
     return parsed ? youtubeEmbedHtml(parsed) : `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
   }
 
+  if (kind === 'svg') {
+    const repoRoot = siteRepoRoot();
+    return lines
+      .map((line) => {
+        const parsed = parseSvgWikiEmbed(line.trim());
+        if (!parsed) return `<p>${inline(line.trim())}</p>`;
+        return svgEmbedHtml(svgWikiEmbedProps(repoRoot, parsed));
+      })
+      .join('');
+  }
+
   if (kind === 'quote') return renderQuote(lines);
   if (kind === 'table') return renderTable(lines);
 
@@ -310,7 +331,7 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 
   const image = /^!\[([^\]]*)\]\((https?:[^)\s]+|\/[^)\s]+)\)$/.exec(lines[0].trim());
   if (image && lines.length === 1) {
-    return `<img src="${escapeHtml(image[2])}" alt="${escapeHtml(image[1])}">`;
+    return lightboxImageHtml(image[2], image[1]);
   }
 
   return `<p>${lines.map((line) => inline(line.trim())).join('<br>')}</p>`;
@@ -320,8 +341,9 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
  * Render a Markdown fragment (no frontmatter) to HTML.
  * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
  * emphasis, images, sanitized HTTPS iframes and videos, ordinary ```mermaid
- * fences, internal `::lab` embeds, `::model` STL/GLB viewers, and a `::youtube`
- * compatibility alias. Other raw HTML is escaped.
+ * fences, internal `::lab` embeds, `::model` STL/GLB viewers, Obsidian
+ * `![[file.svg]]` embeds, and a `::youtube` compatibility alias. Other raw
+ * HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
   return markdownToParts(markdown).map(embedPart).join('');
