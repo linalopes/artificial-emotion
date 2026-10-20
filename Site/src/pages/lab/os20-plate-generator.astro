@@ -1,0 +1,315 @@
+---
+/**
+ * date: 2026-10-20
+ * document: OS20 Plate Generator
+ * role: experimental lab / fabrication tool
+ * page: /lab/os20-plate-generator/
+ *
+ * Parametric laser-cut plate on the Artificial Emotion 20 mm grid.
+ * Not in navigation, not indexed.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  DEFAULT_HEIGHT_MM,
+  DEFAULT_WIDTH_MM,
+  MAX_PLATE_MM,
+  MIN_PLATE_MM,
+} from '../../lib/os20-plate';
+
+const isEmbed = Astro.url.searchParams.get('embed') === '1';
+---
+
+<BaseLayout
+  title="OS20 Plate Generator"
+  description="A parametric laser-cut plate generator on the Artificial Emotion 20 mm grid."
+  theme="dark"
+  noindex
+  embed={isEmbed}
+>
+  <main class="lab" data-pagefind-ignore="all" data-os20-plate>
+    <header class="lab__header">
+      <p class="label">Lab · prototype</p>
+      <h1>OS20 Plate Generator</h1>
+      <p class="lab__subtitle">A parametric laser-cut plate on the Artificial Emotion 20 mm grid</p>
+      <p class="lab__lede">
+        The hole grid is built from the plate centre outward at a fixed 20 mm pitch. Remaining space
+        stays on the edges. Optional M6 holes on the outer grid and small nail holes for a wooden
+        frame.
+      </p>
+    </header>
+
+    <div class="os20">
+      <div class="os20__stage" data-os20-stage aria-live="polite"></div>
+
+      <div class="os20__panel">
+        <fieldset class="os20__fieldset">
+          <legend>Plate</legend>
+          <label class="os20__row">
+            <span>Width (mm)</span>
+            <input
+              data-os20-width
+              type="number"
+              inputmode="decimal"
+              min={MIN_PLATE_MM}
+              max={MAX_PLATE_MM}
+              step="0.1"
+              value={DEFAULT_WIDTH_MM}
+            />
+          </label>
+          <label class="os20__row">
+            <span>Height (mm)</span>
+            <input
+              data-os20-height
+              type="number"
+              inputmode="decimal"
+              min={MIN_PLATE_MM}
+              max={MAX_PLATE_MM}
+              step="0.1"
+              value={DEFAULT_HEIGHT_MM}
+            />
+          </label>
+          <p class="os20__hint">Pitch is fixed at 20 mm and does not stretch to fit the plate.</p>
+        </fieldset>
+
+        <fieldset class="os20__fieldset">
+          <legend>Holes</legend>
+          <label class="os20__check">
+            <input data-os20-m6 type="checkbox" />
+            <span>M6 perimeter</span>
+          </label>
+          <p class="os20__hint">
+            Outer row and column become Ø6.2 mm for M6 threaded rods. Interior stays Ø3.2 mm.
+          </p>
+          <label class="os20__check">
+            <input data-os20-frame type="checkbox" />
+            <span>Wood frame mounting holes</span>
+          </label>
+          <p class="os20__hint">
+            Ø1.2 mm nail holes in a 10 mm edge zone. The shaded band is a preview guide only.
+          </p>
+        </fieldset>
+
+        <fieldset class="os20__fieldset">
+          <legend>Geometry</legend>
+          <dl class="os20__stats" data-os20-summary></dl>
+        </fieldset>
+
+        <fieldset class="os20__fieldset">
+          <legend>Export</legend>
+          <button type="button" class="os20__primary" data-os20-export>Download SVG</button>
+          <p class="os20__hint">
+            Millimetre units. Outline and holes only — no labels, dimensions, or guides.
+          </p>
+        </fieldset>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import { mountOs20PlateGenerator } from '../../scripts/os20-plate-client';
+  const root = document.querySelector<HTMLElement>('[data-os20-plate]');
+  if (root) mountOs20PlateGenerator(root);
+</script>
+
+<style>
+  .lab {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-4) var(--page-gutter) var(--space-5);
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  :global(html.embed) .lab {
+    max-width: none;
+    margin: 0;
+    padding: var(--space-3);
+  }
+
+  .lab__header {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .lab__header h1 {
+    font-size: var(--text-xl);
+    color: var(--accent);
+  }
+
+  .lab__subtitle {
+    font-size: var(--text-lg);
+    color: var(--fg);
+    max-width: 48ch;
+  }
+
+  .lab__lede {
+    color: var(--fg-muted);
+    max-width: 62ch;
+  }
+
+  .os20 {
+    display: grid;
+    gap: var(--space-3);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .os20 {
+      grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+      gap: var(--space-4);
+    }
+  }
+
+  .os20__stage {
+    width: 100%;
+    min-height: 16rem;
+    aspect-ratio: 300 / 220;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+  }
+
+  .os20__stage :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .os20__stage :global(.os20-plate) {
+    fill: color-mix(in srgb, var(--fg) 6%, transparent);
+    stroke: var(--fg);
+    stroke-width: 0.4;
+  }
+
+  .os20__stage :global(.os20-zone__outer) {
+    fill: color-mix(in srgb, var(--accent-alt) 14%, transparent);
+    stroke: none;
+  }
+
+  .os20__stage :global(.os20-zone__inner) {
+    fill: var(--bg);
+    stroke: color-mix(in srgb, var(--accent-alt) 45%, transparent);
+    stroke-width: 0.25;
+    stroke-dasharray: 1.6 1.2;
+  }
+
+  .os20__stage :global(.os20-grid) {
+    stroke: color-mix(in srgb, var(--fg) 22%, transparent);
+    stroke-width: 0.2;
+  }
+
+  .os20__stage :global(.os20-hole) {
+    fill: var(--bg);
+    stroke: var(--accent-alt);
+    stroke-width: 0.35;
+  }
+
+  .os20__stage :global(.os20-hole--m6) {
+    stroke: var(--accent);
+    stroke-width: 0.45;
+  }
+
+  .os20__stage :global(.os20-hole--nail) {
+    stroke: var(--fg-muted);
+    stroke-width: 0.25;
+  }
+
+  .os20__panel {
+    display: grid;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .os20__fieldset {
+    border: 1px solid var(--rule);
+    padding: 0.85rem 0.9rem 1rem;
+    display: grid;
+    gap: 0.65rem;
+    min-width: 0;
+  }
+
+  .os20__fieldset legend {
+    padding-inline: 0.35rem;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-label);
+  }
+
+  .os20__row {
+    display: grid;
+    gap: 0.35rem;
+    max-width: none;
+  }
+
+  .os20__row input[type='number'] {
+    font: inherit;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--rule);
+    padding: 0.35rem 0.5rem;
+    max-width: 10rem;
+  }
+
+  .os20__check {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    max-width: none;
+    cursor: pointer;
+  }
+
+  .os20__check input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+  }
+
+  .os20__stats {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+  }
+
+  .os20__stats > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    max-width: none;
+  }
+
+  .os20__stats dt {
+    color: var(--fg-muted);
+  }
+
+  .os20__stats dd {
+    margin: 0;
+    text-align: right;
+    color: var(--fg);
+  }
+
+  .os20__panel button {
+    font: inherit;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--fg-muted);
+    padding: 0.4rem 0.7rem;
+    cursor: pointer;
+    justify-self: start;
+  }
+
+  .os20__panel button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .os20__primary {
+    border-color: var(--accent-alt) !important;
+    color: var(--accent-alt) !important;
+  }
+
+  .os20__hint {
+    max-width: none;
+    color: var(--fg-muted);
+  }
+</style>

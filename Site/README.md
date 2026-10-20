@@ -60,6 +60,8 @@ Site/
 | `/lab/constellation/`| `src/pages/lab/constellation.astro` — constellation tuning page, not in nav, `noindex` |
 | `/lab/waves/`        | `src/pages/lab/waves.astro` — p5.js Tomorrow's Waves prototype, not in nav, `noindex` |
 | `/lab/tissue/`       | redirects to `/lab/waves/` (previous generative-textile lab URL) |
+| `/lab/heartbeat-slit-animation/` | `src/pages/lab/heartbeat-slit-animation.astro` — barrier-grid fabrication lab, not in nav, `noindex` |
+| `/lab/os20-plate-generator/` | `src/pages/lab/os20-plate-generator.astro` — OS20 laser-cut plate generator, not in nav, `noindex` |
 | `/studies/`          | `src/pages/studies/index.astro`    |
 | `/studies/[id]/`     | `src/pages/studies/[id].astro`     |
 | `/notes/`            | `src/pages/notes/index.astro`      |
@@ -532,6 +534,20 @@ out of production; never mounted on the homepage). The canvas layer uses
 `prefers-reduced-motion` (single static frame, no pointer). Animation pauses
 when the tab is hidden or the canvas is offscreen. p5 is bundled only into
 pages that render the component.
+
+## OS20 Plate Generator
+
+Interactive lab at `/lab/os20-plate-generator/`. Builds a centered 20 mm
+hole grid for laser-cut plates. Pitch never stretches; leftover space stays
+on the edges. Optional M6 perimeter holes (Ø6.2 mm) and 1.2 mm nail holes
+in a 10 mm edge zone. Download SVG is millimetre fabrication geometry only.
+
+| Concern | File |
+| ------- | ---- |
+| Grid, hole, and margin math | `src/lib/os20-plate/geometry.ts` |
+| Preview SVG and millimetre export | `src/lib/os20-plate/svg.ts` |
+| Form, live preview, download | `src/scripts/os20-plate-client.ts` |
+| Lab page | `src/pages/lab/os20-plate-generator.astro` |
 
 ## Deployment (later)
 
