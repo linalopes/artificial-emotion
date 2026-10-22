@@ -4804,7 +4804,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0d58d79f-79e2-4cdd-8383-0241cd5766b3")
-		(property "Reference" "R10"
+		(property "Reference" "R6"
 			(at 280.67 125.73 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4877,7 +4877,7 @@
 		(instances
 			(project "artificial-emotion-controller-v1"
 				(path "/50919683-80cf-4dee-9959-62511e3ef4ee"
-					(reference "R10")
+					(reference "R6")
 					(unit 1)
 				)
 			)
@@ -5162,7 +5162,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "256eb1b1-91c4-49eb-8063-a29a586ffb06")
-		(property "Reference" "R12"
+		(property "Reference" "R7"
 			(at 430.53 85.09 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5235,7 +5235,7 @@
 		(instances
 			(project "artificial-emotion-controller-v1"
 				(path "/50919683-80cf-4dee-9959-62511e3ef4ee"
-					(reference "R12")
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -5534,7 +5534,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "63e7d53d-62bd-4b6b-9e95-68a427d660a1")
-		(property "Reference" "R9"
+		(property "Reference" "R5"
 			(at 241.3 125.73 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5607,7 +5607,7 @@
 		(instances
 			(project "artificial-emotion-controller-v1"
 				(path "/50919683-80cf-4dee-9959-62511e3ef4ee"
-					(reference "R9")
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -5788,7 +5788,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "84ae2876-4b7b-4170-a2ca-99d29d00af9d")
-		(property "Reference" "R5"
+		(property "Reference" "R1"
 			(at 62.23 248.92 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5861,7 +5861,7 @@
 		(instances
 			(project "artificial-emotion-controller-v1"
 				(path "/50919683-80cf-4dee-9959-62511e3ef4ee"
-					(reference "R5")
+					(reference "R1")
 					(unit 1)
 				)
 			)
@@ -6126,7 +6126,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a2a29df9-aaf8-4c6d-8f20-abbe6cee571b")
-		(property "Reference" "R8"
+		(property "Reference" "R4"
 			(at 201.93 125.73 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6199,7 +6199,7 @@
 		(instances
 			(project "artificial-emotion-controller-v1"
 				(path "/50919683-80cf-4dee-9959-62511e3ef4ee"
-					(reference "R8")
+					(reference "R4")
 					(unit 1)
 				)
 			)
@@ -6731,7 +6731,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e1d61fb7-8555-4a2d-8e86-9cec02279c53")
-		(property "Reference" "R7"
+		(property "Reference" "R3"
 			(at 162.56 125.73 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6804,7 +6804,7 @@
 		(instances
 			(project "artificial-emotion-controller-v1"
 				(path "/50919683-80cf-4dee-9959-62511e3ef4ee"
-					(reference "R7")
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -6946,7 +6946,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "f9a28b0a-4279-4752-9113-5f56ca41be2e")
-		(property "Reference" "R6"
+		(property "Reference" "R2"
 			(at 62.484 263.398 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7019,7 +7019,7 @@
 		(instances
 			(project "artificial-emotion-controller-v1"
 				(path "/50919683-80cf-4dee-9959-62511e3ef4ee"
-					(reference "R6")
+					(reference "R2")
 					(unit 1)
 				)
 			)

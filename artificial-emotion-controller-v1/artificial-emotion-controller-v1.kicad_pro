@@ -632,7 +632,7 @@
         "uuid": "50919683-80cf-4dee-9959-62511e3ef4ee"
       }
     ],
-    "used_designators": "",
+    "used_designators": "5V\\-MOTOR1,5V\\-ESP1",
     "variants": []
   },
   "sheets": [

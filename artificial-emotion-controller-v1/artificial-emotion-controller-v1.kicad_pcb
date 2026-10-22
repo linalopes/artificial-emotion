@@ -93,9 +93,10 @@
 		(at 126 85.5 -90)
 		(descr "Through hole straight pin header, 1x03, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x03 2.54mm single row")
-		(property "Reference" "IO6"
+		(property "Reference" "J5"
 			(at 0 7.5 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "9bfe8ddb-c6b2-4474-8af1-f015adf7d5fa")
 			(effects
 				(font
@@ -346,9 +347,10 @@
 		(at 129.796773 103.855933 -90)
 		(descr "Through hole straight pin header, 1x03, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x03 2.54mm single row")
-		(property "Reference" "IO4"
+		(property "Reference" "J3"
 			(at 0 7.5 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "3ff5b12a-c7b1-4c61-9cd6-ab101b40cf76")
 			(effects
 				(font
@@ -599,8 +601,8 @@
 		(at 116.31 68.5 180)
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
-		(property "Reference" "R8"
-			(at 3.81 -2.37 0)
+		(property "Reference" "R4"
+			(at 3.81 -1 0)
 			(layer "F.SilkS")
 			(uuid "48e30caf-54e7-4ea4-9b4b-7e9d1d46a242")
 			(effects
@@ -1328,7 +1330,7 @@
 		(at 105 63.5 180)
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
-		(property "Reference" "R12"
+		(property "Reference" "R7"
 			(at 3.81 -2.37 0)
 			(layer "F.SilkS")
 			(hide yes)
@@ -1562,8 +1564,8 @@
 		(at 116.31 65 180)
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
-		(property "Reference" "R7"
-			(at 3.81 -2.37 0)
+		(property "Reference" "R3"
+			(at 3.81 -1 0)
 			(layer "F.SilkS")
 			(uuid "bcdadf03-02f4-485f-985a-d24b674f1d10")
 			(effects
@@ -1795,7 +1797,7 @@
 		(at 116.31 75.5 180)
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
-		(property "Reference" "R10"
+		(property "Reference" "R6"
 			(at 3.81 -2.37 0)
 			(layer "F.SilkS")
 			(uuid "dedba4f9-30de-4ba8-8047-fe70849a5bd5")
@@ -2276,9 +2278,10 @@
 		(at 129.79 114 -90)
 		(descr "Through hole straight pin header, 1x03, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x03 2.54mm single row")
-		(property "Reference" "IO2"
+		(property "Reference" "J7"
 			(at 0 7.54 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "01f29f72-80b7-4592-ba5d-1033729c6d35")
 			(effects
 				(font
@@ -2529,8 +2532,8 @@
 		(at 116.31 72 180)
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
-		(property "Reference" "R9"
-			(at 3.81 -2.37 0)
+		(property "Reference" "R5"
+			(at 3.81 -0.5 0)
 			(layer "F.SilkS")
 			(uuid "a212a806-8f4e-4b8f-b9fd-313c41e10105")
 			(effects
@@ -4295,9 +4298,10 @@
 		(at 129.779037 99.759142 -90)
 		(descr "Through hole straight pin header, 1x03, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x03 2.54mm single row")
-		(property "Reference" "IO5"
+		(property "Reference" "J4"
 			(at 0 7.5 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "ee8e07e1-57a2-4001-a98b-205241e12acc")
 			(effects
 				(font
@@ -5060,9 +5064,10 @@
 		(at 129.79 118 -90)
 		(descr "Through hole straight pin header, 1x03, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x03 2.54mm single row")
-		(property "Reference" "IO1"
+		(property "Reference" "J6"
 			(at 0 7.54 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "63a71817-b87a-44d0-a4f5-bc8b0750ea27")
 			(effects
 				(font
@@ -5765,6 +5770,7 @@
 		(property "Reference" "JP2"
 			(at 0 -3.1425 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "334bf4e3-0256-42a6-b9da-fe256cbbaabf")
 			(effects
 				(font
@@ -6733,7 +6739,7 @@
 		(at 126.859781 92.62717 180)
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
-		(property "Reference" "R6"
+		(property "Reference" "R2"
 			(at 2.359781 0.12717 0)
 			(layer "F.SilkS")
 			(uuid "2e6189e2-81eb-4166-8f54-3bc39c3c0d79")
@@ -6966,8 +6972,8 @@
 		(at 92.75 118.25 180)
 		(descr "Generic 6mm SW tactile push button")
 		(tags "tact sw push 6mm")
-		(property "Reference" "BTN · IO7"
-			(at 3.25 -2.5 0)
+		(property "Reference" "SW1"
+			(at 3.25 2.25 0)
 			(layer "F.SilkS")
 			(uuid "3bbccca5-ccd1-4eb3-83be-8233cca48cb1")
 			(effects
@@ -7321,7 +7327,7 @@
 		(at 126.81 89.5 180)
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=7.62mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 7.62mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
-		(property "Reference" "R5"
+		(property "Reference" "R1"
 			(at 2.31 0 0)
 			(layer "F.SilkS")
 			(uuid "af9c7f1a-5b7b-4710-a961-5099e87c118a")
@@ -7896,7 +7902,8 @@
 		(property "Reference" "JP1"
 			(at 0 -2.38 0)
 			(layer "F.SilkS")
-			(uuid "7d0d2802-ba31-4a12-a1f2-b4045f189d2f")
+			(hide yes)
+			(uuid "304c540d-329c-4a63-8b58-2044eeb69287")
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -7908,7 +7915,7 @@
 			(at 0 4.92 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e5fcfd1a-e1ae-49f4-bfb0-94c6550b59d0")
+			(uuid "b6a750d6-2f31-4f70-b3c1-e8adcebd3fb3")
 			(effects
 				(font
 					(size 1 1)
@@ -7920,7 +7927,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "bc000c65-e15d-454e-a70d-812232bf8b0c")
+			(uuid "27268234-0ca0-410c-b1c1-fe1d6d5ae736")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7931,7 +7938,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "70d52dab-5f7e-4bf9-95cc-0f7b1fced5d7")
+			(uuid "cdcdf601-beb8-4573-bf3c-93970ef67696")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8136,7 +8143,7 @@
 		(descr "Terminal Block CUI TB007-508-02, 2 pins, pitch 5.08mm, size 10.8x10.2mm, drill diameter 1.6mm, pad diameter 2.4mm, https://www.cuidevices.com/product/resource/tb007-508.pdf")
 		(tags "THT Terminal Block CUI TB007-508-02 pitch 5.08mm size 10.8x10.2mm drill 1.6mm pad 2.4mm")
 		(property "Reference" "J2"
-			(at 2.08 -7 0)
+			(at 2.84 -3.4 0)
 			(layer "F.SilkS")
 			(uuid "5b8fc72d-a2ef-4e77-ae1f-7f62340ac5da")
 			(effects
@@ -9127,7 +9134,7 @@
 		(uuid "abbe3106-775d-4292-920e-5505acad6c8a")
 	)
 	(gr_rect
-		(start 118.04 82)
+		(start 117.5 82)
 		(end 129.5 95.215306)
 		(stroke
 			(width 0.1)
@@ -9138,7 +9145,7 @@
 		(uuid "c52f0cb0-37ba-4ff7-97f3-63dc3aaa85b6")
 	)
 	(gr_rect
-		(start 121.25 111)
+		(start 120.5 111)
 		(end 132.75 121.5)
 		(stroke
 			(width 0.1)
@@ -9149,7 +9156,7 @@
 		(uuid "3144fed6-98b7-4541-b97f-67dfcdada78a")
 	)
 	(gr_rect
-		(start 121.296773 97.355933)
+		(start 120.832555 97.355933)
 		(end 132.756773 107.105933)
 		(stroke
 			(width 0.1)
@@ -9263,10 +9270,32 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "5V"
+	(gr_text "MOTOR\n"
+		(at 112 55.5 0)
+		(layer "F.SilkS")
+		(uuid "ec70e249-6711-4c68-8689-b9510b8bf90c")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.1)
+			)
+		)
+	)
+	(gr_text "ESP32"
+		(at 117 55.5 0)
+		(layer "F.SilkS")
+		(uuid "1bb54eed-fe06-4205-bb9f-883be23fcf4d")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.1)
+			)
+		)
+	)
+	(gr_text "GND\n"
 		(at 100 47.5 0)
 		(layer "F.SilkS")
-		(uuid "bd691838-e200-47ae-89db-4220aba69ae8")
+		(uuid "9b6249b7-0085-4826-a96e-5fb03b139bb6")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -9274,10 +9303,10 @@
 			)
 		)
 	)
-	(gr_text "GND\n"
-		(at 107 47.5 0)
+	(gr_text "5V"
+		(at 106 47.5 0)
 		(layer "F.SilkS")
-		(uuid "9b6249b7-0085-4826-a96e-5fb03b139bb6")
+		(uuid "bd691838-e200-47ae-89db-4220aba69ae8")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -9391,6 +9420,89 @@
 		(effects
 			(font
 				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+		)
+	)
+	(gr_text "BTN IO7"
+		(at 87 121 0)
+		(layer "F.SilkS")
+		(uuid "2ea51e2e-feab-4242-a433-f7c1e2395285")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "IO6"
+		(at 119 86.5 90)
+		(layer "F.SilkS")
+		(uuid "792e4eca-1efc-4d68-a4a8-f42651e9f854")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "IO5"
+		(at 122.5 101 90)
+		(layer "F.SilkS")
+		(uuid "a2846275-c1b7-4aad-b54c-ff35478bf5b5")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "IO4"
+		(at 122.5 105 90)
+		(layer "F.SilkS")
+		(uuid "1f9ae3a7-860d-445b-a227-0b340bd03075")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "IO2"
+		(at 122.5 115 90)
+		(layer "F.SilkS")
+		(uuid "34334e21-27d7-4ea2-a8b6-c9ee19a9376e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "IO1"
+		(at 122.5 119 90)
+		(layer "F.SilkS")
+		(uuid "1dd6cd9a-e18d-4326-946b-4ecf6ea02266")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "R7"
+		(at 103 64.5 0)
+		(layer "F.SilkS")
+		(uuid "cdd4b3b9-a81e-4e7e-9390-f2ede881868a")
+		(effects
+			(font
+				(size 1 1)
 				(thickness 0.15)
 			)
 		)
