@@ -30,6 +30,8 @@ export type SlitAnimationParams = {
   diameterMm: number;
   /** Centre hole / axle guide diameter in millimetres. */
   guideMm: number;
+  /** Diameter of the uncut central hub where slit openings are forbidden, in millimetres. */
+  centerBridgeMm: number;
 };
 
 export type SlitAnimationModel = {
@@ -51,7 +53,12 @@ export const DEFAULT_PARAMS: SlitAnimationParams = {
   slices: 10,
   diameterMm: 120,
   guideMm: 2,
+  centerBridgeMm: 16,
 };
+
+/** Physical Center bridge control range (diameter, mm). Always clamped ≥ guideMm. */
+export const CENTER_BRIDGE_MIN = 2;
+export const CENTER_BRIDGE_MAX = 40;
 
 export const FRAME_CHOICES = [4, 5, 6, 8, 10, 12] as const;
 

@@ -9,6 +9,8 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
+  CENTER_BRIDGE_MAX,
+  CENTER_BRIDGE_MIN,
   CLOCK_PRESETS,
   DEFAULT_MOTOR_RPM,
   DEFAULT_PARAMS,
@@ -277,6 +279,20 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
               value={DEFAULT_PARAMS.guideMm}
             />
           </label>
+          <label class="slit__row">
+            <span>Center bridge <output data-slit-bridge-out>{DEFAULT_PARAMS.centerBridgeMm} mm</output></span>
+            <input
+              data-slit-bridge
+              type="range"
+              min={CENTER_BRIDGE_MIN}
+              max={CENTER_BRIDGE_MAX}
+              step="0.5"
+              value={DEFAULT_PARAMS.centerBridgeMm}
+            />
+          </label>
+          <p class="slit__hint">
+            Solid center kept free of slit openings for cutting the mask from paper.
+          </p>
           <p class="slit__warn" data-slit-a4-fit hidden>
             Two discs at this diameter no longer fit on one A4 sheet at 1:1. Disc SVGs remain correct.
           </p>
@@ -293,7 +309,7 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
 
         <aside class="slit__fab">
           <p><strong>Encoded base:</strong> Print on white paper.</p>
-          <p><strong>Slit mask:</strong> Print on transparent inkjet film using black ink.</p>
+          <p><strong>Slit mask:</strong> Print on transparent inkjet film using black ink, or cut from black paper.</p>
           <p><strong>Print at:</strong> 100% / Actual Size. Do not Fit to Page.</p>
         </aside>
       </div>

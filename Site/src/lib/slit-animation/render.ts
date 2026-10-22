@@ -1,4 +1,4 @@
-import { isMaskSolid } from './encode';
+import { isMaskSolid, maskHubRadius } from './encode';
 import {
   HEART_RED,
   MARK_STROKE,
@@ -69,6 +69,7 @@ export function drawMask(
   radius: number,
 ): void {
   const { params, wedgeCount, wedgeAngle } = model;
+  const hubR = maskHubRadius(params, radius);
   ctx.beginPath();
   ctx.moveTo(cx + radius, cy);
   ctx.arc(cx, cy, radius, 0, Math.PI * 2);
@@ -76,9 +77,19 @@ export function drawMask(
   for (let i = 0; i < wedgeCount; i += 1) {
     if (isMaskSolid(i, params.frames)) continue;
     const a0 = i * wedgeAngle;
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, radius, a0, a0 + wedgeAngle);
-    ctx.closePath();
+    const a1 = a0 + wedgeAngle;
+    if (hubR > 0 && hubR < radius) {
+      ctx.moveTo(cx + hubR * Math.cos(a0), cy + hubR * Math.sin(a0));
+      ctx.lineTo(cx + radius * Math.cos(a0), cy + radius * Math.sin(a0));
+      ctx.arc(cx, cy, radius, a0, a1, false);
+      ctx.lineTo(cx + hubR * Math.cos(a1), cy + hubR * Math.sin(a1));
+      ctx.arc(cx, cy, hubR, a1, a0, true);
+      ctx.closePath();
+    } else {
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, a0, a1);
+      ctx.closePath();
+    }
   }
   ctx.fillStyle = MASK_BLACK;
   ctx.fill('evenodd');

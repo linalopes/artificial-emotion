@@ -1,5 +1,7 @@
 export {
   A4_MM,
+  CENTER_BRIDGE_MAX,
+  CENTER_BRIDGE_MIN,
   CLOCK_PRESETS,
   CLOCK_TICK_DEG,
   DEFAULT_MOTOR_RPM,
@@ -35,11 +37,14 @@ export {
 
 export {
   animationCyclesPerMin,
+  annularWedgePathD,
   apertureWedges,
   buildSlitAnimation,
+  clampCenterBridgeMm,
   cyclesPerRevolution,
   frameAtAngle,
   isMaskSolid,
+  maskHubRadius,
   snapAngle,
   wedgeAngle,
   wedgeCount,

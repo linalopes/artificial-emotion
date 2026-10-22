@@ -1,5 +1,5 @@
 import { pathToSvgD, round } from './heart';
-import { isMaskSolid, wedgePathD } from './encode';
+import { annularWedgePathD, isMaskSolid, maskHubRadius, wedgePathD } from './encode';
 import {
   A4_MM,
   HEART_RED,
@@ -80,14 +80,15 @@ export function encodedHeart(
   return `<defs>${defs.join('')}</defs>${uses}`;
 }
 
-/** Black disc with transparent radial apertures. */
+/** Black disc with transparent radial apertures that stop at the uncut central hub. */
 export function maskEvenoddPath(model: SlitAnimationModel, cx: number, cy: number, radius: number): string {
   const { params, wedgeCount, wedgeAngle } = model;
+  const inner = maskHubRadius(params, radius);
   const parts = [circlePath(cx, cy, radius)];
   for (let i = 0; i < wedgeCount; i += 1) {
     if (isMaskSolid(i, params.frames)) continue;
     const a0 = i * wedgeAngle;
-    parts.push(wedgePathD(cx, cy, radius, a0, a0 + wedgeAngle));
+    parts.push(annularWedgePathD(cx, cy, inner, radius, a0, a0 + wedgeAngle));
   }
   return `<path fill-rule="evenodd" fill="${MASK_BLACK}" d="${parts.join(' ')}"/>`;
 }
@@ -138,7 +139,7 @@ export function exportA4TestSheetSvg(model: SlitAnimationModel): string {
 <circle cx="${cx}" cy="${topCy}" r="${r}" fill="${PAPER_WHITE}"/>
 ${baseArt}
 ${marks(cx, topCy, r, model.params.guideMm)}
-<text x="${cx}" y="${labelYBot}" text-anchor="middle" font-family="sans-serif" font-size="3.2" fill="#22113E">${xmlEscape('SLIT MASK — TRANSPARENCY')}</text>
+<text x="${cx}" y="${labelYBot}" text-anchor="middle" font-family="sans-serif" font-size="3.2" fill="#22113E">${xmlEscape('SLIT MASK — FILM OR PAPER')}</text>
 ${maskArt}
 ${marks(cx, botCy, r, model.params.guideMm)}
 </svg>`;

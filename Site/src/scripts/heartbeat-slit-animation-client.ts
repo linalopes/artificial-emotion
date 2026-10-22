@@ -5,6 +5,8 @@
  */
 import p5 from 'p5';
 import {
+  CENTER_BRIDGE_MAX,
+  CENTER_BRIDGE_MIN,
   CLOCK_TICK_DEG,
   DEFAULT_MOTOR_RPM,
   DEFAULT_PARAMS,
@@ -12,6 +14,7 @@ import {
   MOTOR_RPM_MIN,
   SLICE_MAX,
   SLICE_MIN,
+  clampCenterBridgeMm,
   animationCyclesPerMin,
   buildSlitAnimation,
   clockReport,
@@ -74,11 +77,13 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     slices: root.querySelector<HTMLInputElement>('[data-slit-slices]'),
     diameter: root.querySelector<HTMLInputElement>('[data-slit-diameter]'),
     guide: root.querySelector<HTMLInputElement>('[data-slit-guide]'),
+    bridge: root.querySelector<HTMLInputElement>('[data-slit-bridge]'),
     rpm: root.querySelector<HTMLInputElement>('[data-slit-rpm]'),
     state: root.querySelector<HTMLElement>('[data-slit-state]'),
     slicesOut: root.querySelector<HTMLElement>('[data-slit-slices-out]'),
     diameterOut: root.querySelector<HTMLElement>('[data-slit-diameter-out]'),
     guideOut: root.querySelector<HTMLElement>('[data-slit-guide-out]'),
+    bridgeOut: root.querySelector<HTMLElement>('[data-slit-bridge-out]'),
     rpmOut: root.querySelector<HTMLElement>('[data-slit-rpm-out]'),
     positions: root.querySelector<HTMLElement>('[data-slit-positions]'),
     step: root.querySelector<HTMLElement>('[data-slit-step]'),
@@ -158,6 +163,13 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     }
     if (ui.diameter) params.diameterMm = readNumber(ui.diameter, DEFAULT_PARAMS.diameterMm);
     if (ui.guide) params.guideMm = readNumber(ui.guide, DEFAULT_PARAMS.guideMm);
+    if (ui.bridge) params.centerBridgeMm = readNumber(ui.bridge, DEFAULT_PARAMS.centerBridgeMm);
+    params.centerBridgeMm = clampCenterBridgeMm(params.centerBridgeMm, params.guideMm, params.diameterMm);
+    if (ui.bridge) {
+      ui.bridge.min = String(Math.max(CENTER_BRIDGE_MIN, params.guideMm));
+      ui.bridge.max = String(CENTER_BRIDGE_MAX);
+      ui.bridge.value = String(params.centerBridgeMm);
+    }
     if (ui.rpm) {
       motorRpm = clamp(Math.round(readNumber(ui.rpm, DEFAULT_MOTOR_RPM)), MOTOR_RPM_MIN, MOTOR_RPM_MAX);
       ui.rpm.value = String(motorRpm);
@@ -166,6 +178,7 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     if (ui.slicesOut) ui.slicesOut.textContent = String(params.slices);
     if (ui.diameterOut) ui.diameterOut.textContent = `${params.diameterMm} mm`;
     if (ui.guideOut) ui.guideOut.textContent = `${params.guideMm} mm`;
+    if (ui.bridgeOut) ui.bridgeOut.textContent = `${params.centerBridgeMm} mm`;
     if (ui.a4Fit) {
       const fits = 2 * params.diameterMm + 24 <= 297;
       ui.a4Fit.hidden = fits;
@@ -288,7 +301,7 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     });
   });
 
-  for (const el of [ui.frames, ui.slices, ui.diameter, ui.guide, ui.rpm]) {
+  for (const el of [ui.frames, ui.slices, ui.diameter, ui.guide, ui.bridge, ui.rpm]) {
     el?.addEventListener('input', syncParamsFromUi);
     el?.addEventListener('change', syncParamsFromUi);
   }
@@ -334,7 +347,7 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
     };
 
     const layersFor = (size: number, cx: number, cy: number, radius: number) => {
-      const key = `${size}:${params.frames}:${params.slices}:${params.diameterMm}:${params.guideMm}:${p.pixelDensity()}`;
+      const key = `${size}:${params.frames}:${params.slices}:${params.diameterMm}:${params.guideMm}:${params.centerBridgeMm}:${p.pixelDensity()}`;
       if (cache?.key === key) return cache;
       cache = {
         key,
