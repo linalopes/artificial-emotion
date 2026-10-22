@@ -17,6 +17,7 @@ export type VideoEmbedProps = {
 };
 
 const OPEN_TAG = /^<video\b([^>]*)>/i;
+const CLOSE_TAG = /<\/video\s*>/i;
 const ALLOWED = new Set([
   'src',
   'controls',
@@ -30,9 +31,11 @@ const ALLOWED = new Set([
   'height',
   'aria-label',
 ]);
+const SOURCE_ALLOWED = new Set(['src', 'type']);
 const BOOLEAN = new Set(['controls', 'autoplay', 'muted', 'loop', 'playsinline']);
 const PRELOAD = new Set(['none', 'metadata', 'auto']);
 const SAFE_SIZE = /^\d+(\.\d+)?(px|%)?$/i;
+const SAFE_SOURCE_TYPE = /^video\/mp4(?:\s*;.*)?$/i;
 const SITE_ROOT = /^\/(?!\/)/;
 
 function escapeHtml(value: string): string {
@@ -88,25 +91,56 @@ export function safePosterSrc(raw: string): string | null {
   return safeHttpsSrc(trimmed);
 }
 
-function parseAttributes(openAttrs: string): Record<string, string> {
+function parseAttributes(openAttrs: string, allowed: Set<string>): Record<string, string> {
   const attrs: Record<string, string> = {};
   for (const part of openAttrs.matchAll(
     /([^\s"'>=/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/gi,
   )) {
     const name = part[1].toLowerCase();
-    if (name.startsWith('on') || name.startsWith('data-') || !ALLOWED.has(name)) continue;
+    if (name.startsWith('on') || name.startsWith('data-') || !allowed.has(name)) continue;
     const value = decodeAttr(part[2] ?? part[3] ?? part[4] ?? '').trim();
     attrs[name] = BOOLEAN.has(name) ? 'true' : value;
   }
   return attrs;
 }
 
+function videoInner(source: string): string | null {
+  const trimmed = source.trim();
+  const open = OPEN_TAG.exec(trimmed);
+  if (!open) return null;
+  const afterOpen = trimmed.slice(open[0].length);
+  const close = CLOSE_TAG.exec(afterOpen);
+  if (!close) return null;
+  return afterOpen.slice(0, close.index);
+}
+
+function hasDisallowedInner(inner: string): boolean {
+  const leftover = inner
+    .replace(/<source\b[^>]*\/?>/gi, '')
+    .replace(/<\/source\s*>/gi, '');
+  return /<[a-z/!]/i.test(leftover);
+}
+
+function firstSourceSrc(inner: string): string | null {
+  for (const match of inner.matchAll(/<source\b([^>]*)\/?>/gi)) {
+    const attrs = parseAttributes(match[1] ?? '', SOURCE_ALLOWED);
+    if (attrs.type && !SAFE_SOURCE_TYPE.test(attrs.type)) continue;
+    const src = attrs.src ? safeVideoSrc(attrs.src) : null;
+    if (src) return src;
+  }
+  return null;
+}
+
 export function parseVideoMarkup(source: string): VideoEmbedProps | null {
-  const match = OPEN_TAG.exec(source.trim());
+  const trimmed = source.trim();
+  const match = OPEN_TAG.exec(trimmed);
   if (!match) return null;
 
-  const attrs = parseAttributes(match[1]);
-  const src = attrs.src ? safeVideoSrc(attrs.src) : null;
+  const inner = videoInner(trimmed);
+  if (inner === null || hasDisallowedInner(inner)) return null;
+
+  const attrs = parseAttributes(match[1], ALLOWED);
+  const src = (attrs.src ? safeVideoSrc(attrs.src) : null) ?? firstSourceSrc(inner);
   if (!src) return null;
 
   const autoplay = Object.hasOwn(attrs, 'autoplay');

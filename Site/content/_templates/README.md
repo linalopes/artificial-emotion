@@ -341,9 +341,10 @@ Obsidian.
 ### video
 
 Ordinary `<video>` HTML is allowed through the site’s controlled sanitizer.
-Use a complete `<video …></video>` block and an HTTPS `src` only.
-Inline `style` may be kept for Obsidian; the site drops it and sizes the
-video with CSS.
+Use a complete `<video …></video>` block and an HTTPS file. Inline `style`
+may be kept for Obsidian; the site drops it and sizes the video with CSS.
+
+Prefer a direct `src` on the `<video>` tag:
 
 ```html
 <video
@@ -357,8 +358,21 @@ video with CSS.
 ></video>
 ```
 
-Allowed attributes: `src`, `controls`, `autoplay`, `muted`, `loop`,
+A nested `<source>` is also accepted. The first valid HTTPS `video/mp4`
+source is used; the published page still renders a single `<video src="…">`.
+
+```html
+<video autoplay muted loop controls playsinline>
+  <source src="https://res.cloudinary.com/example/video/upload/clip.mp4" type="video/mp4">
+</video>
+```
+
+If both a video `src` and a nested `<source>` are present, the video `src`
+wins when it is a valid HTTPS URL.
+
+Allowed `<video>` attributes: `src`, `controls`, `autoplay`, `muted`, `loop`,
 `playsinline`, `preload`, `poster`, `width`, `height`, `aria-label`.
+Allowed `<source>` attributes: `src`, `type`.
 If `autoplay` is present, the site also requires `muted` and `playsinline`.
 
 ### Obsidian SVG embeds
