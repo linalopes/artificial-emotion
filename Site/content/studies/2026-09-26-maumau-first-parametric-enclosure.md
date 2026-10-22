@@ -16,7 +16,6 @@ tags:
   - acrylic
   - parametric-design
   - grasshopper
-  - raven
   - t-slot
   - mechanical-connections
   - 28byj-48

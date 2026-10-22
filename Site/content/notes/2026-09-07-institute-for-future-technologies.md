@@ -16,7 +16,7 @@ tags:
   - sensitive-machines
   - creative-technology
   - engineering-education
-  - France
+  - france
 related: []
 draft: false
 ---

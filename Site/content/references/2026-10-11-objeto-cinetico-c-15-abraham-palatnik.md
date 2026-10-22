@@ -65,7 +65,7 @@ By 1969, Palatnik had already spent approximately two decades investigating the 
 
 His first *Aparelhos Cinecromáticos* (Kinechromatic Devices), begun around 1949, concealed moving mechanisms behind a luminous surface. Motors and colored lights produced an image that changed over time, while the machinery itself remained largely out of sight.
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/EgIwO4p1PNE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/EgIwO4p1PNE" title="Abraham Palatnik, Aparelho cinecromático S-14" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 _Abraham Palatnik. Aparelho cinecromático S-14  (Kinechromatic Apparatus S-14. 1957–58). [source](https://www.moma.org/magazine/articles/318)_
 
@@ -75,10 +75,10 @@ The *Relevos Progressivos*, emerging in the mid-1960s, extended his investigatio
 
 So *C-15* is not Palatnik's first experiment with kinetics. It belongs to a mature phase, after he had already investigated **light as movement, invisible forces, and movement as a visible material**.
 
-![](https://midias-publicas.enciclopedia.itaucultural.org.br/a49vqzbv74pt03wbkr69dnp4691d)
+![Abraham Palatnik, Objeto Cinético, 1964](https://midias-publicas.enciclopedia.itaucultural.org.br/a49vqzbv74pt03wbkr69dnp4691d)
 _Photo: Objeto Cinético, 1964. [source](https://enciclopedia.itaucultural.org.br/obras/105224-objeto-cinetico)_
 
-![](https://files.ocula.com/anzax/a6/a647f53b-0844-4798-8d21-8152da41b719_1200_800.JPG)
+![Abraham Palatnik, Objeto Cinético K-06, 1966](https://files.ocula.com/anzax/a6/a647f53b-0844-4798-8d21-8152da41b719_1200_800.JPG)
 _Photo: Objeto Cinético K-06, 1966._
 
 ### He was also an industrial inventor
@@ -115,7 +115,7 @@ The effect is not just sculpture plus motion. It is closer to a **three-dimensio
 
 And one warning for the reconstruction: not every line in a frontal photograph is necessarily metal. Some visible curves and marks may be cast shadows. A photograph with a different light direction, and ideally a side view, is necessary to distinguish the actual construction.
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791727004/Objeto_Cine%CC%81tico_C-15_XYZ.png](https://res.cloudinary.com/da1flkgyb/image/upload/v1791727004/Objeto_Cine%CC%81tico_C-15_XYZ.png)
+![Spatial diagram of Objeto Cinético C-15](https://res.cloudinary.com/da1flkgyb/image/upload/v1791727004/Objeto_Cine%CC%81tico_C-15_XYZ.png)
 ### Why the shadows matter
 
 The cast shadows make the machine's geometry appear to multiply. A rod and its shadow are similar lines with different spatial positions. As the rod moves, the shadow also moves, but its displacement depends on the light source and the distance to the background.
@@ -142,7 +142,7 @@ A curved rod does not necessarily imply that the rod itself is a mechanical guid
 
 I want to measure what the tips of these rods actually do over time: full rotation, limited oscillation, an eccentric path, or a more complicated path transmitted by another linkage?
 
-![](https://uploads6.wikiart.org/images/abraham-palatnik/kinetic-object-1999.jpg)
+![Abraham Palatnik, Kinetic Object, 1999](https://uploads6.wikiart.org/images/abraham-palatnik/kinetic-object-1999.jpg)
 _Photo: Kinetic Object, 1999 [source](https://www.wikiart.org/en/abraham-palatnik/kinetic-object-1999)_
 
 ### 2. Fixed mechanical guides and pins
@@ -159,7 +159,7 @@ I want the reconstruction notes to distinguish:
 
 They may look similar in a photograph, but they serve different mechanical roles.
 
-![](https://design-milk.com/images/2022/01/Abraham_Palatnik_Nara_Roesler_06.jpg)
+![Abraham Palatnik, Objeto Cinético, 1968/2006](https://design-milk.com/images/2022/01/Abraham_Palatnik_Nara_Roesler_06.jpg)
 _Photo: Objecto Cinético, 1968/2006. [source](https://design-milk.com/abraham-palatnik-7-decades-of-pushing-artistic-possibilities/)_
 
 ![](https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/5c143668066981.5e90bb44c6016.png)
@@ -175,7 +175,7 @@ Before attempting to solder everything, I want to investigate whether adjustable
 
 This would connect Palatnik's precision to something very close to tinkering: **iterative construction with accessible mechanical components**. That is a reading I want to test, not an established account of how he built this exact object.
 
-![borne | 200](https://www.lampfix.co.uk/web/image/product.product/33942/image_1024/%5B02110%5D%20Micro%20Screw%20Terminal%20Core%20Connector%20Brass?unique=05680a3)
+![borne](https://www.lampfix.co.uk/web/image/product.product/33942/image_1024/%5B02110%5D%20Micro%20Screw%20Terminal%20Core%20Connector%20Brass?unique=05680a3)
 _Photo: Micro Screw Terminal Core Connector. [source](https://www.lampfix.co.uk/shop/02110-micro-screw-terminal-core-connector-brass-22398)_
 
 ### 4. Motors along the lower edge
@@ -186,7 +186,7 @@ However, a frontal photo does not tell us which components are actual motors, wh
 
 I want a rear view, a detail of the drive shafts, and ideally footage of a full operating cycle before deciding how to reproduce the original movement distribution.
 
-![](https://ceugaleria.com.br/galeria/wp-content/uploads/2024/12/Os-Pioneiros-da-Arte-Digital-no-Brasil-que-Voce-Deve-Conhecer.jpeg)
+![Chromatic gears in a Palatnik kinetic work](https://ceugaleria.com.br/galeria/wp-content/uploads/2024/12/Os-Pioneiros-da-Arte-Digital-no-Brasil-que-Voce-Deve-Conhecer.jpeg)
 Photo: Chromatic gears move the artwork. [source](https://ceugaleria.com.br/os-pioneiros-da-arte-digital-no-brasil-que-voce-deve-conhecer/)
 
 ### 5. Magnets — an intriguing hypothesis about control
@@ -276,7 +276,7 @@ Only after that should I decide whether the next version calls for one motor, se
 4. How much does the apparent movement change with shadow distance and light direction?
 5. Which connections must be rigid, which adjustable, and which must act as bearings or pivots?
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/fKiZb8MA-bk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/fKiZb8MA-bk" title="Abraham Palatnik kinetic works, Itaú Cultural" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 _Video: [source](https://www.itaucultural.org.br/ocupacao/abraham-palatnik/videos/)_
 
 ---

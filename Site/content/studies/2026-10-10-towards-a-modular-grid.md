@@ -43,7 +43,7 @@ Rather than designing each part in isolation, the research began to consider a s
 
 The aim is not to make every mechanism identical. It is to make their points of connection intelligible to one another.
 
-![holes | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791703553/IMG_6319.webp)
+![holes](https://res.cloudinary.com/da1flkgyb/image/upload/v1791703553/IMG_6319.webp)
 
 
 ## OpenStructures as a reference
@@ -102,7 +102,7 @@ That dimension does not fall on a 20 mm grid. It would not fall directly on the 
 
 The initial temptation was to look for a grid that matched the motor. But the motor is only one component in a much larger family of mechanisms, sensors, spools, supports and housings. Other commercial parts will bring other dimensions.
 
-![motor grid | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791704922/IMG_6325.webp)
+![motor grid](https://res.cloudinary.com/da1flkgyb/image/upload/v1791704922/IMG_6325.webp)
 
 The decision is therefore to **keep the 20 mm modular grid** and develop a motor bracket whose external mounting points follow that system while its internal geometry accommodates the 35 mm motor pattern.
 
@@ -146,7 +146,7 @@ The earliest design was based on an ordinary pipe saddle: a curved bracket with 
 
 Redesigning it around OS20 changed the problem. The clamp was no longer just a way to hold one object on a tube. It became the first candidate for a **repeatable system connector**.
 
-![clamps | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791703637/IMG_6312.webp)
+![clamps](https://res.cloudinary.com/da1flkgyb/image/upload/v1791703637/IMG_6312.webp)
 ## Clamp geometry: OS20 version 0.3
 
 The OS20 version introduced four nominal M3 clearance holes, with two positions on each wing.
@@ -187,7 +187,7 @@ This changed the next design decision. Rather than adding material below the hou
 
 This small test illustrates why the modular system must develop through physical assembly, not only through diagrams.
 
-![long U | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_2347.webp)
+![long U](https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_2347.webp)
 
 ## Clamp geometry: OS20 version 0.4
 
@@ -204,7 +204,7 @@ This is a proposed correction based on the physical test, **not yet a validated 
 
 > The grid makes the mounting pattern repeatable. The physical test makes the connector usable.
 
-![clamp on grid | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_6327.webp)
+![clamp on grid](https://res.cloudinary.com/da1flkgyb/image/upload/v1791710213/IMG_6327.webp)
 
 ## Parametric fabrication
 

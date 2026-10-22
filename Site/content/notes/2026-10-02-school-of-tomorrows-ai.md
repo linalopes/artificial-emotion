@@ -19,7 +19,7 @@ tags:
   - physical-computing
   - experimental-education
   - creative-technology
-  - Switzerland
+  - switzerland
 related: []
 draft: false
 ---

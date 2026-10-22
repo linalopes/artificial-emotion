@@ -37,7 +37,7 @@ In 1920, Naum Gabo's *Kinetic Construction (Standing Wave)* used a vibrating met
 
 These dates mark different developments: an early experiment with movement as form, a name for moving sculpture, and the wider recognition of kinetic art. They are not a single moment of invention.
 
-![](https://media.tate.org.uk/art/images/work/T/T00/T00827_10.jpg)
+![Naum Gabo, Kinetic Construction (Standing Wave)](https://media.tate.org.uk/art/images/work/T/T00/T00827_10.jpg)
 
 _Photo: The Work of Naum Gabo, Nina & Graham Williams / Tate, London 2023. [Source](https://www.tate.org.uk/art/artworks/gabo-kinetic-construction-standing-wave-t00827)_
 

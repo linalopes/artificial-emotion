@@ -57,7 +57,7 @@ Munari later described the work in terms of a form growing mechanically through 
 
 
 
-![](https://www.centrepompidou.fr/media/picture/c7/fd/c7fd933e22d9e7f191cc396b4a7e4ef6/thumb_large.jpg)
+![Bruno Munari, Ora X, Centre Pompidou collection](https://www.centrepompidou.fr/media/picture/c7/fd/c7fd933e22d9e7f191cc396b4a7e4ef6/thumb_large.jpg)
 Image: Centre Pompidou collection
 
 
@@ -88,7 +88,7 @@ The prototype appears to have used an ordinary spring-driven alarm clock rather 
 
 Munari takes an already standardized everyday machine with multiple coaxial motions and assigns those motions a second function. The device still measures time, but it also becomes a system for generating visual states.
 
-![](https://www.arapacis.it/sites/default/files/storage/images/musei/museo_dell_ara_pacis/mostre_ed_eventi/mostre/bruno_munari/galleria_di_opere/prototipo_di_ora_x_1945_sveglia_contenitore_e_semidischi_colorati_trasparenti_20_x_20_x_8_cm/139215-1-ita-IT/prototipo_di_ora_x_1945_sveglia_contenitore_e_semidischi_colorati_trasparenti_20_x_20_x_8_cm.jpg)
+![Bruno Munari, Ora X 1945 prototype](https://www.arapacis.it/sites/default/files/storage/images/musei/museo_dell_ara_pacis/mostre_ed_eventi/mostre/bruno_munari/galleria_di_opere/prototipo_di_ora_x_1945_sveglia_contenitore_e_semidischi_colorati_trasparenti_20_x_20_x_8_cm/139215-1-ita-IT/prototipo_di_ora_x_1945_sveglia_contenitore_e_semidischi_colorati_trasparenti_20_x_20_x_8_cm.jpg)
 Image: Fondazione Jacqueline Vodoz e Bruno Danese —  prototype in collection
 
 
@@ -306,7 +306,7 @@ The exhibition provides an important theoretical and historical context for the 
 
 ### *Tetracono* — 1965
 
-<iframe title="vimeo-player" src="https://player.vimeo.com/video/218525789?h=e81275c4ab" width="640" height="360" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"   allowfullscreen></iframe>
+<iframe title="Bruno Munari, Tetracono" src="https://player.vimeo.com/video/218525789?h=e81275c4ab" width="640" height="360" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"   allowfullscreen></iframe>
 [source](https://vimeo.com/218525789)
 
 *Tetracono* develops programmed kinetic variation further. Four cones painted in contrasting colors rotate according to a mechanically defined system inside a cubic structure.

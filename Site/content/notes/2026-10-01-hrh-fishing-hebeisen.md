@@ -24,7 +24,7 @@ tags:
   - fishing
   - braided-line
   - knots
-  - swivels
+  - swivel
   - tension
   - kinetic-mechanisms
   - local-sourcing
@@ -111,7 +111,7 @@ I do not need to reproduce fishing techniques literally. What is useful is recog
 
 The fishing shop therefore becomes less a source of specialised hobby equipment and more a **local library of mechanical possibilities**.
 
-## Earlier use: Petal for Tree
+## Earlier use: A Petal for Three
 
 This is not the first time fishing materials have entered my kinetic practice.
 
@@ -125,7 +125,7 @@ For anyone curious about that earlier experiment:
   width="100%"
   height="400"
   src="https://www.youtube.com/embed/X0ZeQHydlrY"
-  title="Petal for Tree"
+  title="A Petal for Three"
   frameborder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen>

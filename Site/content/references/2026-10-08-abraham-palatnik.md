@@ -84,7 +84,7 @@ He began moving away from figurative painting and toward a freer investigation o
 
 And the route he found drew on something else he already knew: **mechanics**.
 
-![](https://res.cloudinary.com/da1flkgyb/image/upload/v1791717548/Screenshot_2026-10-11_at_13.17.42.webp)
+![Abraham Palatnik work on Google Arts & Culture](https://res.cloudinary.com/da1flkgyb/image/upload/v1791717548/Screenshot_2026-10-11_at_13.17.42.webp)
 [Check Google Arts & Culture ↗](https://artsandculture.google.com/story/abraham-palatnik-ccbb-rio/4QXhXk2Xd4r6KQ)
 
 
@@ -100,7 +100,7 @@ They are often built as boxes containing **light bulbs, moving elements, a motor
 
 The mechanics are largely **hidden**.
 
-![palatinik | 800](https://www.moma.org/media/W1siZiIsIjQ1MTI1NyJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA5MCAtcmVzaXplIDIwMDB4MjAwMFx1MDAzZSJdXQ.jpg?sha=29684e17a925acba)
+![palatinik](https://www.moma.org/media/W1siZiIsIjQ1MTI1NyJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA5MCAtcmVzaXplIDIwMDB4MjAwMFx1MDAzZSJdXQ.jpg?sha=29684e17a925acba)
 Photo: MoMA [source](https://www.moma.org/collection/works/112200)
 
 What interests me here is the reversal of the usual relationship between a machine and an image.
@@ -129,7 +129,7 @@ This seems like a major conceptual transition:
 
 That is particularly relevant to the physical language I am trying to develop in *Artificial Emotion*.
 
-![Objeto Cinético K-66 | 800](https://static-assets.artlogic.net/w_790,h_700,c_limit,f_auto,fl_lossy/ws-nararoesler/usr/images/exhibitions/images_and_objects/28/24308_1_everton-ballardin.jpg)
+![Objeto Cinético K-66](https://static-assets.artlogic.net/w_790,h_700,c_limit,f_auto,fl_lossy/ws-nararoesler/usr/images/exhibitions/images_and_objects/28/24308_1_everton-ballardin.jpg)
 Photo: [source](https://nararoesler.art/en/exhibitions/28/)
 
 ---
@@ -144,7 +144,7 @@ There is an especially valuable technical case study in the Getty publication **
 
 They opened the work, examined its original construction, and documented the problems that appeared during conservation.
 
-![Cinechromatic Device Under Construction | 800](http://ecoarte.info/wp-content/uploads/2019/06/aparelho.gif)
+![Cinechromatic Device Under Construction](https://ecoarte.info/wp-content/uploads/2019/06/aparelho.gif)
 
 And here is a wonderful concrete detail:
 
@@ -164,7 +164,7 @@ This is an excellent example of how conservation becomes a form of reverse engin
 
 And there is an important limit to this finding: **the SAPMI Type 392 is documented in this one work. We cannot conclude it was Palatnik's favorite motor or that he used it across his entire practice.**
 
-![interior | 800](https://www.getty.edu/publications/keepitmoving/assets/img/figures/fig-9-11-gillies.jpg)
+![interior](https://www.getty.edu/publications/keepitmoving/assets/img/figures/fig-9-11-gillies.jpg)
 Photo: A detail of the interior of Abraham Palatnik’s _Aparelho cinecromático_ (Chromo-kinetic set), 1962. [source](https://www.getty.edu/publications/keepitmoving/collections/9-gillies/)
 
 ## What about the thin metallic rods? Are they aluminum?

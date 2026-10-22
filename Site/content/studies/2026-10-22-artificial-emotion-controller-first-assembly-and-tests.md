@@ -10,7 +10,6 @@ status: experiment
 threads:
   - kinetic-studies
 tags:
-  - artificial-emotion
   - electronics
   - pcb-design
   - pcb-assembly
@@ -33,16 +32,16 @@ cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1792648927/IMG_2456.we
 gallery:
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1792648994/IMG_6416.mp4
-    alt: First experiments with the assembled Artificial Emotion Controller
+    caption: First experiments with the assembled Artificial Emotion Controller
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1792648930/IMG_2454.mp4
-    alt: Testing the first assembled controller
+    caption: Testing the first assembled controller
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1792648927/IMG_2456.webp
     alt: The assembled Artificial Emotion Controller PCB
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1792648860/IMG_6418.mp4
-    alt: The Artificial Emotion Controller running a motor movement test
+    caption: The Artificial Emotion Controller running a motor movement test
 
 draft: false
 ---
@@ -71,7 +70,7 @@ I checked the power path with a multimeter: the incoming 5V, the jumpers and the
 
 The connections defined by the circuit were correct; the labels printed on the board were not. Correcting how I connected the external power supply allowed the motor to receive 5V and the movement tests to proceed.
 
-![The external power connector with reversed 5V and GND silkscreen labels | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1792648932/IMG_6419.webp)
+![The external power connector with reversed 5V and GND silkscreen labels](https://res.cloudinary.com/da1flkgyb/image/upload/v1792648932/IMG_6419.webp)
 
 This is a small error in a drawing, but not a small error for the person using the board. Silkscreen is part of the interface: it tells someone where to put a wire and what to expect from a connector. A misleading label can make a functional circuit appear broken and, in the case of power, can create a risk of incorrect connections.
 

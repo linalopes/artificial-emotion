@@ -30,7 +30,7 @@ gallery:
     alt: first physical heartbeat slit animation prototype
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791225352/IMG_6158.mp4
-    alt: rotating slit mask revealing the heartbeat animation
+    caption: Rotating slit mask revealing the heartbeat animation
 
 draft: false
 ---
@@ -198,7 +198,7 @@ The rotating layer needs a central hub that is:
 - removable;
 - capable of holding the mask without introducing wobble.
 
-![discs | 600](https://res.cloudinary.com/da1flkgyb/image/upload/v1791267492/IMG_6161.webp)
+![discs](https://res.cloudinary.com/da1flkgyb/image/upload/v1791267492/IMG_6161.webp)
 
 ## What worked
 

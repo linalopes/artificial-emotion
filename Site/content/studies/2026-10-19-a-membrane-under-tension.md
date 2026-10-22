@@ -8,7 +8,6 @@ status: experiment
 threads:
   - soft-mechanisms
 tags:
-  - soft-mechanisms
   - kinetic-textiles
   - membranes
   - nylon-mesh
@@ -34,10 +33,10 @@ gallery:
     alt: Reinforced corner and metal eyelet at a textile tension point
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1792650553/IMG_6376.mp4
-    alt: Hand-pulling test of the textile membrane across the perforated frame
+    caption: Hand-pulling test of the textile membrane across the perforated frame
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1792650551/IMG_6377.mp4
-    alt: Second manual tension and deformation test of the modular membrane
+    caption: Second manual tension and deformation test of the modular membrane
 draft: false
 ---
 

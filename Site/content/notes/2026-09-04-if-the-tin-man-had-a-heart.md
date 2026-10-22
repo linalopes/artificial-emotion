@@ -138,6 +138,6 @@ At IFT, Mariana Tamashiro works across creative learning, design and technology,
 
 The environment around the hackathon — engineers prototyping quickly, physical materials mixed with code, and permission to make incomplete things — became one of the conditions from which *Artificial Emotion* emerged.
 
-![](https://res.cloudinary.com/da1flkgyb/image/upload/v1791789673/DSCF4836.remini-enhanced.webp)
+![The wider group at IFT during the week in Paris](https://res.cloudinary.com/da1flkgyb/image/upload/v1791789673/DSCF4836.remini-enhanced.webp)
 
 Photo: The wider group at IFT during the week in Paris.

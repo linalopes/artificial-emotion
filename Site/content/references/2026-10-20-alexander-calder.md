@@ -72,7 +72,7 @@ The circus soon became a sustained project: an entire small world of physical fi
 
 ## 1926: Paris and the *Cirque Calder*
 
-![](https://imgix.bustle.com/uploads/image/2025/11/20/094577d8/wmag0625featurecalderhrrgb-1.jpg?w=768&h=960&fit=crop&crop=focalpoint&dpr=2&fp-x=0.4046&fp-y=0.5874)
+![Alexander Calder in Paris in 1930 with Cirque Calder](https://imgix.bustle.com/uploads/image/2025/11/20/094577d8/wmag0625featurecalderhrrgb-1.jpg?w=768&h=960&fit=crop&crop=focalpoint&dpr=2&fp-x=0.4046&fp-y=0.5874)
 
 Photo: Alexander Calder, in Paris in 1930, with Cirque Calder, 1926–31. Photo by George Hoyningen-Huene, [source](https://www.wmagazine.com/culture/alexander-calder-gardens-fondation-louis-vuitton-paris)
 
@@ -93,7 +93,7 @@ Calder transported the circus in suitcases and performed it for audiences in fri
 
 **Watch / explore:** [Whitney Museum — Calder's Circus](https://whitney.org/collection/series/5488) · [High Wire: Calder's Circus at 100](https://whitney.org/exhibitions/calders-circus)
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/t6jwnu8Izy0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/t6jwnu8Izy0" title="Alexander Calder, Cirque Calder" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 ### The mechanics of performance
@@ -124,7 +124,7 @@ A particularly important encounter occurred in **October 1930**, when Calder vis
 
 ### Joan Miró: organic forms and visual play
 
-![](https://www.kunstbeziehung.de/img/w/5e5f84573cb94/A_P1780091.JPG)
+![Joan Miró, Painting (Head and Spider), 1925](https://www.kunstbeziehung.de/img/w/5e5f84573cb94/A_P1780091.JPG)
 
 _Photo: Painting (Head and Spider), 1925. [sorce](https://www.kunstbeziehung.de/work.php?wCode=5e5f84573cb94)_
 
@@ -136,7 +136,7 @@ Calder met **Joan Miró** in **1928**, beginning a lasting friendship. Their wor
 
 ### Jean Arp: the name *stabile*
 
-![](https://omekas.prattsi.org/files/large/2944d1bec3af2e615962d1cf8b2d51808ad02453.jpg)
+![Jean Arp, Growth (Croissance), 1938](https://omekas.prattsi.org/files/large/2944d1bec3af2e615962d1cf8b2d51808ad02453.jpg)
 
 _Photo: Growth ( Croissance ), 1938. [source](https://omekas.prattsi.org/s/biomorphic-sculptures-in-1900s/page/growth-croissance)_
 
@@ -158,7 +158,7 @@ A sculpture might contain slow and fast elements, small and large displacements,
 
 ### *Pantograph* (1931)
 
-![](https://calder.org/wp-content/uploads/2020/11/Pantograph_1931-2048x2048.jpg)
+![Alexander Calder, Pantograph, 1931](https://calder.org/wp-content/uploads/2020/11/Pantograph_1931-2048x2048.jpg)
 
 _**Work:** [Pantograph (1931) — Calder Foundation](https://calder.org/works/standing-mobile/pantograph-1931-2/)_
 
@@ -170,11 +170,11 @@ The title refers to a pantograph, a device for mechanically reproducing or trans
 
 ### *Double Arc and Sphere* (1932)
 
-![](https://calder.org/wp-content/uploads/works/double-arc-and-sphere-1932/double-arc-and-sphere-1932-1537x2048.jpg)
+![Alexander Calder, Double Arc and Sphere, 1932](https://calder.org/wp-content/uploads/works/double-arc-and-sphere-1932/double-arc-and-sphere-1932-1537x2048.jpg)
 
 _**Work:** [Double Arc and Sphere (1932) — Calder Foundation](https://calder.org/works/standing-mobile/double-arc-and-sphere-1932/)_
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/l1NV-9DYrI4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/l1NV-9DYrI4" title="Alexander Calder, Double Arc and Sphere, 1932" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 _**Video:** [Watch *Double Arc and Sphere* in motion](https://www.youtube.com/watch?v=l1NV-9DYrI4)_
 
@@ -186,7 +186,7 @@ This is a particularly useful study of how an arrangement of relatively simple g
 
 ### *Dancing Torpedo Shape* (1932)
 
-![](https://calder.org/wp-content/uploads/works/dancing-torpedo-shape-1932/dancing-torpedo-shape-1932-1602x2048.jpg)
+![Alexander Calder, Dancing Torpedo Shape, 1932](https://calder.org/wp-content/uploads/works/dancing-torpedo-shape-1932/dancing-torpedo-shape-1932-1602x2048.jpg)
 
 _**Work:** [Dancing Torpedo Shape (1932) — Calder Foundation](https://calder.org/works/standing-mobile/dancing-torpedo-shape-1932/)_
 
@@ -196,7 +196,7 @@ An elongated black form, a small metal element, and a sphere belong to an arrang
 
 ### *Half-circle, Quarter-circle and Sphere* (1932)
 
-![](https://calder.org/wp-content/uploads/2020/11/Half-circle-Quarter-circle-and-Sphere-1932-1537x2048.jpg)
+![Alexander Calder, Half-circle, Quarter-circle and Sphere, 1932](https://calder.org/wp-content/uploads/2020/11/Half-circle-Quarter-circle-and-Sphere-1932-1537x2048.jpg)
 
 _**Work:** [Half-circle, Quarter-circle and Sphere (1932) — Calder Foundation](https://calder.org/works/standing-mobile/half-circle-quarter-circle-and-sphere-1932/)_
 
@@ -206,7 +206,7 @@ This motorized construction combines geometric metal shapes with a comparatively
 
 ### *Machine motorisée* (1933)
 
-![](https://calder.org/wp-content/uploads/works/machine-motorisee-1933/machine-motorisee-1933-1636x2048.jpg)
+![Alexander Calder, Machine motorisée, 1933](https://calder.org/wp-content/uploads/works/machine-motorisee-1933/machine-motorisee-1933-1636x2048.jpg)
 
 _**Work:** [Machine motorisée (1933) — Calder Foundation](https://calder.org/works/standing-mobile/machine-motorisee-1933/)_
 
@@ -216,7 +216,7 @@ Made of **wood, wire, paint, and a motor**, this work has an especially useful a
 
 ### *A Universe* (1934): motors did not immediately disappear
 
-![](https://calder.org/wp-content/uploads/works/a-universe-1934/a-universe-1934-1621x2048.jpg)
+![Alexander Calder, A Universe, 1934](https://calder.org/wp-content/uploads/works/a-universe-1934/a-universe-1934-1621x2048.jpg)
 
 _**Work:** [A Universe (1934) — Calder Foundation](https://calder.org/works/standing-mobile/a-universe-1934/)_
 
@@ -241,7 +241,7 @@ The suspended mobile allowed him to design conditions without prescribing every 
 
 ### What changes in a suspended mobile?
 
-![](https://calder.org/wp-content/uploads/historical-photos/lobster-trap-and-fish-tail-1949/lobster-trap-and-fish-tail-1949-1720x2048.jpg)
+![Alexander Calder, Lobster Trap and Fish Tail, 1939](https://calder.org/wp-content/uploads/historical-photos/lobster-trap-and-fish-tail-1949/lobster-trap-and-fish-tail-1949-1720x2048.jpg)
 
 _[See *Lobster Trap and Fish Tail* (1939) at MoMA](https://www.moma.org/collection/works/81621)_
 
@@ -267,7 +267,7 @@ The filmmaker **Jean Painlevé** filmed Calder's moving constructions in **1933*
 
 ## Metal was not merely an aesthetic signature
 
-![](https://calder.org/wp-content/uploads/works/portrait-of-a-man-c-1928/portrait-of-a-man-c-1928-1714x2048.jpg)
+![Alexander Calder, Portrait of a Man, 1928](https://calder.org/wp-content/uploads/works/portrait-of-a-man-c-1928/portrait-of-a-man-c-1928-1714x2048.jpg)
 
 _Photo: Portrait of a Man, 1928 [source](https://www.moma.org/collection/works/81898)_
 

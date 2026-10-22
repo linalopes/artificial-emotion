@@ -52,7 +52,7 @@ What interests me here is how uncomplicated the tooling can be. The paper is sim
 <!-- IMAGE PLACEHOLDER: photograph showing the folded paper-fabric sandwich.
 Source and image credit: original Instructables tutorial; verify reuse rights. -->
 
-![](https://content.instructables.com/FFK/P656/ISCAZYVP/FFKP656ISCAZYVP.jpg?auto=webp&width=1600&height=900&fit=bounds&md=MjAxNi0wOC0yOCAyMjowMDowNC4w)
+![Paper-mold origami fabric after heat-setting](https://content.instructables.com/FFK/P656/ISCAZYVP/FFKP656ISCAZYVP.jpg?auto=webp&width=1600&height=900&fit=bounds&md=MjAxNi0wOC0yOCAyMjowMDowNC4w)
 
 _Photo: Check the Results. [source](https://www.instructables.com/Paper-Mold-Origami-Fabrics-2-V-Grid/)_
 
@@ -72,7 +72,7 @@ A particularly useful distinction emerges between **retaining a crease** and **s
 
 For *Artificial Emotion*, this raises a question beyond whether organza can be pleated: what happens to the movement when the **cell size, stiffness and scale** change?
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/LYaUGTcZfv8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/LYaUGTcZfv8" title="Uyen Nguyen, Folding Fabric: Fashion from Origami" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 
@@ -94,7 +94,7 @@ The Cooper Hewitt account describes a paper mold that holds polyester in its fol
 
 What is compelling here is not simply the resemblance to folded paper. It is the combination of **transparency, physical memory and reversible-looking movement**. The textile can be compressed into a dense object and expanded into a larger, lighter surface.
 
-![](https://collections-images.lacma.org/images/133888/133888-7-primary.webp)
+![Reiko Sudō / NUNO, Origami Pleats, 1997](https://collections-images.lacma.org/images/133888/133888-7-primary.webp)
 
 _Photo: Reiko Sudō, Hiroko Kobayashi, Mizue Okada, Nuno Corporation, Takekura Co., Ltd., _Textile Length, 'Origami Pleats' from 'Origami' Series_, 1997 (alternate view), Los Angeles County Museum of Art, Gift of Grace Tsao, photo © Museum Associates/LACMA. [source](https://collections.lacma.org/object/133888)_
 

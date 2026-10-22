@@ -28,13 +28,13 @@ gallery:
     alt: atelier table
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791125429/C6CBF710-36AF-4B76-B678-B9E69D411401.mp4
-    alt: paper heart tests
+    caption: Paper heart tests
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791128924/IMG_6123.webp
     alt: paper heart studies
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791128258/IMG_6149.mp4
-    alt: moviment of the paper heart
+    caption: Movement of the paper heart
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791128924/IMG_6135.webp
     alt: papers on table
@@ -120,7 +120,7 @@ Most of the movement still comes from the folds.
 
 The printed part simply gives the mechanism a stable point from which to act.
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6150.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6150.webp)
+![3D-printed brace on the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6150.webp)
 
 ## Finding the right paper
 
@@ -177,17 +177,17 @@ The template and brace are still being refined as the study develops.
 
 ## Assemble
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6142.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6142.webp)
+![Assembling the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6142.webp)
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6144.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6144.webp)
+![Assembling the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6144.webp)
 
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6145.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6145.webp)
+![Assembling the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6145.webp)
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128514/IMG_6146.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128514/IMG_6146.webp)
+![Assembling the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128514/IMG_6146.webp)
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6147.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6147.webp)
+![Assembling the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6147.webp)
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6148.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6148.webp)
+![Assembling the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128256/IMG_6148.webp)
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6152.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6152.webp)
+![Assembling the paper heart](https://res.cloudinary.com/da1flkgyb/image/upload/v1791128257/IMG_6152.webp)

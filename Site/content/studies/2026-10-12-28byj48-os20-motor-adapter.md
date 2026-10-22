@@ -54,7 +54,7 @@ The initial drawing proposes a **U-shaped printed bracket** running around the m
 
 A new mounting ear extends beyond the clip to establish a **40 mm distance between the outer mounting centres**. The additional 5 mm is placed on one side, rather than being divided symmetrically.
 
-![Initial hand sketch showing the U-shaped motor adapter, the M3 attachment, snap-fit clip and 40 mm external spacing | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791808578/scketch-adapter.webp)
+![Initial hand sketch showing the U-shaped motor adapter, the M3 attachment, snap-fit clip and 40 mm external spacing](https://res.cloudinary.com/da1flkgyb/image/upload/v1791808578/scketch-adapter.webp)
 
 This asymmetry is intentional: it prioritizes a compact adapter that follows the existing motor geometry. It does **not** mean the motor shaft is centered on the grid.
 

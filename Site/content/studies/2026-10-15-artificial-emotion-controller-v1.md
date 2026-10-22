@@ -10,7 +10,6 @@ status: experiment
 threads:
   - kinetic-studies
 tags:
-  - artificial-emotion
   - electronics
   - pcb-design
   - kicad
@@ -46,7 +45,7 @@ The first version is designed around an **ESP32-S3 SuperMini** and a **ULN2003A*
 
 I developed the schematic and PCB layout in **KiCad 10**. Instead of treating the circuit only as a set of electrical relationships, I also had to decide where each connector would sit, how traces would travel across the board and how someone would interact with the physical object while testing a mechanism.
 
-![PCB layout in the KiCad editor, showing the routing and physical arrangement of the Artificial Emotion Controller | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1792137732/Screenshot_2026-10-16_at_09.59.32.webp)
+![PCB layout in the KiCad editor, showing the routing and physical arrangement of the Artificial Emotion Controller](https://res.cloudinary.com/da1flkgyb/image/upload/v1792137732/Screenshot_2026-10-16_at_09.59.32.webp)
 
 ## Organizing the connections
 

@@ -128,7 +128,7 @@ And later he did indeed write important theoretical texts, including:
 **Arte come mestiere** — 1966
 (*Design as Art* in the English edition)
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/EysmeN6CPII" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/EysmeN6CPII" title="Bruno Munari, Design as Art" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 **Design e comunicazione visiva** — 1968
 
@@ -198,7 +198,7 @@ They are machines **deliberately freed from the obligation to produce something 
 
 They are made with threads, rods, lightweight forms, cardboard, and similar materials. Suspended in space, they remain balanced and are moved by small air currents.
 
-![](https://uploads6.wikiart.org/images/bruno-munari/useless-machine-arrhythmic-carousel-1953.jpg%21Large.jpg)
+![Bruno Munari, Useless Machine (Arrhythmic Carousel), 1953](https://uploads6.wikiart.org/images/bruno-munari/useless-machine-arrhythmic-carousel-1953.jpg%21Large.jpg)
 
 Photo: Useless Machine (Arrhythmic Carousel). [source](https://www.wikiart.org/en/bruno-munari/useless-machine-arrhythmic-carousel-1953)
 
@@ -240,7 +240,7 @@ That feels incredibly contemporary.
 
 ---
 
-![ora X | 600](https://files.ocula.com/ri/73/73dd78ef-a185-4ec7-8814-fc5d70666263/1600/1614/lora-x-by-bruno-munari.webp)
+![ora X](https://files.ocula.com/ri/73/73dd78ef-a185-4ec7-8814-fc5d70666263/1600/1614/lora-x-by-bruno-munari.webp)
 Photo: L'ora X, 1963 [source](https://ocula.com/art-galleries/andrew-kreps-gallery/artworks/bruno-munari/lora-x/)
 # So why the clock?
 
@@ -300,7 +300,7 @@ And that, for me, is one of the major shifts in his work.
 
 ---
 
-![](https://www.munart.org/images/bruno-munari-disegni-di-macchine-inutili.jpg)
+![Bruno Munari, drawings of macchine inutili](https://www.munart.org/images/bruno-munari-disegni-di-macchine-inutili.jpg)
 Photo: disegni di _macchine inutili_ pubblicate sul libro _Arte come mestiere_, Laterza. [source](https://www.munart.org/index.php?p=9)
 
 # And the graphic dimension is absolutely central

@@ -13,8 +13,7 @@ tags:
   - miura-ori
   - folding
   - heat-setting
-  - textiles
-  - soft-mechanisms
+  - textile
 related:
   - studies/paper-heart
   - references/from-paper-molds-to-folded-textiles
@@ -36,7 +35,7 @@ Rather than beginning with a digitally fabricated mold, I wanted to fold the pap
 </video>
 
 
-![](https://res.cloudinary.com/da1flkgyb/image/upload/v1792645080/IMG_6391.webp)
+![Hand-folded Miura-ori paper mold](https://res.cloudinary.com/da1flkgyb/image/upload/v1792645080/IMG_6391.webp)
 
 ## Setup
 
@@ -66,7 +65,7 @@ I preheated the electric oven for 10 minutes at 65 °C, placed the folded sandwi
 
 This is a record of the parameters used in one studio experiment, **not a validated oven protocol**. Future tests should take account of the fire risk of paper and textiles in ovens, the accuracy of oven temperature controls, and the suitability of the equipment for heat-setting.
 
-![https://res.cloudinary.com/da1flkgyb/image/upload/v1792645080/IMG_6397.webp](https://res.cloudinary.com/da1flkgyb/image/upload/v1792645080/IMG_6397.webp)
+![Heat-set Miura-ori organza](https://res.cloudinary.com/da1flkgyb/image/upload/v1792645080/IMG_6397.webp)
 
 ## Observation
 

@@ -23,14 +23,13 @@ gallery:
     alt: Studio work in progress
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1790891129/IMG_6106.mp4
-    alt: Kinetic Module working
+    caption: Kinetic Module working
 
 threads:
   - soft-mechanisms
   - kinetic-studies
   - heartbeat-biosignals
 tags:
-  - open-studio
   - public-research
   - wetzikon
 related:

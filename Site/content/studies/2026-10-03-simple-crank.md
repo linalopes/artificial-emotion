@@ -26,7 +26,7 @@ cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1791131557/IMG_6141.we
 gallery:
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791131559/IMG_6121.mp4
-    alt: testing the crank mechanism
+    caption: Testing the crank mechanism
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791131557/IMG_6134.webp
     alt: wood block and bent brass wire crank
@@ -38,7 +38,7 @@ gallery:
     alt: assembling the wood and wire mechanism
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1791131555/IMG_6114.mp4
-    alt: hand-cranked reciprocating movement
+    caption: Hand-cranked reciprocating movement
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1791131555/IMG_6122.webp
     alt: crank mechanism prototype

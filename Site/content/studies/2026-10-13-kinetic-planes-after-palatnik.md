@@ -11,7 +11,6 @@ threads:
   - kinetic-studies
 tags:
   - kinetic-mechanisms
-  - abraham-palatnik
   - 28byj-48
   - stepper-motor
   - oscillating-motion
@@ -94,16 +93,16 @@ I moved from the hot-glued connection to **parametric 3D-printed interfaces in O
 
 The **shaft coupler** accepts the 28BYJ-48's nominal **5 mm double-flat profile** on one side and a **Ø2 mm output** on the other. Its output diameter is adjustable in the OpenSCAD source. Instead of relying on hot glue, the design uses **M2 set screws and captive M2 nuts**. The nuts can be inserted into open pockets **after printing**, without pausing the printer. On the motor side, the screw is oriented to press against one of the shaft's flat faces.
 
-![Documentation of the shaft-coupling development | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6366.webp)
+![Documentation of the shaft-coupling development](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6366.webp)
 
-![Detail of the coupler fabrication or fitting test | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6367.webp)
+![Detail of the coupler fabrication or fitting test](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6367.webp)
 
-![Documentation of the flange development | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6368.webp)
+![Documentation of the flange development](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974420/IMG_6368.webp)
 
 The **flange** preserves that motor-side connection but replaces the 2 mm output with a circular mounting face. It has **four M2 clearance holes**, making it possible to attach disks, arms or other experimental elements without redesigning the motor interface each time.
 
 
-![Detail of the printed connector studies | 800](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6364.webp)
+![Detail of the printed connector studies](https://res.cloudinary.com/da1flkgyb/image/upload/v1791974419/IMG_6364.webp)
 
 Both parts were **printed and physically tested**. These are working iterations rather than final standardized components: their fit, durability and repeatability will continue to inform later versions.
 
