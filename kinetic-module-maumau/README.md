@@ -70,6 +70,8 @@ kinetic-module-maumau/
 ├── spool-3dprinting.3dm
 ├── spool-3dprinting.gh
 ├── spool.stl
+├── DESIGNS/
+│   └── box-lasercutting-v2.gh
 └── ELECTRONICS/
     ├── Arduino-motor-test/
     │   └── Arduino-motor-test.ino
@@ -89,9 +91,10 @@ Mechanical design is authored in **Rhino 8** and **Grasshopper**. Electronics in
 
 ### Enclosure
 
-Sources: `box-lasercutting.3dm`, `box-lasercutting.gh`
+Original design sources: `box-lasercutting.3dm`, `box-lasercutting.gh`  
+V2 fabrication definition: `kinetic-module-maumau/DESIGNS/box-lasercutting-v2.gh`
 
-The Grasshopper definition develops a parametric laser-cut enclosure for the kinetic module.
+The Grasshopper definitions develop a parametric laser-cut enclosure for the kinetic module. The V2 work extends the original design with modular OS20 mounting patterns and a direct-to-SVG fabrication pipeline.
 
 Current prototype dimensions are approximately:
 
@@ -115,7 +118,7 @@ Current parts:
 
 There is no external Back panel in the current design. The front and rear remain open.
 
-The Top is designed to sit flush against a ceiling and includes four M5 clearance holes for ceiling attachment.
+In V2, the Top uses a center-derived OS20 mounting pattern with **four primary Ø4.5 mm M4 clearance holes on a 40 × 40 mm rectangle**, plus **two optional holes**. `ExtraMountHoles` is currently enabled, giving six Top mounting holes. The upper enclosure joint axes have been raised by **0.5 mm**, and the captive nuts may project approximately **0.3 mm above the Top**. A perfectly flush ceiling-facing surface should therefore not be assumed without addressing that protrusion.
 
 The Internal Divider is the mounting plane for the motor and guide pulley. Viewed from the open front:
 
@@ -123,11 +126,40 @@ The Internal Divider is the mounting plane for the motor and guide pulley. Viewe
 - the shaft projects through the Divider toward the front
 - the spool sits on the shaft in front of the Divider
 
-The definition also contains a fabrication pipeline: assembled 3D preview, 2D laser-cut profiles, CUT / ENGRAVE separation, part IDs, parametric laser-bed dimensions, multi-sheet placement, and experimental true-outline nesting. Current bed presets include 600 × 400 mm, 900 × 600 mm, and Custom.
+### V2 enclosure changes
 
-**The repository currently contains the Rhino / Grasshopper sources only.** Ready-to-cut SVG or DXF exports are not committed.
+The V2 design retains the six physical sheet parts, the 3 mm material system, and the front/rear openings. Its current features include:
 
-The Bottom includes a parametric guide-hole for a future sliding-tube mechanism. That relationship is still being tuned and should not be treated as a finished mechanical assembly.
+| Feature | V2 specification |
+|---|---|
+| Upper enclosure joints | Screw axes shifted +0.5 mm; existing M3 captive-nut joints retained |
+| Bottom guide opening | Square **6 × 6 mm**, intended to reduce rotation of a future sliding tube |
+| Top mounting grid | OS20, **six Ø4.5 mm** M4 clearance holes with `ExtraMountHoles = True` |
+| Right universal mounting plate | **Ten Ø3.2 mm** holes on a PCB-anchored 20 mm grid: four PCB positions plus six additional positions |
+| Left universal mounting plate | **Eight Ø3.2 mm** holes on an optimized 20 mm grid |
+
+The **Right panel** has four PCB-reference centers forming a **40 × 60 mm** rectangle. These four holes are geometrically non-overlapping but have a minimum material ligament of approximately **2.265 mm**, below the project's **3 mm** screening policy. They remain explicit, documented *PCB clearance exceptions*, not ordinary passes or proof of mechanical strength. Two other Right grid positions were omitted because they overlap Divider slots.
+
+The **Left panel** has eight mounting holes that pass the existing 3 mm geometric-ligament rule; a ninth candidate was omitted because of its proximity to a microswitch-bracket mounting opening. The two lateral patterns differ because their existing openings differ.
+
+The mounting holes make the enclosure more adaptable to PCBs, sensors, and small mechanical accessories. **Bare-hole clearance does not certify the fit of screw heads, spacers, board outlines, or attached components.** The intended PCB mounts on the *exterior* of the Right panel, but its complete physical fit still requires verification. In particular, the previously documented approximate PCB body size and the proposed 40 × 60 mm mounting-hole spacing should be checked against the actual KiCad design before claiming they describe the same board.
+
+The Bottom square opening is a guide interface only. The matching sliding tube and its homing behavior remain under development.
+
+### Laser fabrication workflow (V2)
+
+The V2 definition has a **direct Grasshopper-to-SVG exporter**, which **does not require baking geometry into Rhino**:
+
+- `1300`: canonical six-part 2D layout and SVG serializer; uses kerf-compensated source curves
+- `1305`: `ExportFabricationSvg` Boolean Toggle; exporting while `True` may rewrite the output on subsequent Grasshopper recomputations
+- `1306`: exporter report
+- `1312`: translated Top-view preview, **not** the export source
+
+The latest validated setup contains **67 closed cutting curves for all six parts**, with no duplicates or open paths. It uses a **500 × 250 mm** sheet, **5 mm** margins/spacing, **1:1 millimetre SVG** output, and **0.15 mm full-kerf compensation applied once**. The preview's sheet boundary, construction geometry, labels, and engraving are excluded from the SVG. The red line visible in Rhino's Top viewport was identified as the construction-plane X-axis, not fabrication geometry.
+
+The export target was subsequently requested to be changed to the **same folder as the active `.gh` file**, retaining the filename `kinetic-module-v2-fabrication-layout.svg`. Verify the resolved path in the exporter report: the latest conversation confirms the *request*, not that the path change was implemented and saved. Likewise, SVG export or Git commit status must be verified in the repository rather than assumed.
+
+The older fabrication workflow included experimental multi-sheet nesting. V2 instead uses a simpler direct layout, avoiding an automatic nesting step.
 
 ### Spool
 
@@ -178,7 +210,7 @@ This is the wiring assumed by the bench-test firmware.
 
 ### 2. Experimental custom PCB
 
-`kinetic-module-maumau/ELECTRONICS/PCB mau-mau/` is a KiCad experiment named **mau-mau**. It explores integrating the ESP32-S3 Super Mini, a bare ULN2003 DIP-16, a +5 V / GND screw-terminal input, and a power-indicator LED with series resistor onto a small custom board (approximately 40 × 42 mm).
+`kinetic-module-maumau/ELECTRONICS/PCB mau-mau/` is a KiCad experiment named **mau-mau**. It explores integrating the ESP32-S3 Super Mini, a bare ULN2003 DIP-16, a +5 V / GND screw-terminal input, and a power-indicator LED with series resistor onto a small custom board. The earlier README described its body as approximately 40 × 42 mm; the V2 Right mounting study instead used a provisional 40 × 60 mm four-hole pattern. **The actual PCB outline and mounting-hole coordinates must be rechecked in KiCad** before treating these descriptions as compatible.
 
 The board includes a custom symbol and through-hole footprint for the ESP32-S3 Super Mini. Silkscreen on the layout reads *Kinetic Module / Mau Mau / by Lina Lopes*.
 
@@ -242,7 +274,7 @@ The spool is the 3D-printed part. Sources are `spool-3dprinting.3dm` and `spool-
 
 ### Laser cutting
 
-The enclosure and microswitch bracket are designed for 3 mm sheet. Sources are `box-lasercutting.3dm` and `box-lasercutting.gh`. Cut-ready SVG or DXF files are not currently in the repository; they need to be exported from the Grasshopper definition.
+The enclosure and microswitch bracket are designed for 3 mm sheet. V2 fabrication is authored in `kinetic-module-maumau/DESIGNS/box-lasercutting-v2.gh`. Its exporter directly writes kerf-compensated SVG cutting paths for all six pieces, without Bake. Verify the actual output path and exported file before sending it to a laser cutter. The exporter is configured for millimetres at 1:1; confirm the physical dimensions in the laser software before cutting. The source README does not establish whether an SVG has been committed to the repository.
 
 ### PCB
 
@@ -254,7 +286,8 @@ The experimental `mau-mau` KiCad project can be opened from `kinetic-module-maum
 
 Represented now:
 
-- parametric laser-cut enclosure
+- parametric laser-cut enclosure, including V2 OS20 mounting patterns on Top and both sides
+- direct Grasshopper SVG workflow validated for six pieces / 67 cutting curves
 - parametric 3D-printed spool
 - motor-test firmware
 - experimental KiCad PCB
@@ -263,7 +296,7 @@ Still evolving:
 
 - sliding-tube / flange homing mechanism
 - final pulley, guide-hole, and switch relationship
-- fabrication exports (laser SVG/DXF; current spool STL)
+- confirmation and version control of the final V2 SVG export; regeneration of the current spool STL
 - production firmware
 - finalized controller PCB
 - physiological sensing / heartbeat interface
