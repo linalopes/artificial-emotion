@@ -1,8 +1,9 @@
 ---
 /**
- * One site-wide image lightbox. Gallery stills opt in with
- * `[data-gallery-lightbox]` + `[data-lightbox-image]`. Markdown article
- * images use `[data-lightbox-image]` alone and open without prev/next.
+ * One site-wide media lightbox.
+ * Stills opt in with `[data-lightbox-image]`. Videos opt in with
+ * `[data-lightbox-video]` and play in this same dialog, without the zoom tools.
+ * `[data-gallery-lightbox]` groups stills so previous/next can move between them.
  */
 ---
 
@@ -42,6 +43,14 @@
       </div>
     </div>
     <figcaption class="gallery-lightbox__caption" data-lightbox-caption hidden></figcaption>
+    <video
+      class="gallery-lightbox__video"
+      data-lightbox-video-media
+      controls
+      playsinline
+      preload="none"
+      hidden
+    ></video>
   </figure>
   <div class="gallery-lightbox__tools">
     <button type="button" data-lightbox-zoom-out aria-label="Zoom out">−</button>
@@ -65,7 +74,8 @@
     overscroll-behavior: none;
   }
 
-  button[data-lightbox-image] {
+  button[data-lightbox-image],
+  button[data-lightbox-video] {
     display: block;
     width: 100%;
     margin: 0;
@@ -77,7 +87,12 @@
     color: inherit;
   }
 
-  button[data-lightbox-image]:focus-visible {
+  button[data-lightbox-video] {
+    cursor: pointer;
+  }
+
+  button[data-lightbox-image]:focus-visible,
+  button[data-lightbox-video]:focus-visible {
     outline: 2px solid var(--color-link);
     outline-offset: 2px;
   }
@@ -178,6 +193,25 @@
 
   .gallery-lightbox__caption[hidden] {
     display: none;
+  }
+
+  .gallery-lightbox__video {
+    display: none;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: transparent;
+  }
+
+  .gallery-lightbox.is-video .gallery-lightbox__media,
+  .gallery-lightbox.is-video .gallery-lightbox__tools {
+    display: none;
+  }
+
+  .gallery-lightbox.is-video .gallery-lightbox__video {
+    display: block;
   }
 
   .gallery-lightbox__tools {

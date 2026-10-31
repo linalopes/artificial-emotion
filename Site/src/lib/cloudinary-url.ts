@@ -58,10 +58,11 @@ function isTransformSegment(part: string): boolean {
 }
 
 /**
- * Insert `f_auto,q_auto,c_limit,w_{width}` into a Cloudinary image URL.
+ * Insert a limit-width transform into a Cloudinary delivery URL.
+ * Images also get `f_auto`. Videos keep their container format.
  * `c_limit` never upscales. Non-Cloudinary URLs are returned unchanged.
  */
-export function cloudinaryScaledImageUrl(src: string, width: number): string {
+function cloudinaryScaledUrl(src: string, width: number, kind: 'image' | 'video'): string {
   const trimmed = src.trim();
   if (!trimmed || !Number.isFinite(width) || width <= 0) return trimmed;
 
@@ -69,7 +70,7 @@ export function cloudinaryScaledImageUrl(src: string, width: number): string {
     const url = new URL(trimmed);
     if (!isCloudinaryHost(url.hostname)) return trimmed;
 
-    const match = /\/image\/(upload|fetch|private|authenticated)\//.exec(url.pathname);
+    const match = new RegExp(`\\/${kind}\\/(upload|fetch|private|authenticated)\\/`).exec(url.pathname);
     if (!match || match.index === undefined) return trimmed;
 
     const markerEnd = match.index + match[0].length;
@@ -96,13 +97,27 @@ export function cloudinaryScaledImageUrl(src: string, width: number): string {
         return !key || !SCALE_KEYS.has(key);
       });
 
-    const transform = [`f_auto`, `q_auto`, `c_limit`, `w_${Math.round(width)}`, ...existing].join(',');
+    const prefix = kind === 'image' ? ['f_auto', 'q_auto'] : ['q_auto'];
+    const transform = [...prefix, 'c_limit', `w_${Math.round(width)}`, ...existing].join(',');
     const rest = segments.slice(transformEnd);
     url.pathname = `${head}${[transform, ...rest].join('/')}`;
     return url.toString();
   } catch {
     return trimmed;
   }
+}
+
+/**
+ * Insert `f_auto,q_auto,c_limit,w_{width}` into a Cloudinary image URL.
+ * `c_limit` never upscales. Non-Cloudinary URLs are returned unchanged.
+ */
+export function cloudinaryScaledImageUrl(src: string, width: number): string {
+  return cloudinaryScaledUrl(src, width, 'image');
+}
+
+/** Scaled still from a Cloudinary video poster URL (`so_auto` preserved). */
+export function cloudinaryGalleryPosterUrl(src: string): string {
+  return cloudinaryScaledUrl(src, GALLERY_WIDTH, 'video');
 }
 
 /** In-page gallery stills — large enough for 2x displays, not original files. */

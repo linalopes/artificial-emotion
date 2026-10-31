@@ -39,6 +39,7 @@ type CloudinaryResource = {
   filename?: string;
   context?: unknown;
   metadata?: unknown;
+  tags?: string[];
 };
 
 type CloudinaryListResponse = {
@@ -227,6 +228,11 @@ async function folderExists(
     if (status === 404) return false;
     throw error;
   }
+}
+
+function hasExactTag(resource: CloudinaryResource, tag: string): boolean {
+  if (!Array.isArray(resource.tags)) return true;
+  return resource.tags.some((item) => item === tag);
 }
 
 function isSupportedResource(resource: CloudinaryResource): boolean {
@@ -472,6 +478,43 @@ export async function getCloudinaryFolderMedia(folder: string): Promise<GalleryI
     if (status === 404) throw folderNotFoundError(name);
     const message = error instanceof Error ? error.message : 'Unknown Cloudinary error';
     throw apiError(name, message);
+  }
+}
+
+/**
+ * Public delivery URLs for image and video assets carrying an exact Cloudinary tag.
+ * Admin API only — call from Astro server code, never from the browser.
+ * An empty tag, missing credentials, or a failed request returns [] so a page can omit the section.
+ */
+export async function getCloudinaryTagMedia(tag: string): Promise<GalleryItem[]> {
+  const name = tag.trim();
+  if (!name) return [];
+
+  const credentials = readCredentials();
+  if (!credentials) {
+    console.warn(`Cloudinary tag "${name}" was not listed because credentials are missing.`);
+    return [];
+  }
+
+  try {
+    const search = {
+      max_results: String(MAX_RESULTS),
+      tags: 'true',
+      ...LIST_METADATA,
+    };
+    const [images, videos] = await Promise.all([
+      listPages(credentials, `resources/image/tags/${encodeURIComponent(name)}`, search),
+      listPages(credentials, `resources/video/tags/${encodeURIComponent(name)}`, search),
+    ]);
+
+    return [...images, ...videos]
+      .filter((resource) => isSupportedResource(resource) && hasExactTag(resource, name))
+      .map(toGalleryItem)
+      .filter((item): item is GalleryItem => item !== undefined);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown Cloudinary error';
+    console.warn(`Cloudinary tag "${name}" could not be listed: ${message}`);
+    return [];
   }
 }
 

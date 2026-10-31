@@ -6,11 +6,21 @@ import CurrentPublic from '../components/CurrentPublic.astro';
 import GenerativeWaves from '../components/GenerativeWaves.astro';
 import InstallationIntro from '../components/InstallationIntro.astro';
 import LatestStudies from '../components/LatestStudies.astro';
+import VisualArchiveStrip from '../components/VisualArchiveStrip.astro';
+import { getCloudinaryTagMedia } from '../lib/cloudinary';
 import { getPublishedResearchThreads } from '../lib/content';
 import { mediaSrc, threadPath } from '../lib/paths';
+import { prepareVisualArchive } from '../lib/visual-archive';
 import { isResearchThread, researchLogicalId } from '../lib/vocabulary';
 
 const indexLines = ['Bodies', 'Machines', 'Materials', 'Emotions', 'in circulation'];
+
+let visualArchive: ReturnType<typeof prepareVisualArchive> = [];
+try {
+  visualArchive = prepareVisualArchive(await getCloudinaryTagMedia('gallery'));
+} catch {
+  visualArchive = [];
+}
 
 const threads = (await getPublishedResearchThreads()).flatMap((entry, index) => {
   const id = researchLogicalId(entry.id);
@@ -107,6 +117,8 @@ const threads = (await getPublishedResearchThreads()).flatMap((entry, index) => 
         </ul>
       </div>
     </section>
+
+    <VisualArchiveStrip assets={visualArchive} />
 
     <InstallationIntro />
 

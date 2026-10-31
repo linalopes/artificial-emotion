@@ -1,0 +1,205 @@
+---
+/**
+ * Homepage visual stream. Assets are prepared on the server; order is shuffled
+ * in the browser once per page load.
+ */
+import type { VisualArchiveAsset } from '../lib/visual-archive';
+
+interface Props {
+  assets: VisualArchiveAsset[];
+}
+
+const { assets } = Astro.props;
+const payload = JSON.stringify(assets).replace(/</g, '\\u003c');
+---
+
+{
+  assets.length > 0 && (
+    <section class="visual-archive" data-visual-archive data-gallery-lightbox hidden aria-label="Visual archive">
+      <p class="visual-archive__label">Visual archive</p>
+      <div class="visual-archive__frame">
+        <button type="button" class="visual-archive__nav visual-archive__nav--prev" data-archive-prev>
+          Previous
+        </button>
+        <ul class="visual-archive__track" data-archive-track tabindex="0" aria-label="Project media"></ul>
+        <button type="button" class="visual-archive__nav visual-archive__nav--next" data-archive-next>
+          Next
+        </button>
+      </div>
+      <script type="application/json" data-archive-assets set:html={payload} />
+    </section>
+  )
+}
+
+<script>
+  import { mountVisualArchiveStrip } from '../scripts/visual-archive-strip';
+
+  document.querySelectorAll<HTMLElement>('[data-visual-archive]').forEach((strip) => {
+    mountVisualArchiveStrip(strip);
+  });
+</script>
+
+<style>
+  .visual-archive {
+    display: grid;
+    gap: 0.7rem;
+    width: 100%;
+    min-width: 0;
+    margin-top: calc(var(--space-7) * -1 + var(--space-5));
+  }
+
+  .visual-archive[hidden] {
+    display: none;
+  }
+
+  .visual-archive__label {
+    margin: 0;
+    padding-inline: var(--page-gutter);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: var(--weight-mono-regular);
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .visual-archive__frame {
+    position: relative;
+    min-width: 0;
+  }
+
+  .visual-archive__track {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0 var(--page-gutter) 0.15rem;
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--page-gutter);
+    scrollbar-width: none;
+    cursor: grab;
+  }
+
+  .visual-archive__track:active {
+    cursor: grabbing;
+  }
+
+  .visual-archive__track:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 3px;
+  }
+
+  .visual-archive__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .visual-archive :global(.visual-archive__item) {
+    flex: 0 0 calc(100vw - (var(--page-gutter) * 2) - 14vw);
+    aspect-ratio: 4 / 5;
+    margin: 0;
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+
+  .visual-archive :global(.visual-archive__open) {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-gray-green) 35%, var(--color-white));
+  }
+
+  .visual-archive :global(.visual-archive__open img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  .visual-archive :global(.visual-archive__play) {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--color-deep-purple) 16%, transparent);
+  }
+
+  .visual-archive :global(.visual-archive__play::after) {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translate(-32%, -50%);
+    border-style: solid;
+    border-width: 0.7rem 0 0.7rem 1.15rem;
+    border-color: transparent transparent transparent var(--color-white);
+    filter: drop-shadow(0 0 1px color-mix(in srgb, var(--color-deep-purple) 70%, transparent));
+  }
+
+  .visual-archive__nav {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .visual-archive :global(.visual-archive__item) {
+      flex-basis: calc((100vw - (var(--page-gutter) * 2) - 1.5rem) / 3);
+    }
+
+    .visual-archive__nav {
+      position: absolute;
+      top: 50%;
+      z-index: 1;
+      display: block;
+      margin: 0;
+      padding: 0.4rem 0.55rem;
+      border: 0;
+      background: color-mix(in srgb, var(--color-white) 82%, transparent);
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: var(--weight-mono-regular);
+      letter-spacing: 0.12em;
+      line-height: 1;
+      text-transform: uppercase;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+
+    .visual-archive__nav--prev {
+      left: max(0.4rem, calc(var(--page-gutter) - 0.2rem));
+    }
+
+    .visual-archive__nav--next {
+      right: max(0.4rem, calc(var(--page-gutter) - 0.2rem));
+    }
+
+    .visual-archive__nav:hover,
+    .visual-archive__nav:focus-visible {
+      color: var(--accent);
+    }
+
+    .visual-archive__nav:focus-visible {
+      outline: 2px solid var(--color-link);
+      outline-offset: 3px;
+    }
+
+    .visual-archive__nav:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .visual-archive__track {
+      scroll-behavior: auto;
+    }
+  }
+</style>

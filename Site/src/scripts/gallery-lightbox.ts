@@ -1,6 +1,7 @@
 /**
- * Shared image lightbox for article galleries and Markdown stills.
- * Videos stay in the gallery; only `[data-lightbox-image]` enters the dialog.
+ * Shared lightbox for article galleries, Markdown stills, and opted-in videos.
+ * `[data-lightbox-image]` opens the zoomable still.
+ * `[data-lightbox-video]` plays in the same dialog, with native controls.
  * Zoom is relative to the fitted (contain) size: 1× fills the viewport,
  * 8× is the maximum. SVG sources keep their vector URL.
  */
@@ -80,6 +81,7 @@ export function mountGalleryLightbox(dialog: HTMLDialogElement): void {
   const zoomOutBtn = dialog.querySelector<HTMLButtonElement>('[data-lightbox-zoom-out]');
   const zoomResetBtn = dialog.querySelector<HTMLButtonElement>('[data-lightbox-zoom-reset]');
   const zoomLabel = dialog.querySelector<HTMLElement>('[data-lightbox-zoom-label]');
+  const clip = dialog.querySelector<HTMLVideoElement>('[data-lightbox-video-media]');
   if (
     !viewport ||
     !stage ||
@@ -240,6 +242,53 @@ export function mountGalleryLightbox(dialog: HTMLDialogElement): void {
     return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
   };
 
+  const stopClip = () => {
+    dialog.classList.remove('is-video');
+    if (!clip) return;
+    clip.pause();
+    clip.removeAttribute('src');
+    clip.removeAttribute('poster');
+    clip.removeAttribute('aria-label');
+    clip.hidden = true;
+    clip.load();
+  };
+
+  const openClip = (trigger: HTMLElement) => {
+    const src = trigger.dataset.lightboxSrc?.trim() || '';
+    if (!src || !clip) return;
+    const poster = trigger.dataset.lightboxPoster?.trim() || '';
+    const text = trigger.dataset.lightboxCaption?.trim() || '';
+    const label = trigger.getAttribute('aria-label')?.trim() || 'Video';
+
+    items = [];
+    index = 0;
+    lastTrigger = trigger;
+    prevBtn.hidden = true;
+    nextBtn.hidden = true;
+    caption.textContent = text;
+    caption.hidden = text.length === 0;
+    dialog.setAttribute('aria-label', label);
+    dialog.classList.add('is-video');
+    clip.hidden = false;
+    clip.setAttribute('aria-label', label);
+    clip.playsInline = true;
+    clip.controls = true;
+    if (poster) clip.poster = poster;
+    else clip.removeAttribute('poster');
+    clip.src = src;
+
+    document.documentElement.classList.add('is-lightbox-open');
+    document.body.classList.add('is-lightbox-open');
+    if (!dialog.open) dialog.showModal();
+    closeBtn.focus();
+    if (!prefersReducedMotion()) {
+      void clip.play().catch(() => {
+        /* Playback can wait for the native controls. */
+      });
+    }
+    document.dispatchEvent(new Event('gallery-lightbox-change'));
+  };
+
   const show = (nextIndex: number) => {
     if (items.length === 0) return;
     index = ((nextIndex % items.length) + items.length) % items.length;
@@ -292,6 +341,7 @@ export function mountGalleryLightbox(dialog: HTMLDialogElement): void {
   };
 
   const open = (trigger: HTMLElement) => {
+    stopClip();
     items = itemsInGallery(trigger);
     const start = items.findIndex((item) => item.trigger === trigger);
     index = start === -1 ? 0 : start;
@@ -309,6 +359,7 @@ export function mountGalleryLightbox(dialog: HTMLDialogElement): void {
   };
 
   dialog.addEventListener('close', () => {
+    stopClip();
     document.documentElement.classList.remove('is-lightbox-open');
     document.body.classList.remove('is-lightbox-open');
     image.removeAttribute('src');
@@ -522,7 +573,7 @@ export function mountGalleryLightbox(dialog: HTMLDialogElement): void {
 
   document.addEventListener('pointerdown', (event) => {
     const trigger = event.target instanceof Element
-      ? event.target.closest<HTMLElement>('[data-lightbox-image]')
+      ? event.target.closest<HTMLElement>('[data-lightbox-image], [data-lightbox-video]')
       : null;
     if (!trigger) {
       pointerStart = null;
@@ -534,7 +585,7 @@ export function mountGalleryLightbox(dialog: HTMLDialogElement): void {
   document.addEventListener('click', (event) => {
     if (dialog.open) return;
     const trigger = event.target instanceof Element
-      ? event.target.closest<HTMLElement>('[data-lightbox-image]')
+      ? event.target.closest<HTMLElement>('[data-lightbox-image], [data-lightbox-video]')
       : null;
     if (!trigger) return;
     if (trigger.closest('[data-thumb]')) return;
@@ -547,6 +598,7 @@ export function mountGalleryLightbox(dialog: HTMLDialogElement): void {
     }
     pointerStart = null;
     event.preventDefault();
-    open(trigger);
+    if (trigger.hasAttribute('data-lightbox-video')) openClip(trigger);
+    else open(trigger);
   });
 }
