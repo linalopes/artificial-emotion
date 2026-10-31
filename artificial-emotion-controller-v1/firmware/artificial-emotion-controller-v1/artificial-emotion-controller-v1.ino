@@ -34,8 +34,8 @@ const uint8_t SEQUENCE[8] = {
   0b0100, 0b1100, 0b1000, 0b1001
 };
 
-// Limit switch uses COM + NC contacts.
-// LOW = normal, HIGH = triggered or disconnected.
+// Limit switch uses COM + NO contacts (optional).
+// HIGH = normal or disconnected, LOW = triggered.
 const uint32_t DEBOUNCE_MS = 30;
 
 uint8_t mode = 1;
@@ -52,8 +52,8 @@ bool lastButtonReading = HIGH;
 bool buttonStable = HIGH;
 uint32_t buttonChangedAt = 0;
 
-bool lastLimitReading = LOW;
-bool limitStable = LOW;
+bool lastLimitReading = HIGH;
+bool limitStable = HIGH;
 uint32_t limitChangedAt = 0;
 
 void releaseMotor() {
@@ -91,16 +91,16 @@ void printMenu() {
   Serial.println("? = Show menu");
   Serial.println();
   Serial.println("USER BUTTON: Cycle through modes");
-  Serial.println("ENDSTOP: COM + NC on J6");
+  Serial.println("ENDSTOP: Optional, COM + NO on J6");
   Serial.println("=================================");
 }
 
 void selectMode(uint8_t newMode) {
   if (newMode < 1 || newMode > 3) return;
 
-  // Never restart against a pressed or disconnected switch.
-  if (digitalRead(LIMIT_PIN) == HIGH ||
-      limitStable == HIGH) {
+  // Never restart while the limit switch is pressed.
+if (digitalRead(LIMIT_PIN) == LOW ||
+    limitStable == LOW) {
     stopMotor();
     Serial.println("[BLOCKED] Limit switch is active.");
     return;
@@ -132,9 +132,9 @@ void selectMode(uint8_t newMode) {
 void updateLimit() {
   bool reading = digitalRead(LIMIT_PIN);
 
-  // Stop immediately when the NC contact opens.
-  // Debouncing is used only for the status message.
-  if (reading == HIGH && running) {
+  // Stop immediately when the NO contact closes.
+// Debouncing is used only for the status message.
+if (reading == LOW && running) {
     stopMotor();
     limitLatched = true;
     Serial.println("[LIMIT] Motor stopped.");
@@ -148,10 +148,10 @@ void updateLimit() {
       reading != limitStable) {
     limitStable = reading;
 
-    if (limitStable == HIGH) {
-      Serial.println("[LIMIT] Triggered or disconnected.");
+    if (limitStable == LOW) {
+      Serial.println("[LIMIT] Triggered.");
     } else {
-      Serial.println("[LIMIT] Released.");
+      Serial.println("[LIMIT] Released  or disconnected.");
       if (limitLatched) {
         Serial.println("[LIMIT] Select a mode to restart.");
       }
@@ -193,7 +193,7 @@ void updateMotor() {
   }
 
   // Limit safety check immediately before stepping.
-  if (digitalRead(LIMIT_PIN) == HIGH) {
+  if (digitalRead(LIMIT_PIN) == LOW) {
     stopMotor();
     limitLatched = true;
     Serial.println("[LIMIT] Motor stopped.");
@@ -256,18 +256,16 @@ void setup() {
   delay(800);
   printMenu();
 
-  if (digitalRead(LIMIT_PIN) == LOW) {
-    limitStable = LOW;
-    lastLimitReading = LOW;
-    selectMode(1);
+  if (digitalRead(LIMIT_PIN) == HIGH) {
+  limitStable = HIGH;
+  lastLimitReading = HIGH;
+  selectMode(1);
   } else {
-    limitStable = HIGH;
-    lastLimitReading = HIGH;
-    limitLatched = true;
-    Serial.println(
-      "[LIMIT] Active or disconnected at startup."
-    );
-    Serial.println("[MOTOR] Startup inhibited.");
+  limitStable = LOW;
+  lastLimitReading = LOW;
+  limitLatched = true;
+  Serial.println("[LIMIT] Triggered at startup.");
+  Serial.println("[MOTOR] Startup inhibited.");
   }
 }
 
