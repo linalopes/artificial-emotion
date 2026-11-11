@@ -1,7 +1,7 @@
 /**
  * Heartbeat Slit Animation — p5 instance-mode lab.
  * Preview and SVG export share src/lib/slit-animation geometry.
- * Actuation (quartz clock vs DC motor) is motion metadata only.
+ * Actuation (quartz clock vs motor) is motion metadata only.
  */
 import p5 from 'p5';
 import {
@@ -112,7 +112,7 @@ export function mountHeartbeatSlitAnimation(root: HTMLElement): void {
   const params: SlitAnimationParams = { ...DEFAULT_PARAMS };
   let model: SlitAnimationModel = buildSlitAnimation(params);
   let preview: PreviewMode = 'composite';
-  let actuation: ActuationMode = 'clock';
+  let actuation: ActuationMode = 'motor';
   let motorRpm = DEFAULT_MOTOR_RPM;
   let motorPlaying = false;
   let rotation = 0;

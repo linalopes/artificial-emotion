@@ -50,7 +50,7 @@ export const MARK_STROKE = '#6B5A78';
 
 export const DEFAULT_PARAMS: SlitAnimationParams = {
   frames: 6,
-  slices: 10,
+  slices: 20,
   diameterMm: 120,
   guideMm: 2,
   centerBridgeMm: 16,
@@ -63,7 +63,7 @@ export const CENTER_BRIDGE_MAX = 40;
 export const FRAME_CHOICES = [4, 5, 6, 8, 10, 12] as const;
 
 export const SLICE_MIN = 1;
-export const SLICE_MAX = 15;
+export const SLICE_MAX = 30;
 
 /** Quartz second-hand tick. */
 export const CLOCK_TICK_DEG = 6;
@@ -78,8 +78,8 @@ export const CLOCK_PRESETS = [
 
 export type ActuationMode = 'clock' | 'motor';
 
-/** 6V N20 geared DC motor — informational, never baked into SVG. */
-export const DEFAULT_MOTOR_RPM = 68;
+/** Motor preview speed — informational, never baked into SVG. */
+export const DEFAULT_MOTOR_RPM = 2;
 export const MOTOR_RPM_MIN = 1;
 export const MOTOR_RPM_MAX = 200;
 

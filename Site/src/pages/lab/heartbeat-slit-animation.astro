@@ -47,7 +47,7 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
       <p class="lab__lede">
         An experimental tool for designing a physical slit animation. Multiple states of an anatomical
         heart are interlaced into a fixed image and revealed through a rotating radial mask. The same
-        encoded base and slit mask can be driven by a quartz clock movement or a DC motor — two
+        encoded base and slit mask can be driven by a quartz clock movement or a motor — two
         actuation strategies around one barrier-grid fabrication system.
       </p>
       <p class="lab__note">
@@ -90,7 +90,7 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
             <span>Angle</span>
             <input data-slit-rotation type="range" min="0" max="360" step="0.1" value="0" />
           </label>
-          <div class="slit__actions" data-slit-mode-clock>
+          <div class="slit__actions" data-slit-mode-clock hidden>
             <button type="button" data-slit-tick-back>−6° Clock tick</button>
             <button type="button" data-slit-tick>＋6° Clock tick</button>
           </div>
@@ -99,22 +99,22 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
             <button type="button" data-slit-prev>Prev frame</button>
             <button type="button" data-slit-next>Next frame</button>
           </div>
-          <div class="slit__actions" data-slit-mode-motor hidden>
+          <div class="slit__actions" data-slit-mode-motor>
             <button type="button" data-slit-motor-play>Start motor preview</button>
             <button type="button" data-slit-motor-pause>Pause</button>
           </div>
-          <p class="slit__hint" data-slit-mode-clock>
+          <p class="slit__hint" data-slit-mode-clock hidden>
             Rotate the slit mask manually, or step it using the controls. A standard ticking quartz second hand
             advances by 6° per second. Use the clock-tick buttons to test whether the current encoding works
             well with a real clock mechanism.
           </p>
-          <p class="slit__hint" data-slit-mode-motor hidden>
+          <p class="slit__hint" data-slit-mode-motor>
             Rotate the slit mask manually, or start a continuous preview at the entered motor speed. The
             preview uses the same mask geometry as the SVG export. Fabrication files are not affected.
           </p>
         </fieldset>
 
-        <fieldset class="slit__fieldset" data-slit-mode-clock>
+        <fieldset class="slit__fieldset" data-slit-mode-clock hidden>
           <legend>Clock Compatibility</legend>
           <dl class="slit__stats">
             <div><dt>Clock tick</dt><dd data-slit-clock-tick>6°</dd></div>
@@ -147,8 +147,8 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
           <legend>Frame Interlacing</legend>
           <p class="slit__preset-label">Actuation</p>
           <div class="slit__tabs" role="toolbar" aria-label="Actuation">
-            <button type="button" data-slit-actuation="clock" aria-pressed="true">Quartz Clock</button>
-            <button type="button" data-slit-actuation="motor" aria-pressed="false">DC Motor</button>
+            <button type="button" data-slit-actuation="clock" aria-pressed="false">Quartz Clock</button>
+            <button type="button" data-slit-actuation="motor" aria-pressed="true">Motor</button>
           </div>
           <p class="slit__hint">
             Actuation interprets motion. Encoded base and slit mask geometry stay the same.
@@ -175,11 +175,11 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
               value={DEFAULT_PARAMS.slices}
             />
           </label>
-          <p class="slit__hint" data-slit-mode-clock>
+          <p class="slit__hint" data-slit-mode-clock hidden>
             Slices per frame = how many times each frame is repeated around the circle. More slices can
             improve continuity, but they also change how the design behaves with a real clock tick.
           </p>
-          <p class="slit__hint" data-slit-mode-motor hidden>
+          <p class="slit__hint" data-slit-mode-motor>
             Slices per frame = how many times the source-frame sequence repeats around the disc. That count
             is also the number of complete animation cycles per physical revolution.
           </p>
@@ -190,10 +190,10 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
             </div>
             <div>
               <dt>Encoding step angle</dt>
-              <dd data-slit-step>6.0° per position</dd>
+              <dd data-slit-step>{(360 / (DEFAULT_PARAMS.frames * DEFAULT_PARAMS.slices)).toFixed(1)}° per position</dd>
             </div>
           </dl>
-          <div data-slit-mode-clock>
+          <div data-slit-mode-clock hidden>
             <p class="slit__preset-label">Clock-friendly presets</p>
             <div class="slit__actions" role="group" aria-label="Clock-friendly presets">
               {CLOCK_PRESETS.map((preset) => (
@@ -208,7 +208,7 @@ const isEmbed = Astro.url.searchParams.get('embed') === '1';
             </div>
             <p class="slit__hint">These presets align exactly with a 6° quartz second-hand tick.</p>
           </div>
-          <div data-slit-mode-motor hidden>
+          <div data-slit-mode-motor>
             <label class="slit__row">
               <span>Motor speed <output data-slit-rpm-out>{DEFAULT_MOTOR_RPM} RPM</output></span>
               <input
