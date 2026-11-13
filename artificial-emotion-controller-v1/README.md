@@ -73,7 +73,7 @@ One 4-pin male header, 2.54mm pitch.
 
 | GPIO | Function |
 |---|---|
-| GPIO1 | Sensor A1 |
+| GPIO1 | Sensor A1 / Optional mechanical endstop (MauMau firmware) |
 | GPIO2 | Sensor A2 |
 | GPIO4 | Sensor A3 |
 | GPIO5 | Sensor A4 |
@@ -87,6 +87,8 @@ One 4-pin male header, 2.54mm pitch.
 | GPIO13 | Motor IN4 |
 
 GPIO3 is not assigned. TX and RX remain unused.
+
+The PCB exposes GPIO1 through sensor port A1. In the current MauMau firmware, that same input can be used as an optional mechanical endstop / limit switch with the ESP32-S3 internal pull-up resistor. The endstop does not need to be connected for the motor to operate. When used, this provides limit detection rather than a complete automatic homing routine.
 
 ## 4. User Interface
 

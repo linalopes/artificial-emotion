@@ -59,7 +59,7 @@ The current module investigates a simple vertical actuation chain.
    home / endstop
 ```
 
-The spool attaches directly to the 28BYJ-48 shaft. The guide pulley redirects the fishing line into the vertical path. A microswitch provides a mechanical home / endstop reference. A future sliding-tube / flange mechanism is intended to interact with that switch for homing; that mechanism is not finished in this repository.
+The spool attaches directly to the 28BYJ-48 shaft. The guide pulley redirects the fishing line into the vertical path. A microswitch can provide a mechanical endstop / limit reference. A future sliding-tube / flange mechanism is intended to interact with that switch for homing; that mechanism is not finished in this repository. The current Controller v1 firmware can use an optional endstop for limit detection; it is not a complete automatic homing routine.
 
 ## Repository Structure
 
@@ -85,7 +85,7 @@ kinetic-module-maumau/
             └── ESP32-S3_SuperMini_THT.kicad_mod
 ```
 
-Mechanical design is authored in **Rhino 8** and **Grasshopper**. Electronics include bench-test firmware and an experimental KiCad project.
+Mechanical design is authored in **Rhino 8** and **Grasshopper**. Current motor control uses the shared **Artificial Emotion Controller v1** PCB and firmware. This folder also retains earlier MauMau bench-test firmware and an experimental KiCad board as development history.
 
 ## Mechanical Design
 
@@ -184,11 +184,52 @@ The Grasshopper definition also includes shaft tolerance, insertion depth, motor
 
 ## Electronics
 
-The project currently contains two related electronics approaches. They should not be confused.
+Current MauMau motor control uses the shared **Artificial Emotion Controller v1**. Earlier MauMau electronics remain in this folder as historical development context and should not be confused with the current controller.
 
-### 1. Prototype wiring
+### Current controller — Artificial Emotion Controller v1
 
-The currently tested prototype uses a ready-made ULN2003 driver module with:
+Documentation and firmware:
+
+- Controller hardware README: [`artificial-emotion-controller-v1/README.md`](../artificial-emotion-controller-v1/README.md)
+- Arduino firmware: [`artificial-emotion-controller-v1/firmware/artificial-emotion-controller-v1/artificial-emotion-controller-v1.ino`](../artificial-emotion-controller-v1/firmware/artificial-emotion-controller-v1/artificial-emotion-controller-v1.ino)
+
+Hardware used with MauMau:
+
+- ESP32-S3 Super Mini
+- Artificial Emotion Controller v1 PCB with ULN2003A
+- 28BYJ-48 5 V stepper motor
+- Optional mechanical endstop / limit switch
+- External regulated 5 V supply
+
+Current pin assignments from the firmware:
+
+| ESP32-S3 | Function |
+|---|---|
+| GPIO10 | ULN2003A IN1 |
+| GPIO11 | ULN2003A IN2 |
+| GPIO12 | ULN2003A IN3 |
+| GPIO13 | ULN2003A IN4 |
+| GPIO7 | USER button |
+| GPIO1 | optional mechanical endstop (sensor port A1) |
+
+#### Optional mechanical endstop
+
+The endstop is optional. The motor can operate without an endstop connected.
+
+In the current firmware:
+
+- GPIO1 is configured as `INPUT_PULLUP`
+- the firmware expects COM + NO contacts
+- HIGH = normal operation, or endstop disconnected
+- LOW = endstop triggered
+- when triggered, the firmware stops and releases the motor
+- after the switch is released, movement requires selecting a mode again
+
+This provides **limit detection**, not a complete automatic homing routine. The sliding-tube / flange homing mechanism described in the mechanical sections remains unfinished.
+
+### Historical prototype wiring
+
+The earlier MauMau prototype used a ready-made ULN2003 driver module with:
 
 - ESP32-S3 Super Mini
 - ULN2003 driver module
@@ -196,7 +237,7 @@ The currently tested prototype uses a ready-made ULN2003 driver module with:
 - KW11-style microswitch
 - 5 V power
 
-Tested pin mapping:
+Historical pin mapping used by the early bench-test firmware:
 
 | ESP32-S3 | Function |
 |---|---|
@@ -206,29 +247,53 @@ Tested pin mapping:
 | GPIO7 | ULN2003 IN4 |
 | GPIO8 | home switch (INPUT_PULLUP, active LOW) |
 
-This is the wiring assumed by the bench-test firmware.
+This mapping belongs to the historical prototype. It is not the wiring used by Artificial Emotion Controller v1.
 
-### 2. Experimental custom PCB
+### Historical experimental MauMau PCB
 
-`kinetic-module-maumau/ELECTRONICS/PCB mau-mau/` is a KiCad experiment named **mau-mau**. It explores integrating the ESP32-S3 Super Mini, a bare ULN2003 DIP-16, a +5 V / GND screw-terminal input, and a power-indicator LED with series resistor onto a small custom board. The earlier README described its body as approximately 40 × 42 mm; the V2 Right mounting study instead used a provisional 40 × 60 mm four-hole pattern. **The actual PCB outline and mounting-hole coordinates must be rechecked in KiCad** before treating these descriptions as compatible.
+`kinetic-module-maumau/ELECTRONICS/PCB mau-mau/` is an earlier KiCad experiment named **mau-mau**. It explored integrating the ESP32-S3 Super Mini, a bare ULN2003 DIP-16, a +5 V / GND screw-terminal input, and a power-indicator LED with series resistor onto a small custom board. The earlier README described its body as approximately 40 × 42 mm; the V2 Right mounting study instead used a provisional 40 × 60 mm four-hole pattern. **The actual PCB outline and mounting-hole coordinates must be rechecked in KiCad** before treating these descriptions as compatible.
 
 The board includes a custom symbol and through-hole footprint for the ESP32-S3 Super Mini. Silkscreen on the layout reads *Kinetic Module / Mau Mau / by Lina Lopes*.
 
-**This PCB is not a production controller.** In the current KiCad files:
+**This PCB is not the current Artificial Emotion Controller v1.** In the current KiCad files for that earlier experiment:
 
 - ULN2003 outputs are not brought to a motor connector
 - GPIO8 / the home-switch input is not exposed
 - Gerbers, drill files, and a BOM export are not present
 
-Treat it as an experimental alternative to the ready-made ULN2003 module, still in progress.
+Treat it as historical development context for MauMau electronics, superseded for current motor control by Controller v1.
 
 ## Firmware
 
-File: [`kinetic-module-maumau/ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino`](kinetic-module-maumau/ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino)
+### Current firmware — Artificial Emotion Controller v1
 
-This is bench-test firmware for the prototype wiring above. It is not installation firmware.
+File: [`artificial-emotion-controller-v1/firmware/artificial-emotion-controller-v1/artificial-emotion-controller-v1.ino`](../artificial-emotion-controller-v1/firmware/artificial-emotion-controller-v1/artificial-emotion-controller-v1.ino)
 
-It currently tests:
+This is the firmware currently used to drive the MauMau kinetic module through Controller v1. It is motion-test firmware for one 28BYJ-48 on the ULN2003A, not finished installation software.
+
+It currently provides:
+
+- half-step coil sequencing on GPIO10–GPIO13
+- three modes at 2 RPM: continuous clockwise, continuous counterclockwise, and alternating ±360°
+- USER button cycling on GPIO7
+- optional endstop / limit detection on GPIO1
+- Serial commands `1`, `2`, `3`, `0`, and `?`
+
+Pin map in the sketch:
+
+```text
+MOTOR_PINS = GPIO10, GPIO11, GPIO12, GPIO13
+BUTTON_PIN = GPIO7
+LIMIT_PIN  = GPIO1
+```
+
+### Historical bench-test firmware
+
+File: [`kinetic-module-maumau/ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino`](ELECTRONICS/Arduino-motor-test/Arduino-motor-test.ino)
+
+This earlier sketch belongs to the historical prototype wiring above. It is retained for development history and is not the current MauMau controller firmware.
+
+It tested:
 
 - 28BYJ-48 movement through a ULN2003
 - half-step coil sequencing
@@ -236,7 +301,7 @@ It currently tests:
 - home-switch detection on GPIO8
 - motor release when idle or when the switch is triggered
 
-Pin map in the sketch:
+Historical pin map in that sketch:
 
 ```text
 IN1      = GPIO4
@@ -250,10 +315,11 @@ HOME_PIN = GPIO8
 
 | Item | Role in the current prototype |
 |---|---|
+| Artificial Emotion Controller v1 | current motor controller PCB |
 | ESP32-S3 Super Mini | microcontroller |
 | 28BYJ-48, 5 V | geared stepper motor |
-| ULN2003 | motor driver (ready-made module in the tested prototype; DIP-16 on the experimental PCB) |
-| KW11-style microswitch | mechanical home / endstop |
+| ULN2003A | motor driver on Controller v1 |
+| Optional KW11-style microswitch | mechanical endstop / limit switch on GPIO1 |
 | V-groove guide pulley (~3 mm bore, 12 mm OD, 4 mm width) | redirects the line into the vertical path |
 | 5 V power supply | motor and logic supply |
 | Braided fishing line (~0.24 mm) | actuation line |
@@ -278,7 +344,7 @@ The enclosure and microswitch bracket are designed for 3 mm sheet. V2 fabricatio
 
 ### PCB
 
-The experimental `mau-mau` KiCad project can be opened from `kinetic-module-maumau/ELECTRONICS/PCB mau-mau/`. Production fabrication outputs (Gerbers, drill files, BOM) are not committed.
+Current motor control uses Artificial Emotion Controller v1. The earlier experimental `mau-mau` KiCad project remains in `kinetic-module-maumau/ELECTRONICS/PCB mau-mau/` as historical development context. Production fabrication outputs for that earlier board (Gerbers, drill files, BOM) are not committed.
 
 ## Status
 
@@ -289,16 +355,17 @@ Represented now:
 - parametric laser-cut enclosure, including V2 OS20 mounting patterns on Top and both sides
 - direct Grasshopper SVG workflow validated for six pieces / 67 cutting curves
 - parametric 3D-printed spool
-- motor-test firmware
-- experimental KiCad PCB
+- Artificial Emotion Controller v1 for current motor control
+- Controller v1 motion-test firmware with optional endstop / limit detection
+- earlier MauMau bench-test firmware and experimental KiCad PCB retained as history
 
 Still evolving:
 
 - sliding-tube / flange homing mechanism
+- complete automatic homing behavior
 - final pulley, guide-hole, and switch relationship
 - confirmation and version control of the final V2 SVG export; regeneration of the current spool STL
-- production firmware
-- finalized controller PCB
+- installation firmware beyond the current motion tests
 - physiological sensing / heartbeat interface
 - module count
 - larger installation architecture
