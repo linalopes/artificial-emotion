@@ -39,6 +39,11 @@ export interface NodeState {
   /** Travel accumulated by the coordinator from telemetry since that homing, in mm. */
   travelSinceHomeMm: number;
   clock: ClockStatus | null;
+  /**
+   * Firmware status.clock_synced when reported. null for simulator or before first firmware status.
+   * Collective prepare on hardware requires this to be true (node-side gate).
+   */
+  clockSyncedFromNode: boolean | null;
   /** Coordinator wall-clock time of the last telemetry frame. Retained after disconnect. */
   lastTelemetryAtMs: number | null;
 }

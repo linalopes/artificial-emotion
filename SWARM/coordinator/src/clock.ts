@@ -3,6 +3,9 @@ import type { ClockStatus } from '@swarm/shared';
 /** Coordinator monotonic clock in milliseconds. Never jumps with wall-clock adjustments. */
 export const monoNow = (): number => performance.now();
 
+/** Same monotonic base as monoNow, in microseconds — required by firmware clock_sync / commit_run. */
+export const monoNowUs = (): number => Math.round(performance.now() * 1000);
+
 export interface ClockSample {
   /** Coordinator send time. */
   t1: number;
@@ -32,6 +35,7 @@ interface Kept {
  * Keeps the recent exchanges for one node and reports the one with the shortest round trip,
  * because the offset error of a sample is bounded by half its round-trip time.
  * The numbers describe the estimate, not measured motor timing.
+ * Samples are stored in milliseconds regardless of wire units.
  */
 export class ClockTracker {
   private samples: Kept[] = [];

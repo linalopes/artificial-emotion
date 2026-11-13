@@ -40,9 +40,15 @@ describe('generators', () => {
   });
   it('wave propagates: neighbours along the diagonal are phase shifted', () => {
     const s = generateWave({ ...DEFAULT_PARAMS.wave, phaseDeg: 90 });
-    expect(positionAt(s, 'Mau01', 0)).toBeCloseTo(450, 0);
-    expect(positionAt(s, 'Mau02', 0)).toBeCloseTo(300, 0);
+    expect(positionAt(s, 'Mau01', 0)).toBeCloseTo(DEFAULT_PARAMS.wave.centerMm, 0);
+    expect(positionAt(s, 'Mau02', 0)).toBeCloseTo(DEFAULT_PARAMS.wave.centerMm - DEFAULT_PARAMS.wave.amplitudeMm, 0);
     expect(positionAt(s, 'Mau02', 0)).toBeCloseTo(positionAt(s, 'Mau04', 0), 5);
+  });
+  it('keeps every preset within the firmware keyframe cap so Preview matches Live', () => {
+    for (const type of ['wave', 'breathing', 'drift'] as const) {
+      const s = generate(type, DEFAULT_PARAMS[type]);
+      for (const id of NODE_IDS) expect(s.tracks[id].length).toBeLessThanOrEqual(32);
+    }
   });
   it('drift is reproducible from its seed and differs between seeds', () => {
     const a = generateDrift(DEFAULT_PARAMS.drift);
@@ -63,7 +69,7 @@ describe('validation', () => {
   });
   it('flags travel outside the limits of a single node', () => {
     const l = limits(50);
-    l.Mau03 = { ...l.Mau03, maxMm: 500 };
+    l.Mau03 = { ...l.Mau03, maxMm: 200 };
     const r = validateScore(wave, l);
     expect(r.issues.map((i) => `${i.kind}:${i.node}`)).toEqual(['range:Mau03']);
   });

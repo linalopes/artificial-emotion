@@ -7,6 +7,8 @@ import { WebSocketServer, type WebSocket } from 'ws';
 import { parseEnvelope, type ServerMessage } from '@swarm/shared';
 import type { Config } from './config';
 import { Coordinator } from './coordinator';
+import { createFirmwareCodec } from './devices/firmware-codec';
+import type { Codec } from './devices/protocol';
 import { simCodec } from './devices/sim-codec';
 import { SimFleet } from './sim/fleet';
 import type { SimNodeOptions } from './sim/node';
@@ -25,18 +27,26 @@ export interface App {
   sim: SimFleet | null;
   server: Server;
   port: number;
+  codec: Codec;
   close(): Promise<void>;
 }
 
-export async function createApp(cfg: Config, simOptions: SimNodeOptions = {}): Promise<App> {
+function selectCodec(cfg: Config): Codec {
   if (cfg.fleet === 'hardware') {
-    // Refuse rather than pretend: there is no codec for the real firmware protocol yet.
-    throw new Error(
-      'SWARM_FLEET=hardware is not available in this build. The coordinator has no codec for SWARM firmware v0.2.0 ' +
-        'because SWARM/firmware/docs/PROTOCOL.md was not available when it was written. See README.md, "Connecting real hardware".'
-    );
+    if (!cfg.authToken) {
+      throw new Error(
+        'SWARM_FLEET=hardware requires SWARM_AUTH_TOKEN to match the token provisioned on each module (Serial set_token). ' +
+          'The token is not logged. Example: SWARM_FLEET=hardware SWARM_AUTH_TOKEN=… SWARM_PORT=8787 npm run start'
+      );
+    }
+    return createFirmwareCodec({ authToken: cfg.authToken });
   }
-  const coordinator = new Coordinator(cfg, simCodec);
+  return simCodec;
+}
+
+export async function createApp(cfg: Config, simOptions: SimNodeOptions = {}): Promise<App> {
+  const codec = selectCodec(cfg);
+  const coordinator = new Coordinator(cfg, codec);
   const server = createServer((req, res) => void http(req, res, cfg, coordinator));
   const deviceWss = new WebSocketServer({ noServer: true });
   const clientWss = new WebSocketServer({ noServer: true, maxPayload: 4 * 1024 * 1024 });
@@ -98,16 +108,25 @@ export async function createApp(cfg: Config, simOptions: SimNodeOptions = {}): P
   const addr = server.address();
   const port = typeof addr === 'object' && addr ? addr.port : cfg.port;
 
-  const sim = new SimFleet(`ws://127.0.0.1:${port}${cfg.devicePath}`, simOptions);
-  coordinator.sim = sim;
-  sim.start();
-  coordinator.note('info', `Coordinator listening on port ${port} with nine SIMULATED nodes (${simCodec.name}). No hardware is connected.`);
+  let sim: SimFleet | null = null;
+  if (cfg.fleet === 'simulator') {
+    sim = new SimFleet(`ws://127.0.0.1:${port}${cfg.devicePath}`, simOptions);
+    coordinator.sim = sim;
+    sim.start();
+    coordinator.note('info', `Coordinator listening on port ${port} with nine SIMULATED nodes (${codec.name}). No hardware is connected.`);
+  } else {
+    coordinator.note(
+      'info',
+      `Coordinator listening on port ${port} for HARDWARE on ${cfg.devicePath} (${codec.name}). ` +
+        `Provision each module: set_coordinator <this-host> ${port} and matching auth token. Waiting for Mau01–Mau09.`
+    );
+  }
 
   return {
-    coordinator, sim, server, port,
+    coordinator, sim, server, port, codec,
     close: async () => {
       clearInterval(broadcast);
-      sim.stop();
+      sim?.stop();
       coordinator.close();
       for (const ws of sockets.values()) ws.terminate();
       deviceWss.close();
@@ -123,7 +142,9 @@ async function http(req: IncomingMessage, res: ServerResponse, cfg: Config, coor
     res.writeHead(code, { 'content-type': 'application/json', 'cache-control': 'no-store' });
     res.end(JSON.stringify(body));
   };
-  if (path === '/api/health') return json(200, { ok: true, fleet: cfg.fleet, env: cfg.env });
+  if (path === '/api/health') {
+    return json(200, { ok: true, fleet: cfg.fleet, env: cfg.env, devicePath: cfg.devicePath });
+  }
   if (path === '/api/presets') {
     if (req.method === 'GET') return json(200, existsSync(PRESETS_FILE) ? JSON.parse(readFileSync(PRESETS_FILE, 'utf8')) : {});
     if (req.method === 'PUT') {
@@ -147,7 +168,6 @@ async function http(req: IncomingMessage, res: ServerResponse, cfg: Config, coor
   }
   if (path.startsWith('/api/')) return json(404, { error: 'not found' });
 
-  // Static frontend (production-style). In development Vite serves the frontend instead.
   if (!existsSync(WEB_DIST)) {
     res.writeHead(503, { 'content-type': 'text/plain; charset=utf-8' });
     res.end('The frontend has not been built. Run "npm run build", or use "npm run dev" and open the Vite address.');

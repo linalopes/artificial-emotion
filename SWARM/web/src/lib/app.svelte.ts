@@ -14,7 +14,7 @@ export interface Result {
 const blank = (id: NodeId): NodeState => ({
   id, connected: false, simulated: false, fwVersion: null, homed: false, homing: false, moving: false, faultCode: null, positionMm: null,
   targetMm: null, endstop: null, rssiDbm: null, rpm: null, accelMmS2: null, limitMinMm: null, limitMaxMm: null, lastHomedAtMs: null,
-  travelSinceHomeMm: 0, clock: null, lastTelemetryAtMs: null
+  travelSinceHomeMm: 0, clock: null, clockSyncedFromNode: null, lastTelemetryAtMs: null
 });
 const ACTIVE = ['positioning', 'loading', 'preparing', 'committing', 'armed', 'running'];
 

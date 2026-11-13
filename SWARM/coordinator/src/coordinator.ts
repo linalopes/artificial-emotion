@@ -32,6 +32,7 @@ const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 export class Coordinator {
   readonly fleet = new Fleet();
   readonly device: DeviceServer;
+  readonly codec: Codec;
   private log: LogEntry[] = [];
   private stop = { engaged: false, atMs: null as number | null };
   private run: RunState = idleRun();
@@ -43,6 +44,7 @@ export class Coordinator {
   sim: SimControl | null = null;
 
   constructor(private readonly cfg: Config, codec: Codec) {
+    this.codec = codec;
     this.device = new DeviceServer(codec, cfg, {
       onConnect: (node, info) => {
         this.fleet.connected(node, info);
@@ -63,6 +65,10 @@ export class Coordinator {
       },
       onRunStatus: (node, ev) => {
         if (ev.runId !== this.run.runId) return;
+        if (ev.state === 'armed') {
+          this.run.perNode[node] = 'armed';
+          return;
+        }
         this.run.perNode[node] = ev.state;
         if (ev.state === 'aborted' && ACTIVE.has(this.run.phase)) void this.failRun(`${node} aborted the run${ev.reason ? `: ${ev.reason}` : ''}.`);
       },
@@ -238,7 +244,13 @@ export class Coordinator {
       if (!n.connected) out.push(`${id} is not connected.`);
       else if (n.faultCode) out.push(`${id} has fault ${n.faultCode}.`);
       else if (!n.homed) out.push(`${id} is not homed.`);
-      else if (needSync && !this.device.clockStatus(id)?.synced) out.push(`${id} clock is not synchronised.`);
+      else if (needSync) {
+        const mac = this.device.clockStatus(id)?.synced === true;
+        const node = n.clockSyncedFromNode;
+        // Firmware prepare_run requires the node's own clock_synced; sim only has Mac estimate.
+        const ok = this.codec.speaksFirmware ? mac && node === true : mac;
+        if (!ok) out.push(`${id} clock is not synchronised.`);
+      }
     }
     return out;
   }
@@ -349,15 +361,27 @@ export class Coordinator {
       return failed.length ? `${phase} failed: ${failed.join('; ')}.` : null;
     };
 
-    let err = await stage('loading', 'trajectory loaded', (id) => ({ name: 'load_trajectory', runId, durationMs: score.durationMs, keyframes: score.tracks[id] }));
+    let err = await stage('loading', 'trajectory loaded', (id) => ({
+      name: 'load_trajectory',
+      runId,
+      durationMs: score.durationMs,
+      keyframes: score.tracks[id],
+      presetId: score.name
+    }));
     err ??= await stage('preparing', 'ready', () => ({ name: 'prepare', runId }));
     let startAt = 0;
     if (!err) {
       startAt = monoNow() + this.cfg.startLeadMs;
-      err = await stage('committing', 'armed', (id) => {
-        const t = this.device.toNodeTime(id, startAt);
-        return t === null ? null : { name: 'commit', runId, startAtNodeMs: t };
-      });
+      if (this.codec.speaksFirmware) {
+        // Absolute coordinator monotonic µs — same value for every node (PROTOCOL.md).
+        const startAtCoordUs = Math.round(startAt * 1000);
+        err = await stage('committing', 'armed', () => ({ name: 'commit', runId, startAtCoordUs }));
+      } else {
+        err = await stage('committing', 'armed', (id) => {
+          const t = this.device.toNodeTime(id, startAt);
+          return t === null ? null : { name: 'commit', runId, startAtNodeMs: t };
+        });
+      }
     }
     if (!err && monoNow() >= startAt) err = 'Arming took longer than the start lead time.';
     if (err) {
@@ -366,7 +390,12 @@ export class Coordinator {
     }
     this.run.phase = 'armed';
     this.run.startAtMs = startAt;
-    this.note('info', `${score.name} armed on nine modules, pass ${this.run.pass}. Each module starts from its own clock.`);
+    this.note(
+      'info',
+      this.codec.speaksFirmware
+        ? `${score.name} armed on nine modules, pass ${this.run.pass}. Shared start_at_us=${Math.round(startAt * 1000)}.`
+        : `${score.name} armed on nine modules, pass ${this.run.pass}. Each module starts from its own clock.`
+    );
     this.watch(score, token, startAt);
     return null;
   }

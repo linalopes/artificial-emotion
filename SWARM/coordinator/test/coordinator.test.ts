@@ -63,7 +63,7 @@ describe('connections', () => {
   });
 
   it('rejects a second device claiming an identity that is already connected', async () => {
-    const ws = new WebSocket(`ws://127.0.0.1:${app.port}/device`);
+    const ws = new WebSocket(`ws://127.0.0.1:${app.port}/swarm`);
     const got: string[] = [];
     ws.on('message', (d) => got.push(d.toString()));
     await new Promise((r) => ws.on('open', r));
@@ -75,7 +75,7 @@ describe('connections', () => {
   });
 
   it('rejects unknown identities and notices a node dropping and returning', async () => {
-    const ws = new WebSocket(`ws://127.0.0.1:${app.port}/device`);
+    const ws = new WebSocket(`ws://127.0.0.1:${app.port}/swarm`);
     await new Promise((r) => ws.on('open', r));
     ws.send(JSON.stringify({ v: SIM_WIRE, event: { type: 'hello', nodeId: 'Mau10', fwVersion: 'x', simulated: true } }));
     await new Promise((r) => ws.on('close', r));
@@ -151,7 +151,7 @@ describe('commands', () => {
     expect(r.outcomes).toEqual([{ node: 'Mau08', ok: true }, { node: 'Mau09', ok: false, error: 'is not connected' }]);
 
     // A device that registers as Mau09 but never acknowledges anything.
-    const mute = new WebSocket(`ws://127.0.0.1:${app.port}/device`);
+    const mute = new WebSocket(`ws://127.0.0.1:${app.port}/swarm`);
     await new Promise((res) => mute.on('open', res));
     mute.send(JSON.stringify({ v: SIM_WIRE, event: { type: 'hello', nodeId: 'Mau09', fwVersion: 'mute', simulated: true } }));
     await until(() => node('Mau09').connected);

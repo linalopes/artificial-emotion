@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { isNodeId, type ClockStatus, type NodeId } from '@swarm/shared';
-import { ClockTracker, monoNow } from '../clock';
+import { ClockTracker, monoNow, monoNowUs } from '../clock';
 import type { Codec, DeviceCommand, DeviceEvent, Telemetry } from './protocol';
 
 export interface DeviceServerOptions {
@@ -31,6 +31,7 @@ interface Link {
   pending: Map<string, Pending>;
   clock: ClockTracker;
   clockSeq: number;
+  /** seq → coordinator t1 in the same units the codec uses on the wire. */
   clockSent: Map<number, number>;
   clockTimer: NodeJS.Timeout;
 }
@@ -60,27 +61,12 @@ export class DeviceServer {
     }, this.opts.helloTimeoutMs);
 
     ws.on('message', (data) => {
-      const t4 = monoNow();
+      const t4 = this.codec.speaksFirmware ? monoNowUs() : monoNow();
       const ev = this.codec.decode(data.toString());
       if (!ev) return;
       if (!link) {
-        if (ev.type !== 'hello') return;
-        clearTimeout(helloTimer);
-        if (!isNodeId(ev.nodeId)) {
-          this.handlers.onLog('warn', `Rejected a device with unknown identity "${String(ev.nodeId).slice(0, 32)}".`);
-          ws.send(this.codec.encodeReject('unknown_identity'));
-          ws.close();
-          return;
-        }
-        if (this.links.has(ev.nodeId)) {
-          // The established connection keeps the identity. Two modules must never share one.
-          this.handlers.onLog('error', `Duplicate identity: a second device claimed ${ev.nodeId} and was rejected. Check commissioning.`);
-          ws.send(this.codec.encodeReject('duplicate_identity'));
-          ws.close();
-          return;
-        }
-        link = this.register(ws, ev.nodeId);
-        this.handlers.onConnect(ev.nodeId, { fwVersion: ev.fwVersion, simulated: ev.simulated === true });
+        const id = this.tryRegister(ws, ev, helloTimer);
+        if (id) link = id;
         return;
       }
       this.handle(link, ev, t4);
@@ -90,6 +76,44 @@ export class DeviceServer {
       if (link) this.unregister(link);
     });
     ws.on('error', () => ws.close());
+  }
+
+  private tryRegister(ws: WebSocket, ev: DeviceEvent, helloTimer: NodeJS.Timeout): Link | null {
+    let nodeId: string | null = null;
+    let fwVersion = 'unknown';
+    let simulated = false;
+    let telemetry: Telemetry | null = null;
+
+    if (ev.type === 'hello') {
+      nodeId = ev.nodeId;
+      fwVersion = ev.fwVersion;
+      simulated = ev.simulated === true;
+    } else if (ev.type === 'status') {
+      nodeId = ev.nodeId;
+      fwVersion = ev.fwVersion;
+      simulated = ev.simulated === true;
+      telemetry = ev.telemetry;
+    } else {
+      return null;
+    }
+
+    clearTimeout(helloTimer);
+    if (!isNodeId(nodeId)) {
+      this.handlers.onLog('warn', `Rejected a device with unknown identity "${String(nodeId).slice(0, 32)}".`);
+      ws.send(this.codec.encodeReject('unknown_identity'));
+      ws.close();
+      return null;
+    }
+    if (this.links.has(nodeId)) {
+      this.handlers.onLog('error', `Duplicate identity: a second device claimed ${nodeId} and was rejected. Check commissioning.`);
+      ws.send(this.codec.encodeReject('duplicate_identity'));
+      ws.close();
+      return null;
+    }
+    const link = this.register(ws, nodeId);
+    this.handlers.onConnect(nodeId, { fwVersion, simulated });
+    if (telemetry) this.handlers.onTelemetry(nodeId, telemetry);
+    return link;
   }
 
   private register(ws: WebSocket, node: NodeId): Link {
@@ -103,7 +127,6 @@ export class DeviceServer {
       clockTimer: setInterval(() => this.probeClock(link), this.opts.clockIntervalMs)
     };
     this.links.set(node, link);
-    // A short burst gives a usable estimate soon after connecting.
     for (let i = 0; i < 4; i++) setTimeout(() => this.probeClock(link), 50 + i * 120);
     return link;
   }
@@ -124,9 +147,9 @@ export class DeviceServer {
     if (this.links.get(link.node) !== link || link.ws.readyState !== link.ws.OPEN) return;
     const seq = ++link.clockSeq;
     if (link.clockSent.size > 16) link.clockSent.clear();
-    const t1 = monoNow();
+    const t1 = this.codec.speaksFirmware ? monoNowUs() : monoNow();
     link.clockSent.set(seq, t1);
-    link.ws.send(this.codec.encodeClockRequest(seq, t1));
+    link.ws.send(this.codec.encodeClockRequest(seq, t1, link.node));
   }
 
   private handle(link: Link, ev: DeviceEvent, t4: number): void {
@@ -143,11 +166,28 @@ export class DeviceServer {
       case 'telemetry':
         this.handlers.onTelemetry(link.node, ev.telemetry);
         return;
+      case 'status':
+        if (ev.nodeId !== link.node) {
+          this.handlers.onLog('warn', `Ignoring status from ${ev.nodeId} on the ${link.node} link.`);
+          return;
+        }
+        this.handlers.onTelemetry(link.node, ev.telemetry);
+        return;
       case 'clock_reply': {
         const t1 = link.clockSent.get(ev.seq);
         if (t1 === undefined) return;
         link.clockSent.delete(ev.seq);
-        link.clock.add({ t1, t2: ev.t2, t3: ev.t3, t4 });
+        const units = ev.units ?? (this.codec.speaksFirmware ? 'us' : 'ms');
+        if (units === 'us' && this.codec.encodeClockFin) {
+          link.ws.send(
+            this.codec.encodeClockFin(ev.seq, { t1, t2: ev.t2, t3: ev.t3, t4 }, link.node),
+            () => undefined
+          );
+          // Store tracker samples in milliseconds for shared ClockStatus.
+          link.clock.add({ t1: t1 / 1000, t2: ev.t2 / 1000, t3: ev.t3 / 1000, t4: t4 / 1000 });
+        } else {
+          link.clock.add({ t1, t2: ev.t2, t3: ev.t3, t4 });
+        }
         return;
       }
       case 'run_status':
@@ -176,13 +216,19 @@ export class DeviceServer {
     const link = this.links.get(node);
     if (!link || link.ws.readyState !== link.ws.OPEN) return Promise.reject(new Error('not connected'));
     const messageId = randomUUID();
+    let encoded: string;
+    try {
+      encoded = this.codec.encodeCommand(messageId, cmd, node);
+    } catch (e) {
+      return Promise.reject(e instanceof Error ? e : new Error(String(e)));
+    }
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         link.pending.delete(messageId);
         reject(new Error(`no acknowledgment within ${timeoutMs} ms`));
       }, timeoutMs);
       link.pending.set(messageId, { resolve, reject, timer });
-      link.ws.send(this.codec.encodeCommand(messageId, cmd), (err) => {
+      link.ws.send(encoded, (err) => {
         if (err) {
           clearTimeout(timer);
           link.pending.delete(messageId);

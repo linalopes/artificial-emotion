@@ -172,8 +172,11 @@ export class SimNode {
         return null;
       case 'commit':
         if (!this.traj || this.traj.runId !== cmd.runId || !this.traj.prepared) return 'run not prepared';
+        if (cmd.startAtNodeMs === undefined) return 'start time missing';
         if (cmd.startAtNodeMs <= this.clock()) return 'start time already passed';
         this.traj.startAt = cmd.startAtNodeMs;
+        return null;
+      case 'get_config':
         return null;
     }
   }

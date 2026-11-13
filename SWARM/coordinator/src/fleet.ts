@@ -5,7 +5,8 @@ function blank(id: NodeId): NodeState {
   return {
     id, connected: false, simulated: false, fwVersion: null, homed: false, homing: false, moving: false,
     faultCode: null, positionMm: null, targetMm: null, endstop: null, rssiDbm: null, rpm: null, accelMmS2: null,
-    limitMinMm: null, limitMaxMm: null, lastHomedAtMs: null, travelSinceHomeMm: 0, clock: null, lastTelemetryAtMs: null
+    limitMinMm: null, limitMaxMm: null, lastHomedAtMs: null, travelSinceHomeMm: 0, clock: null,
+    clockSyncedFromNode: null, lastTelemetryAtMs: null
   };
 }
 
@@ -37,6 +38,7 @@ export class Fleet {
     s.moving = false;
     s.homing = false;
     s.clock = null;
+    s.clockSyncedFromNode = null;
   }
 
   telemetry(id: NodeId, t: Telemetry, wallMs: number): void {
@@ -52,13 +54,15 @@ export class Fleet {
     s.moving = t.moving;
     s.faultCode = t.faultCode;
     s.positionMm = t.homed ? t.positionMm : null;
-    s.targetMm = t.targetMm;
+    if (t.targetMm !== null) s.targetMm = t.targetMm;
     s.endstop = t.endstop;
-    s.rssiDbm = t.rssiDbm;
-    s.rpm = t.rpm;
-    s.accelMmS2 = t.accelMmS2;
-    s.limitMinMm = t.limitMinMm;
-    s.limitMaxMm = t.limitMaxMm;
+    if (t.rssiDbm !== null) s.rssiDbm = t.rssiDbm;
+    // Firmware status may omit acceleration; do not wipe a known value with null.
+    if (t.rpm !== null) s.rpm = t.rpm;
+    if (t.accelMmS2 !== null) s.accelMmS2 = t.accelMmS2;
+    if (t.limitMinMm !== null) s.limitMinMm = t.limitMinMm;
+    if (t.limitMaxMm !== null) s.limitMaxMm = t.limitMaxMm;
+    if (t.clockSynced !== undefined) s.clockSyncedFromNode = t.clockSynced;
     s.lastTelemetryAtMs = wallMs;
   }
 }

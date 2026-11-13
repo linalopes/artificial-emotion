@@ -1,3 +1,4 @@
+import { FW_MAX_KEYFRAMES } from './generators';
 import { NODE_IDS, type NodeId } from './ids';
 import { SCORE_SCHEMA, type Score } from './score';
 
@@ -8,7 +9,7 @@ export interface NodeLimits {
   maxSpeedMmS: number;
 }
 
-export type IssueKind = 'structure' | 'range' | 'speed' | 'loop';
+export type IssueKind = 'structure' | 'range' | 'speed' | 'loop' | 'size';
 export interface ScoreIssue {
   kind: IssueKind;
   node?: NodeId;
@@ -19,6 +20,7 @@ export interface TrackStats {
   minMm: number;
   maxMm: number;
   peakSpeedMmS: number;
+  keyframes: number;
 }
 export interface ValidationResult {
   ok: boolean;
@@ -26,8 +28,17 @@ export interface ValidationResult {
   stats: Record<NodeId, TrackStats>;
 }
 
-const MAX_KEYFRAMES_PER_TRACK = 5000;
 const MAX_DURATION_MS = 4 * 60 * 60 * 1000;
+
+/** Rough upper bound for one load_trajectory JSON envelope (auth + track). Firmware max is 2048. */
+export const FW_MAX_WS_MESSAGE_BYTES = 2048;
+
+/** Conservative estimate of encoded load_trajectory size for one module. */
+export function estimateFirmwareTrackBytes(keyframes: { tMs: number; zMm: number }[], runIdLen = 36, tokenLen = 32): number {
+  // Envelope overhead + per-keyframe {"time_ms":N,"z_mm":N.NN},
+  const per = 28;
+  return 280 + runIdLen + tokenLen + keyframes.length * per;
+}
 
 /** Structural check for data arriving from a browser or a file. Never throws. */
 export function checkScoreShape(raw: unknown): { score: Score } | { error: string } {
@@ -41,7 +52,7 @@ export function checkScoreShape(raw: unknown): { score: Score } | { error: strin
   for (const id of NODE_IDS) {
     const tr = (s.tracks as Record<string, unknown>)[id];
     if (!Array.isArray(tr) || tr.length < 2) return { error: `${id} needs at least two keyframes.` };
-    if (tr.length > MAX_KEYFRAMES_PER_TRACK) return { error: `${id} has too many keyframes.` };
+    if (tr.length > FW_MAX_KEYFRAMES) return { error: `${id} has ${tr.length} keyframes; firmware allows at most ${FW_MAX_KEYFRAMES}.` };
     let prev = -1;
     for (const k of tr) {
       if (!k || typeof k.tMs !== 'number' || typeof k.zMm !== 'number' || !Number.isFinite(k.tMs) || !Number.isFinite(k.zMm)) return { error: `${id} has a malformed keyframe.` };
@@ -79,7 +90,14 @@ export function validateScore(score: Score, limits: Record<NodeId, NodeLimits>):
         peakAt = tr[i - 1].tMs;
       }
     }
-    stats[id] = { minMm, maxMm, peakSpeedMmS: peak };
+    stats[id] = { minMm, maxMm, peakSpeedMmS: peak, keyframes: tr.length };
+    if (tr.length > FW_MAX_KEYFRAMES) {
+      issues.push({ kind: 'size', node: id, message: `${id} has ${tr.length} keyframes; firmware allows at most ${FW_MAX_KEYFRAMES}.` });
+    }
+    const bytes = estimateFirmwareTrackBytes(tr);
+    if (bytes > FW_MAX_WS_MESSAGE_BYTES) {
+      issues.push({ kind: 'size', node: id, message: `${id} trajectory would exceed the firmware ${FW_MAX_WS_MESSAGE_BYTES}-byte message limit (≈${bytes} bytes).` });
+    }
     if (minMm < lim.minMm - 0.01 || maxMm > lim.maxMm + 0.01) {
       issues.push({ kind: 'range', node: id, message: `${id} would travel ${minMm.toFixed(0)} to ${maxMm.toFixed(0)} mm, outside its limits of ${lim.minMm.toFixed(0)} to ${lim.maxMm.toFixed(0)} mm.` });
     }

@@ -1,8 +1,14 @@
 import { NODE_IDS, gridOf, type NodeId } from './ids';
 import { SCORE_SCHEMA, type Keyframe, type Score } from './score';
 
-/** Keyframe spacing used by the preset generators. Linear segments at 1 s track a slow sine closely. */
+/**
+ * Preferred spacing hint for generators. The result is always capped at FW_MAX_KEYFRAMES
+ * so Preview and Live send the same trajectory the firmware can load.
+ */
 export const GENERATOR_STEP_MS = 1000;
+
+/** Firmware TrackPlayer / PROTOCOL.md hard cap. */
+export const FW_MAX_KEYFRAMES = 32;
 
 export interface WaveParams {
   amplitudeMm: number;
@@ -37,10 +43,11 @@ export interface PresetParams {
   drift: DriftParams;
 }
 
+/** Defaults stay inside a 0–500 mm travel window (firmware default max_travel_mm). */
 export const DEFAULT_PARAMS: PresetParams = {
-  wave: { amplitudeMm: 150, periodS: 120, phaseDeg: 40, direction: 'diagonal', centerMm: 450, cycles: 2 },
-  breathing: { amplitudeMm: 200, periodS: 150, ringDelayDeg: 25, centerMm: 450, cycles: 2 },
-  drift: { amplitudeMm: 160, durationS: 480, variation: 0.5, seed: 7, centerMm: 450 }
+  wave: { amplitudeMm: 120, periodS: 120, phaseDeg: 40, direction: 'diagonal', centerMm: 250, cycles: 2 },
+  breathing: { amplitudeMm: 120, periodS: 150, ringDelayDeg: 25, centerMm: 250, cycles: 2 },
+  drift: { amplitudeMm: 100, durationS: 480, variation: 0.5, seed: 7, centerMm: 250 }
 };
 
 /** Small deterministic PRNG so Drift is reproducible from its seed. */
@@ -55,15 +62,22 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-function sample(durationMs: number, fn: (tS: number) => number): Keyframe[] {
-  const n = Math.max(2, Math.round(durationMs / GENERATOR_STEP_MS));
+/**
+ * Sample a continuous curve into ≤ FW_MAX_KEYFRAMES linear keyframes.
+ * Preview uses this same array that load_trajectory will send.
+ */
+export function sample(durationMs: number, fn: (tS: number) => number): Keyframe[] {
+  const ideal = Math.max(1, Math.round(durationMs / GENERATOR_STEP_MS));
+  const segments = Math.min(FW_MAX_KEYFRAMES - 1, ideal);
   const out: Keyframe[] = [];
-  for (let j = 0; j <= n; j++) {
-    const tMs = Math.round((durationMs * j) / n);
+  for (let j = 0; j <= segments; j++) {
+    const tMs = Math.round((durationMs * j) / segments);
     out.push({ tMs, zMm: Math.round(fn(tMs / 1000) * 100) / 100, ease: 'linear' });
   }
   // Close the loop exactly so a repeated score has no seam.
   out[out.length - 1].zMm = out[0].zMm;
+  out[out.length - 1].tMs = durationMs;
+  out[0].tMs = 0;
   return out;
 }
 
