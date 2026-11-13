@@ -1,0 +1,21 @@
+{
+  "name": "swarm-control",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SWARM Control: Mac coordinator and browser interface for the nine MauMau modules",
+  "type": "module",
+  "workspaces": ["shared", "coordinator", "web"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "concurrently -k -n coord,web -c magenta,cyan \"npm run dev -w coordinator\" \"npm run dev -w web\"",
+    "build": "npm run typecheck && npm run build -w web",
+    "start": "npm run start -w coordinator",
+    "typecheck": "tsc -p shared --noEmit && tsc -p coordinator --noEmit && npm run check -w web",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

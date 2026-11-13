@@ -1,0 +1,65 @@
+/* Brand tokens from the School of Tomorrow's AI brand kit, as established in the approved wireframe. */
+:root {
+  --purple: #22113e;
+  --gray-green: #cad8d8;
+  --pink: #ea7dff;
+  --turquoise: #08f2db;
+  --white: #ffffff;
+  --danger: #b93232;
+  --danger-dark: #8f2222;
+  --line: rgba(34, 17, 62, 0.14);
+  --line-strong: rgba(34, 17, 62, 0.4);
+  --title: 'Space Grotesk', system-ui, sans-serif;
+  --text: 'Inter', system-ui, sans-serif;
+  --mono: 'Courier Prime', ui-monospace, monospace;
+  --radius: 4px;
+}
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; }
+body { margin: 0; background: var(--white); color: var(--purple); font-family: var(--text); font-weight: 300; font-size: 14px; line-height: 1.45; }
+button, input, select { font: inherit; color: inherit; }
+
+.t { font-family: var(--title); font-weight: 300; letter-spacing: -0.02em; line-height: 1.1; }
+.m { font-family: var(--mono); font-size: 13px; }
+.l { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(34, 17, 62, 0.78); }
+.small { font-size: 12px; }
+
+.b { font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid var(--purple); background: transparent; color: var(--purple); border-radius: var(--radius); padding: 6px 12px; min-height: 36px; cursor: pointer; }
+.b:hover:not(:disabled) { background: var(--pink); color: var(--purple); }
+.b:disabled { opacity: 0.38; cursor: not-allowed; }
+.b:focus-visible, .card:focus-visible, .tl:focus-visible, .sphere:focus-visible { outline: 2px solid #a21caf; outline-offset: 2px; }
+.b.on { background: var(--purple); color: var(--white); }
+.b.pk { background: var(--pink); }
+.b.a { background: var(--turquoise); }
+.b.d { background: var(--danger); border-color: var(--danger); color: var(--white); font-weight: 700; }
+.b.d:hover:not(:disabled) { background: var(--danger-dark); color: var(--white); }
+.b.s { min-height: 28px; padding: 2px 8px; font-size: 12px; }
+.b.big { min-height: 44px; }
+
+.bd { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 999px; padding: 2px 8px; white-space: nowrap; border: 1px solid transparent; }
+.bd.offline { background: var(--white); border: 1px dashed var(--purple); }
+.bd.fault, .bd.bad { background: var(--danger); color: var(--white); }
+.bd.homing { background: var(--pink); border-color: var(--purple); }
+.bd.unhomed { background: var(--white); border: 1px dotted var(--purple); }
+.bd.moving { background: var(--turquoise); border-color: var(--purple); }
+.bd.idle, .bd.good { background: var(--gray-green); }
+
+.k { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.col { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; }
+.sec { display: flex; flex-direction: column; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.note { font-size: 12px; background: rgba(202, 216, 216, 0.5); padding: 8px; border-radius: var(--radius); }
+.alert { font-size: 12px; color: var(--danger-dark); font-weight: 600; border: 1px solid var(--danger); border-radius: var(--radius); padding: 8px; }
+input[type='range'] { width: 100%; accent-color: var(--purple); margin: 0; height: 24px; }
+input[type='number'], select { border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 4px 6px; background: var(--white); font-family: var(--mono); font-size: 13px; min-height: 30px; }
+input[type='number']:focus, select:focus { outline: none; border-color: var(--pink); }
+.tl { font-family: var(--mono); font-size: 12px; border: 0; background: transparent; color: var(--purple); padding: 0; text-align: left; cursor: pointer; }
+.card { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid rgba(34, 17, 62, 0.18); border-radius: var(--radius); background: var(--white); color: var(--purple); text-align: left; cursor: pointer; min-width: 0; }
+.card.sel, .tv.sel { background: var(--pink); }
+
+@media (max-width: 699px) {
+  .b { min-height: 44px; }
+  .b.s { min-height: 40px; }
+}

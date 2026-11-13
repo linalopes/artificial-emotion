@@ -1,0 +1,64 @@
+import { NODE_IDS, type NodeId, type NodeState } from '@swarm/shared';
+import type { Telemetry } from './devices/protocol';
+
+function blank(id: NodeId): NodeState {
+  return {
+    id, connected: false, simulated: false, fwVersion: null, homed: false, homing: false, moving: false,
+    faultCode: null, positionMm: null, targetMm: null, endstop: null, rssiDbm: null, rpm: null, accelMmS2: null,
+    limitMinMm: null, limitMaxMm: null, lastHomedAtMs: null, travelSinceHomeMm: 0, clock: null, lastTelemetryAtMs: null
+  };
+}
+
+/**
+ * Last known state of the nine modules. Only node reports change it.
+ * After a disconnect the last telemetry is kept but motion flags are cleared, because
+ * nothing is known about the module any more.
+ */
+export class Fleet {
+  private states = new Map<NodeId, NodeState>(NODE_IDS.map((id) => [id, blank(id)]));
+
+  get(id: NodeId): NodeState {
+    return this.states.get(id)!;
+  }
+  all(): NodeState[] {
+    return NODE_IDS.map((id) => this.get(id));
+  }
+
+  connected(id: NodeId, info: { fwVersion: string; simulated: boolean }): void {
+    const s = this.get(id);
+    s.connected = true;
+    s.simulated = info.simulated;
+    s.fwVersion = info.fwVersion;
+  }
+
+  disconnected(id: NodeId): void {
+    const s = this.get(id);
+    s.connected = false;
+    s.moving = false;
+    s.homing = false;
+    s.clock = null;
+  }
+
+  telemetry(id: NodeId, t: Telemetry, wallMs: number): void {
+    const s = this.get(id);
+    if (t.homed && !s.homed) {
+      s.lastHomedAtMs = wallMs;
+      s.travelSinceHomeMm = 0;
+    } else if (t.homed && s.positionMm !== null && t.positionMm !== null) {
+      s.travelSinceHomeMm += Math.abs(t.positionMm - s.positionMm);
+    }
+    s.homed = t.homed;
+    s.homing = t.homing;
+    s.moving = t.moving;
+    s.faultCode = t.faultCode;
+    s.positionMm = t.homed ? t.positionMm : null;
+    s.targetMm = t.targetMm;
+    s.endstop = t.endstop;
+    s.rssiDbm = t.rssiDbm;
+    s.rpm = t.rpm;
+    s.accelMmS2 = t.accelMmS2;
+    s.limitMinMm = t.limitMinMm;
+    s.limitMaxMm = t.limitMaxMm;
+    s.lastTelemetryAtMs = wallMs;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@swarm/coordinator",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "SWARM_ENV=development tsx watch src/main.ts",
+    "start": "SWARM_ENV=production tsx src/main.ts"
+  },
+  "dependencies": {
+    "@swarm/shared": "*",
+    "tsx": "^4.19.2",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13"
+  }
+}
