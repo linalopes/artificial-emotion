@@ -1,15 +1,18 @@
 # Firmware integration (Phase B.1 + B.2)
 
-The coordinator speaks SWARM firmware **v0.3.0** (protocol v1 additive) when `SWARM_FLEET=hardware`.
+The coordinator speaks SWARM firmware **v0.3.0** (protocol **1**, additive autonomous fields) when `SWARM_FLEET=hardware`.
 
-Authoritative contract: `firmware/docs/PROTOCOL.md` and `firmware/src/net/protocol.cpp`.  
-Autonomous playback: `docs/AUTONOMOUS-OPERATION.md`.
+Authoritative contract: [`firmware/docs/PROTOCOL.md`](firmware/docs/PROTOCOL.md) and `firmware/src/net/protocol.cpp`.  
+Autonomous playback: [`docs/AUTONOMOUS-OPERATION.md`](docs/AUTONOMOUS-OPERATION.md).  
+Operator entry: [`README.md`](README.md).
+
+Earlier Phase A / simulator-only work used `sim-codec.ts` (`swarm-sim/0`). That path remains the default for development and regression; it is **not** the hardware wire format.
 
 ## Codecs
 
 | Mode | Codec | Wire |
 |---|---|---|
-| `SWARM_FLEET=simulator` (default) | `devices/sim-codec.ts` | `swarm-sim/0` — regression only |
+| `SWARM_FLEET=simulator` (default) | `devices/sim-codec.ts` | `swarm-sim/0` — simulator / regression |
 | `SWARM_FLEET=hardware` | `devices/firmware-codec.ts` | JSON envelope, `protocol_version: 1` |
 
 Hardware mode **requires** `SWARM_AUTH_TOKEN` (non-empty). The value is never logged.
@@ -18,7 +21,7 @@ Hardware mode **requires** `SWARM_AUTH_TOKEN` (non-empty). The value is never lo
 
 - ESP32 is the WebSocket **client**.
 - Path: `/swarm` (firmware hard-coded).
-- Host/port: whatever was provisioned with Serial `set_coordinator <host> <port>` — typically the Mac LAN IP and `SWARM_PORT` (default `8787`).
+- Host/port: provisioned with Serial `set_coordinator <host> <port>` — typically the Mac LAN IP and `SWARM_PORT` (default `8787`).
 - Identity: first `type: "status"` with `source` / `module_id` in Mau01–Mau09. Duplicate identities are rejected.
 - There is no simulator `hello` event on the firmware wire.
 
@@ -48,12 +51,17 @@ Collective starts must **not** use legacy `start_at` / `delay_ms`.
 - UI RPM max: 8 (`SWARM_ABS_MAX_RPM`); device `hardMaxRpm` may be lower
 - Default travel assumption when a node has not reported: 0–500 mm
 
-## Still out of scope (next phase)
+## Implemented in B.2 (software)
 
-- Finish entire loaded track after coordinator disconnect
-- Onboard loop without Mac re-arm
-- Cross-node fault stop without coordinator
-- Position retention across reboot
+- Finish entire loaded track after coordinator disconnect when the run was prepared with `autonomous: true` and local start has occurred
+- Onboard looping without Mac re-arm when loop / continuous policy was authorized at prepare
+- Status telemetry for autonomous policy and loop progress
+
+Still **not** provided by firmware alone:
+
+- Cross-node fault or Stop propagation without the coordinator
+- Position retention or auto-resume across reboot
+- Guaranteed multi-hour nine-node sync while offline (no time master after disconnect)
 
 ## Practical start
 
@@ -63,4 +71,4 @@ npm install && npm run build
 SWARM_FLEET=hardware SWARM_AUTH_TOKEN='…' npm run start
 ```
 
-Provision modules so `coordinator_host` / `coordinator_port` / `auth_token` match this process. See README hardware checklist.
+Provision modules so `coordinator_host` / `coordinator_port` / `auth_token` match this process. See the hardware checklist in [`README.md`](README.md) and [`firmware/docs/COMMISSIONING.md`](firmware/docs/COMMISSIONING.md).

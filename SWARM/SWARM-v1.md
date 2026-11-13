@@ -7,6 +7,8 @@
 **Status:** Proposed architecture; implementation and physical calibration pending  
 **Language:** English  
 
+> **Document status (read first):** This file is the **historical / baseline** architecture and implementation specification. It records original design intentions, open physical questions, and proposed values (for example ~1000 mm choreography travel). It is **not** the current implementation manual. For what the software actually does today, use [`README.md`](README.md), [`firmware/README.md`](firmware/README.md), [`firmware/docs/PROTOCOL.md`](firmware/docs/PROTOCOL.md), [`FIRMWARE-INTEGRATION.md`](FIRMWARE-INTEGRATION.md), and [`docs/AUTONOMOUS-OPERATION.md`](docs/AUTONOMOUS-OPERATION.md). Do not silently rewrite proposed values in this document to match later firmware defaults.
+
 > **Purpose:** Build and upload the same Swarm-capable firmware to nine ESP32-S3 Super Mini controllers **before ceiling installation**. After installation, use a local Wi-Fi web application to commission, home, control, tune, and choreograph nine suspended **lightweight hollow glass Christmas ornaments**. Normal experimentation must not require a USB cable or physical access to the ceiling. OTA firmware updating is required for code changes.
 
 ## 1. Scope and decisions

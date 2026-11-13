@@ -7,7 +7,31 @@
 **Protocol version:** `1` (additive fields only in 0.3.0)  
 **Max inbound message:** 2048 bytes  
 
-Phase B / B.2 implement this contract. This is not the web UI.
+Phase B.1 / B.2 implement this contract in software. Physical ESP32 validation is separate. This is not the web UI. Source of truth for behaviour: `firmware/src/net/protocol.cpp`.
+
+Mac mapping: [`../../FIRMWARE-INTEGRATION.md`](../../FIRMWARE-INTEGRATION.md). Autonomous semantics: [`../../docs/AUTONOMOUS-OPERATION.md`](../../docs/AUTONOMOUS-OPERATION.md).
+
+## Message envelope
+
+Every JSON object includes at least:
+
+| Field | Role |
+|---|---|
+| `protocol_version` | Must be `1`; mismatch → nack |
+| `message_id` | Unique per side-effecting command within a WS session; required for those commands |
+| `type` | Command, `ack` / `nack`, `status`, `event`, or sync message type |
+| `source` / `module_id` | Module identity on node → Mac messages |
+| `auth_token` | Required on privileged Mac → node commands |
+
+Acks/nacks echo `message_id` and carry a `detail` string. Events use generated `message_id` values (e.g. `evt-…`).
+
+## Device registration
+
+There is no separate `hello` / register command on the firmware wire. After connecting as a WebSocket client to `/swarm`, the node periodically sends `type: "status"`. The Mac registers the device from the first valid `status` whose `module_id` / `source` is in `Mau01`–`Mau09`. Duplicate identities are rejected by the coordinator.
+
+## Authentication
+
+Privileged commands (`home`, `move_to_mm`, `set_config`, trajectory / run control, OTA, etc.) require a matching `auth_token`. `stop` does not require auth. Tokens must not be logged.
 
 ## Security (local Wi-Fi)
 
@@ -161,13 +185,18 @@ Nodes: event run_started { start_error_us }
 Nodes: event run_completed
 ```
 
-## Phase B requirements checklist
+## Phase B coordinator checklist
 
-- [ ] Maintain coordinator monotonic µs clock
-- [ ] Drive sync until all nine report `clock_synced`
-- [ ] Detect duplicate `module_id`
-- [ ] Wait for nine prepare acks before commit
-- [ ] Choose `start_at_us` with adequate lead
-- [ ] Wait for nine arm acks or cancel
-- [ ] Unique `message_id` / `run_id`
-- [ ] Never use `delay_ms` for collective starts
+Software in `SWARM/coordinator` is expected to:
+
+- [x] Maintain coordinator monotonic µs clock
+- [x] Drive sync until nodes report `clock_synced` (gate before prepare)
+- [x] Detect duplicate `module_id`
+- [x] Wait for prepare acks before commit
+- [x] Choose `start_at_us` with adequate lead
+- [x] Wait for arm acks or cancel
+- [x] Unique `message_id` / `run_id`
+- [x] Never use `delay_ms` for collective starts
+- [x] Pass autonomous policy on prepare when authorized (B.2)
+
+Physical nine-node confirmation of the same checklist remains pending.

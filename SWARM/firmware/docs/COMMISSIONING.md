@@ -43,7 +43,15 @@ set_token <shared-secret>
 save_config
 ```
 
-6. Run mock coordinator on the Mac (`tools/mock_coordinator.py`) and confirm `status` heartbeats for each module id.
+**Ports:** Firmware NVS default and `tools/mock_coordinator.py` use **8765**. **SWARM Control** (`npm run start` / `npm run dev`) listens on **8787** by default (`SWARM_PORT`). When connecting modules to the real app, use:
+
+```text
+set_coordinator <mac-lan-ip> 8787
+```
+
+(or whatever `SWARM_PORT` you set). The WebSocket path is always `/swarm`.
+
+6. Run mock coordinator on the Mac (`tools/mock_coordinator.py --port 8765`) **or** SWARM Control in hardware mode, and confirm `status` heartbeats for each module id.
 
 ## Homing safety (bench)
 

@@ -25,6 +25,10 @@ artificial-emotion/
 ├── Site/
 │   └── Public research website and Markdown-based research archive
 │
+├── SWARM/
+│   └── Nine-module MauMau installation:
+│       ESP32 firmware, Mac coordinator, Svelte control interface
+│
 ├── kinetic-module-maumau/
 │   └── Mau Mau kinetic module:
 │       mechanical design, electronics, firmware and fabrication files
@@ -79,6 +83,16 @@ npm run preview    # serve the built site
 ```
 
 Cloudinary folder galleries (Research Threads) need credentials in `Site/.env`. Copy `Site/.env.example` and restart `npm run dev` after changing it. Those variables are used at build time only.
+
+## SWARM
+
+[`SWARM/`](SWARM/)
+
+**SWARM** is a nine-module kinetic installation built from MauMau units: suspended lightweight glass ornaments driven by ESP32-S3 controllers on Artificial Emotion Controller v1 boards, choreographed over local Wi-Fi.
+
+The folder holds the dedicated Swarm firmware, a Mac-side Node.js coordinator, a Svelte control interface, a nine-node simulator, and the documentation for connected and autonomous operation.
+
+Software for firmware **v0.3.0**, protocol integration and autonomous playback is implemented; physical nine-module validation remains pending. Start at [`SWARM/README.md`](SWARM/README.md).
 
 ## Kinetic Module — Mau Mau
 
@@ -160,5 +174,6 @@ https://www.linalopes.info/
 
 - Artificial Emotion — https://emotion.linalopes.info/
 - Repository — https://github.com/linalopes/artificial-emotion
+- SWARM installation software — [`SWARM/README.md`](SWARM/README.md)
 - Lina Lopes — https://www.linalopes.info/
 - School of Tomorrow's AI — https://schoolai.linalopes.info/
