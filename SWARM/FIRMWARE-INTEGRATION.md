@@ -1,8 +1,9 @@
-# Firmware integration (Phase B.1)
+# Firmware integration (Phase B.1 + B.2)
 
-The coordinator speaks SWARM firmware v0.2.0 when `SWARM_FLEET=hardware`.
+The coordinator speaks SWARM firmware **v0.3.0** (protocol v1 additive) when `SWARM_FLEET=hardware`.
 
-Authoritative contract: `firmware/docs/PROTOCOL.md` and `firmware/src/net/protocol.cpp`.
+Authoritative contract: `firmware/docs/PROTOCOL.md` and `firmware/src/net/protocol.cpp`.  
+Autonomous playback: `docs/AUTONOMOUS-OPERATION.md`.
 
 ## Codecs
 
@@ -32,7 +33,7 @@ Hardware mode **requires** `SWARM_AUTH_TOKEN` (non-empty). The value is never lo
 | `clear_fault` | `clear_fault` | Re-home required after |
 | `get_config` | `get_config` | |
 | `load_trajectory` | `load_trajectory` | `track[{time_ms,z_mm}]`, ≤32 frames, ≤2048 bytes |
-| `prepare` | `prepare_run` | Requires node `clock_synced` |
+| `prepare` | `prepare_run` | Requires node `clock_synced`; optional `autonomous` / `loop` / `max_loops` / `max_runtime_ms` / `continuous` |
 | `commit` | `commit_run` | **`start_at_us`** coordinator monotonic µs (shared) |
 | `cancel` | `cancel_run` | |
 

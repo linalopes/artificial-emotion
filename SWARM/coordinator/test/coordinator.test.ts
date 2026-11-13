@@ -247,6 +247,26 @@ describe('collective run', () => {
     expect(run().error).toContain('Mau07 disconnected');
   });
 
+  it('rejects autonomous looping when the score is not loop-compatible', async () => {
+    await homeAll();
+    const score = shortScore(800, 100, 101);
+    score.loop = false;
+    // Close enough for speed validation, far enough to break 1 mm loop closure.
+    score.tracks.Mau01[score.tracks.Mau01.length - 1].zMm = 103;
+    await positioned(score);
+    const r = await send({
+      type: 'execute',
+      score,
+      confirmed: true,
+      repeat: false,
+      autonomous: true,
+      autonomousLoop: true,
+      maxLoops: 2
+    });
+    expect(r.ok).toBe(false);
+    expect(r.error).toMatch(/loop-compatible/i);
+  });
+
   it('refuses to execute when a clock is no longer synchronised', async () => {
     await homeAll();
     const score = shortScore();

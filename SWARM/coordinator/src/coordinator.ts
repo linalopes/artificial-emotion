@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import {
   ACCEL_MAX_MM_S2, ACCEL_MIN_MM_S2, DEFAULT_TRAVEL_MAX_MM, DEFAULT_TRAVEL_MIN_MM, NODE_IDS, OPEN_INTENTS, RPM_MAX, RPM_MIN,
-  positionAt, rpmToMmPerS, scoreFingerprint, validateScore,
+  positionAt, rpmToMmPerS, scoreFingerprint, scoreLoopCompatible, validateScore,
   type Intent, type LogEntry, type NodeId, type NodeLimits, type NodeOutcome, type RunState, type Score, type SimScenario, type Snapshot
 } from '@swarm/shared';
 import { monoNow } from './clock';
@@ -20,7 +20,10 @@ export interface SimControl {
 }
 
 const ACTIVE = new Set<RunState['phase']>(['positioning', 'loading', 'preparing', 'committing', 'armed', 'running']);
-const idleRun = (): RunState => ({ phase: 'idle', runId: null, scoreName: null, scoreFingerprint: null, durationMs: 0, startAtMs: null, repeat: false, pass: 0, error: null, perNode: {} });
+const idleRun = (): RunState => ({
+  phase: 'idle', runId: null, scoreName: null, scoreFingerprint: null, durationMs: 0, startAtMs: null,
+  repeat: false, autonomous: false, autonomousLoop: false, pass: 0, error: null, perNode: {}
+});
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -159,7 +162,14 @@ export class Coordinator {
       case 'goToStart':
         return this.goToStart(intent.score);
       case 'execute':
-        return this.execute(intent.score, intent.repeat);
+        return this.execute(intent.score, {
+          repeat: intent.repeat,
+          autonomous: intent.autonomous === true,
+          autonomousLoop: intent.autonomousLoop === true,
+          continuous: intent.continuous === true,
+          maxLoops: intent.maxLoops,
+          maxRuntimeMs: intent.maxRuntimeMs
+        });
       case 'cancelRun':
         if (!ACTIVE.has(this.run.phase) && this.run.phase !== 'positioned') return { ok: false, error: 'No run to cancel.' };
         return this.stopAll('Run cancelled by the operator.');
@@ -320,7 +330,17 @@ export class Coordinator {
     }
   }
 
-  private async execute(score: Score, repeat: boolean): Promise<IntentResult> {
+  private async execute(
+    score: Score,
+    opts: {
+      repeat: boolean;
+      autonomous: boolean;
+      autonomousLoop: boolean;
+      continuous: boolean;
+      maxLoops?: number;
+      maxRuntimeMs?: number;
+    }
+  ): Promise<IntentResult> {
     if (this.run.phase !== 'positioned' || this.run.scoreFingerprint !== scoreFingerprint(score)) {
       return { ok: false, error: 'Move the modules to the start of this score first (Go to start). The score has changed or was never positioned.' };
     }
@@ -330,14 +350,35 @@ export class Coordinator {
     if (away.length) return { ok: false, error: `${away.join(', ')} moved away from the start position. Go to start again.` };
     const bad = this.checkScore(score);
     if (bad) return { ok: false, error: bad };
+    if (opts.autonomous && opts.autonomousLoop && !scoreLoopCompatible(score)) {
+      return { ok: false, error: 'This score is not loop-compatible for autonomous playback (first and last positions must match within 1 mm).' };
+    }
     const token = ++this.token;
-    this.run = { ...this.run, repeat, pass: 0 };
-    const err = await this.startPass(score, token);
+    // Autonomous runs loop on the modules; the Mac must not re-arm.
+    const repeat = opts.autonomous ? false : opts.repeat;
+    this.run = {
+      ...this.run,
+      repeat,
+      autonomous: opts.autonomous,
+      autonomousLoop: opts.autonomous && opts.autonomousLoop,
+      pass: 0
+    };
+    const err = await this.startPass(score, token, opts);
     return err ? { ok: false, error: err } : { ok: true };
   }
 
   /** load, prepare, commit. Returns an error string, or null once every node has confirmed it is armed. */
-  private async startPass(score: Score, token: number): Promise<string | null> {
+  private async startPass(
+    score: Score,
+    token: number,
+    auto: {
+      autonomous: boolean;
+      autonomousLoop: boolean;
+      continuous: boolean;
+      maxLoops?: number;
+      maxRuntimeMs?: number;
+    } = { autonomous: false, autonomousLoop: false, continuous: false }
+  ): Promise<string | null> {
     const runId = randomUUID();
     this.run = { ...this.run, runId, phase: 'loading', pass: this.run.pass + 1, startAtMs: null, error: null, perNode: {} };
     const stage = async (phase: RunState['phase'], done: string, make: (id: NodeId) => DeviceCommand | null): Promise<string | null> => {
@@ -368,12 +409,19 @@ export class Coordinator {
       keyframes: score.tracks[id],
       presetId: score.name
     }));
-    err ??= await stage('preparing', 'ready', () => ({ name: 'prepare', runId }));
+    err ??= await stage('preparing', 'ready', () => ({
+      name: 'prepare',
+      runId,
+      autonomous: auto.autonomous,
+      loop: auto.autonomous && auto.autonomousLoop,
+      continuous: auto.autonomous && auto.continuous,
+      maxLoops: auto.autonomous ? auto.maxLoops : undefined,
+      maxRuntimeMs: auto.autonomous ? auto.maxRuntimeMs : undefined
+    }));
     let startAt = 0;
     if (!err) {
       startAt = monoNow() + this.cfg.startLeadMs;
       if (this.codec.speaksFirmware) {
-        // Absolute coordinator monotonic µs — same value for every node (PROTOCOL.md).
         const startAtCoordUs = Math.round(startAt * 1000);
         err = await stage('committing', 'armed', () => ({ name: 'commit', runId, startAtCoordUs }));
       } else {
@@ -392,9 +440,11 @@ export class Coordinator {
     this.run.startAtMs = startAt;
     this.note(
       'info',
-      this.codec.speaksFirmware
-        ? `${score.name} armed on nine modules, pass ${this.run.pass}. Shared start_at_us=${Math.round(startAt * 1000)}.`
-        : `${score.name} armed on nine modules, pass ${this.run.pass}. Each module starts from its own clock.`
+      auto.autonomous
+        ? `${score.name} armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.`
+        : this.codec.speaksFirmware
+          ? `${score.name} armed on nine modules, pass ${this.run.pass}. Shared start_at_us=${Math.round(startAt * 1000)}.`
+          : `${score.name} armed on nine modules, pass ${this.run.pass}. Each module starts from its own clock.`
     );
     this.watch(score, token, startAt);
     return null;
@@ -413,8 +463,8 @@ export class Coordinator {
       const finished = NODE_IDS.every((id) => this.run.perNode[id] === 'finished');
       if (finished) {
         clearInterval(this.monitor!);
-        if (this.run.repeat) {
-          void this.startPass(score, token);
+        if (this.run.repeat && !this.run.autonomous) {
+          void this.startPass(score, token, { autonomous: false, autonomousLoop: false, continuous: false });
         } else {
           this.run.phase = 'finished';
           this.note('info', `${score.name} finished. All nine modules confirmed completion.`);

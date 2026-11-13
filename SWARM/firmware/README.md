@@ -105,6 +105,7 @@ Relative to `SWARM-v1.md`:
 6. Firmware **0.1.1** remediates C1–C2 and H1–H7.  
 7. Firmware **0.1.2** remediates M1–M10 / L1–L5.  
 8. Firmware **0.2.0** adds collective clock sync + prepare/commit/arm (`docs/PROTOCOL.md`).
+9. Firmware **0.3.0** adds opt-in autonomous full-track / local loop after Mac disconnect (see `../docs/AUTONOMOUS-OPERATION.md`).
 
 ## Host tests
 

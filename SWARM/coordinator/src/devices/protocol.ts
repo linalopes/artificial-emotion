@@ -16,7 +16,15 @@ export type DeviceCommand =
   | { name: 'clear_fault' }
   | { name: 'get_config' }
   | { name: 'load_trajectory'; runId: string; durationMs: number; keyframes: Keyframe[]; presetId?: string }
-  | { name: 'prepare'; runId: string }
+  | {
+      name: 'prepare';
+      runId: string;
+      autonomous?: boolean;
+      loop?: boolean;
+      continuous?: boolean;
+      maxLoops?: number;
+      maxRuntimeMs?: number;
+    }
   /** Sim: startAtNodeMs. Firmware: startAtCoordUs (coordinator monotonic microseconds). */
   | { name: 'commit'; runId: string; startAtNodeMs?: number; startAtCoordUs?: number }
   | { name: 'cancel'; runId: string };

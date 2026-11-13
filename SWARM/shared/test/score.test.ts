@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_PARAMS, NODE_IDS, checkScoreShape, generate, generateDrift, generateWave, parseEnvelope, positionAt, rpmToMmPerS,
-  scoreFingerprint, validateScore, type NodeId, type NodeLimits, type Score
+  scoreFingerprint, scoreLoopCompatible, validateScore, type NodeId, type NodeLimits, type Score
 } from '../src/index';
 
 const limits = (speed: number, min = 0, max = 1000) => Object.fromEntries(NODE_IDS.map((id) => [id, { minMm: min, maxMm: max, maxSpeedMmS: speed }])) as Record<NodeId, NodeLimits>;
@@ -48,6 +48,7 @@ describe('generators', () => {
     for (const type of ['wave', 'breathing', 'drift'] as const) {
       const s = generate(type, DEFAULT_PARAMS[type]);
       for (const id of NODE_IDS) expect(s.tracks[id].length).toBeLessThanOrEqual(32);
+      expect(scoreLoopCompatible(s)).toBe(true);
     }
   });
   it('drift is reproducible from its seed and differs between seeds', () => {

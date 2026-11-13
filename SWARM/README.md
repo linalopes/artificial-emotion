@@ -14,9 +14,9 @@ Browser (Svelte 5 + Vite)  <-- WebSocket + HTTP -->  Mac coordinator (Node.js + 
 |---|---|
 | Frontend, coordinator, shared code | Implemented; type-check and production build required after `npm install` |
 | Coordinator logic against nine **simulated** nodes | Automated tests (sim codec) |
-| Communication with SWARM firmware v0.2.0 | **Implemented** (`firmware-codec.ts`, hardware fleet mode) |
+| Communication with SWARM firmware v0.3.0 | **Implemented** (`firmware-codec.ts`, hardware fleet mode) |
 | Tested against real ESP32 hardware | **Not claimed here** — use the hardware checklist below |
-| Autonomous looping after Mac power-off | **Not implemented** (next phase) |
+| Autonomous playback after Mac disconnect | **Implemented in software** — see `docs/AUTONOMOUS-OPERATION.md`; physical validation required |
 
 The interface always shows whether it is looking at simulated nodes or hardware (`fleet` in the snapshot).
 

@@ -44,6 +44,11 @@ class AppState {
   preset = $state<PresetType>('wave');
   params = $state<PresetParams>(structuredClone(DEFAULT_PARAMS));
   loop = $state(true);
+  /** Opt-in: modules continue after Mac disconnect. Not the same as Preview/Mac loop. */
+  autonomous = $state(false);
+  /** Local loop count when autonomous (finite). Ignored when continuousAutonomous. */
+  autonomousMaxLoops = $state(3);
+  continuousAutonomous = $state(false);
   playing = $state(false);
   rate = $state(10);
   tMs = $state(0);

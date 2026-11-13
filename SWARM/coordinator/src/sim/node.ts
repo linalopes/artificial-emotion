@@ -17,6 +17,7 @@ interface Trajectory {
   prepared: boolean;
   startAt: number | null;
   started: boolean;
+  autonomous?: boolean;
 }
 
 /**
@@ -168,7 +169,14 @@ export class SimNode {
       case 'prepare':
         if (!this.traj || this.traj.runId !== cmd.runId) return 'no trajectory for this run';
         if (!this.homed) return 'not homed';
+        if (cmd.autonomous && cmd.loop) {
+          const tr = this.traj.score.tracks[this.id];
+          if (tr && tr.length >= 2 && Math.abs(tr[0].zMm - tr[tr.length - 1].zMm) > 1) {
+            return 'track_not_loop_compatible';
+          }
+        }
         this.traj.prepared = true;
+        this.traj.autonomous = cmd.autonomous === true;
         return null;
       case 'commit':
         if (!this.traj || this.traj.runId !== cmd.runId || !this.traj.prepared) return 'run not prepared';

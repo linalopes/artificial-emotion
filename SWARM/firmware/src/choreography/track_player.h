@@ -6,6 +6,7 @@
 #include "../motor/motion_planner.h"
 #include "../position/position.h"
 #include "../system/module_state.h"
+#include "autonomous_policy.h"
 
 namespace swarm {
 
@@ -34,8 +35,13 @@ class TrackPlayer {
   bool load(const char* presetId, uint32_t revision, const TrackKeyframe* frames, size_t count,
             String* error);
   bool prepareStart(String* error);
-  bool startAt(uint32_t startAtMillisLocal, String* error);
+  /** Arm local start. policy is copied for this playback only. */
+  bool startAt(uint32_t startAtMillisLocal, const AutonomousPolicy& policy, String* error);
+  bool startAt(uint32_t startAtMillisLocal, String* error) {
+    return startAt(startAtMillisLocal, AutonomousPolicy{}, error);
+  }
   void stop();
+  /** Coordinator link lost. Autonomous runs that have started continue; others follow policy. */
   void onCoordinatorDisconnected(bool finishCurrentSegment);
 
   void service();
@@ -46,6 +52,18 @@ class TrackPlayer {
   size_t keyframeCount() const { return count_; }
   size_t currentIndex() const { return index_; }
   bool hasTrack() const { return count_ >= 2; }
+  bool autonomousActive() const { return policy_.autonomous && started_; }
+  bool started() const { return started_; }
+  const AutonomousPolicy& policy() const { return policy_; }
+  uint32_t passIndex() const { return passIndex_; }  // 0-based current pass
+  uint32_t completedPasses() const { return completedPasses_; }
+  uint32_t epochStartMs() const { return epochStartMs_; }
+  uint32_t trackDurationMs() const { return count_ >= 2 ? frames_[count_ - 1].timeMs : 0; }
+  float firstZMm() const { return count_ > 0 ? frames_[0].zMm : 0; }
+  float lastZMm() const { return count_ > 0 ? frames_[count_ - 1].zMm : 0; }
+  bool loopCompatible() const {
+    return count_ >= 2 && trackLoopCompatible(frames_[0].zMm, frames_[count_ - 1].zMm);
+  }
 
  private:
   MotionPlanner* planner_ = nullptr;
@@ -59,11 +77,18 @@ class TrackPlayer {
   char presetId_[24] = "";
   uint32_t revision_ = 0;
   TrackPhase phase_ = TrackPhase::Idle;
-  uint32_t startAtMs_ = 0;
+  uint32_t epochStartMs_ = 0;
   bool disconnectPendingStop_ = false;
+  AutonomousPolicy policy_{};
+  bool started_ = false;
+  uint32_t passIndex_ = 0;
+  uint32_t completedPasses_ = 0;
 
   bool validateFeasibility(String* error) const;
   bool beginSegment(size_t fromIndex, String* error);
+  uint32_t elapsedEpochMs(uint32_t nowMs) const;
+  bool runtimeExpired(uint32_t nowMs) const;
+  void finishPass(uint32_t nowMs);
 };
 
 }  // namespace swarm

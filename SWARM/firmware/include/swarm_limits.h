@@ -95,3 +95,20 @@
 #ifndef SWARM_RUN_ID_MAX
 #define SWARM_RUN_ID_MAX 32u
 #endif
+
+// Autonomous playback (Phase B.2)
+#ifndef SWARM_LOOP_CLOSURE_MM
+#define SWARM_LOOP_CLOSURE_MM 1.0f  // first/last keyframe must match within this for looping
+#endif
+
+#ifndef SWARM_AUTONOMOUS_MAX_LOOPS_CAP
+#define SWARM_AUTONOMOUS_MAX_LOOPS_CAP 10000u
+#endif
+
+#ifndef SWARM_AUTONOMOUS_MAX_RUNTIME_MS
+#define SWARM_AUTONOMOUS_MAX_RUNTIME_MS (12u * 60u * 60u * 1000u)  // 12 h software ceiling
+#endif
+
+#ifndef SWARM_AUTONOMOUS_MIN_RUNTIME_MS
+#define SWARM_AUTONOMOUS_MIN_RUNTIME_MS 1000u
+#endif

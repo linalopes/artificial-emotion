@@ -225,8 +225,17 @@ export function createFirmwareCodec(opts: FirmwareCodecOptions): Codec {
           }
           return body;
         }
-        case 'prepare':
-          return envelope('prepare_run', target, messageId, withAuth({ run_id: cmd.runId }), source);
+        case 'prepare': {
+          const payload: Record<string, unknown> = { run_id: cmd.runId };
+          if (cmd.autonomous) {
+            payload.autonomous = true;
+            if (cmd.loop) payload.loop = true;
+            if (cmd.continuous) payload.continuous = true;
+            if (cmd.maxLoops !== undefined) payload.max_loops = cmd.maxLoops;
+            if (cmd.maxRuntimeMs !== undefined) payload.max_runtime_ms = cmd.maxRuntimeMs;
+          }
+          return envelope('prepare_run', target, messageId, withAuth(payload), source);
+        }
         case 'commit': {
           if (cmd.startAtCoordUs === undefined) {
             throw new Error('Firmware commit requires startAtCoordUs (coordinator monotonic microseconds).');

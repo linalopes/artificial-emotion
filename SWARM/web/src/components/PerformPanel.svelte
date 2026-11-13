@@ -93,6 +93,21 @@
     {#each checks as c}
       <div class="k" style="font-size: 13px"><span>{c.label}</span><span class="row" style="gap: 6px"><span class="m small">{c.detail}</span><span class="bd {c.ok ? 'good' : 'bad'}">{c.ok ? 'OK' : 'Blocked'}</span></span></div>
     {/each}
+    <label class="row" style="gap: 8px; align-items: center">
+      <input type="checkbox" bind:checked={app.autonomous} disabled={locked} />
+      <span class="small">Autonomous on modules — continue if the Mac disconnects after start</span>
+    </label>
+    {#if app.autonomous && app.loop}
+      <label class="row" style="gap: 8px; align-items: center">
+        <input type="checkbox" bind:checked={app.continuousAutonomous} disabled={locked} />
+        <span class="small">Continuous local loop (still stops on fault / Stop while connected)</span>
+      </label>
+      {#if !app.continuousAutonomous}
+        <label class="k"><span class="l">Local loop count</span>
+          <input type="number" min="1" max="1000" step="1" style="width: 90px" bind:value={app.autonomousMaxLoops} disabled={locked} />
+        </label>
+      {/if}
+    {/if}
     {#if app.runActive}
       <button class="b d big" disabled={!app.linked} onclick={() => app.send({ type: 'cancelRun' })}>Stop run</button>
     {:else}
@@ -104,6 +119,7 @@
     {#if run && run.phase !== 'idle'}
       <div class={run.phase === 'failed' ? 'alert' : 'note'} role="status">
         {run.scoreName}{app.runIsThisScore ? '' : ' (not the score shown here)'}: {PHASE[run.phase]}
+        {#if run.autonomous} Autonomous.{/if}
         {#if run.pass > 1} Pass {run.pass}.{/if}
         {#if run.error} {run.error}{/if}
       </div>
@@ -112,7 +128,12 @@
       {#if app.mode !== 'live'}Switch to Live to run on the modules. Preview never sends commands.
       {:else if !app.isOperator}Take control to run the choreography.
       {:else}Go to start moves the spheres to their first positions. Execute never repositions them.
-        {app.loop ? 'With Loop on, the coordinator re-arms the score after each pass, with a short pause. That needs this Mac running.' : ''}{/if}
+        {#if app.autonomous}
+          Autonomous uses each module's local clock after start. Long-run sync will drift without the Mac.
+        {:else if app.loop}
+          With Loop on (and Autonomous off), the coordinator re-arms after each pass. That needs this Mac running.
+        {/if}
+      {/if}
     </span>
   </div>
 </div>

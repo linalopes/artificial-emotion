@@ -33,7 +33,16 @@
   });
   async function execute() {
     app.confirm = false;
-    await app.send({ type: 'execute', score: app.score, confirmed: true, repeat: app.loop });
+    await app.send({
+      type: 'execute',
+      score: app.score,
+      confirmed: true,
+      repeat: app.loop,
+      autonomous: app.autonomous || undefined,
+      autonomousLoop: app.autonomous && app.loop ? true : undefined,
+      continuous: app.autonomous && app.continuousAutonomous ? true : undefined,
+      maxLoops: app.autonomous && app.loop && !app.continuousAutonomous ? app.autonomousMaxLoops : undefined
+    });
   }
   const stats = $derived(Object.values(app.validation.stats));
 
@@ -145,11 +154,20 @@
       <span class="t" id="confirm-title" style="font-size: 30px">Start {app.score.name} on nine {app.simulated ? 'simulated modules' : 'motors'}?</span>
       <span>
         The spheres will travel between {Math.round(Math.min(...stats.map((s) => s.minMm)))} and {Math.round(Math.max(...stats.map((s) => s.maxMm)))} mm at up to
-        {Math.max(...stats.map((s) => s.peakSpeedMmS)).toFixed(1)} mm/s for {Math.round(app.score.durationMs / 1000)} s{app.loop ? ', then repeat until stopped' : ''}. They start from where they are now. Keep the space below clear.
+        {Math.max(...stats.map((s) => s.peakSpeedMmS)).toFixed(1)} mm/s for {Math.round(app.score.durationMs / 1000)} s
+        {app.autonomous
+          ? (app.loop
+            ? (app.continuousAutonomous ? ', looping on each module until stopped or faulted' : `, looping ${app.autonomousMaxLoops} times on each module`)
+            : ', once on each module')
+          : (app.loop ? ', then the Mac re-arms until stopped' : '')}.
+        They start from where they are now. Keep the space below clear.
+        {#if app.autonomous}
+          <strong> Autonomous:</strong> after start, the Mac may disconnect; modules continue from their local clocks. Software Stop will not reach them while offline. Keep a physical power cut-off available. Independent clocks will drift over long runs.
+        {/if}
       </span>
       <div class="row" style="gap: 8px; justify-content: flex-end">
         <button class="b" bind:this={cancelBtn} onclick={() => (app.confirm = false)}>Cancel</button>
-        <button class="b a" onclick={execute}>Start {app.score.name} live</button>
+        <button class="b a" onclick={execute}>{app.autonomous ? 'Start autonomous run' : `Start ${app.score.name} live`}</button>
       </div>
     </div>
   </div>

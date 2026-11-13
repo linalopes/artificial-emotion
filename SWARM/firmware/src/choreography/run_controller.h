@@ -6,6 +6,7 @@
 #include <swarm_limits.h>
 
 #include "../sync/clock_sync.h"
+#include "autonomous_policy.h"
 #include "run_schedule.h"
 #include "track_player.h"
 
@@ -23,7 +24,7 @@ enum class RunPhase : uint8_t {
 };
 
 // Collective prepare/commit/arm on top of TrackPlayer.
-// Host-testable core: scheduling validation without Arduino.
+// Host-testable core: scheduling validation without Arduino (policy helpers).
 class RunController {
  public:
   void begin(TrackPlayer* track, ClockSync* clock) {
@@ -40,6 +41,7 @@ class RunController {
     actualStartLocalUs_ = 0;
     startErrorUs_ = 0;
     reject_[0] = '\0';
+    clearAutonomousPolicy(&policy_);
   }
 
   RunPhase phase() const { return phase_; }
@@ -47,6 +49,8 @@ class RunController {
   int64_t startErrorUs() const { return startErrorUs_; }
   uint64_t startLocalUs() const { return startLocalUs_; }
   const char* lastReject() const { return reject_; }
+  const AutonomousPolicy& policy() const { return policy_; }
+  bool autonomous() const { return policy_.autonomous; }
 
   bool loadRun(const char* runId, const char* presetId, uint32_t revision,
                const TrackKeyframe* frames, size_t count, String* error) {
@@ -67,12 +71,12 @@ class RunController {
     }
     strncpy(runId_, runId, SWARM_RUN_ID_MAX - 1);
     runId_[SWARM_RUN_ID_MAX - 1] = '\0';
+    clearAutonomousPolicy(&policy_);
     phase_ = RunPhase::Loaded;
     reject_[0] = '\0';
     return true;
   }
 
-  // Also accept track already loaded via load_preset — bind run_id only.
   bool bindLoadedTrack(const char* runId, String* error) {
     if (!track_->hasTrack()) {
       if (error) {
@@ -92,8 +96,8 @@ class RunController {
     return true;
   }
 
-  bool prepare(const char* runId, bool positionValid, bool readyState, bool faulted, bool otaActive,
-               bool plannerBusy, bool homeActive, String* error) {
+  bool prepare(const char* runId, const AutonomousPolicy& policy, bool positionValid, bool readyState,
+               bool faulted, bool otaActive, bool plannerBusy, bool homeActive, String* error) {
     if (!runId || strcmp(runId, runId_) != 0) {
       setReject("run_id mismatch");
       if (error) {
@@ -103,6 +107,21 @@ class RunController {
     }
     if (phase_ != RunPhase::Loaded && phase_ != RunPhase::Prepared) {
       setReject("not loaded");
+      if (error) {
+        *error = reject_;
+      }
+      return false;
+    }
+    const char* reason = nullptr;
+    if (!validateAutonomousPolicy(policy, &reason)) {
+      setReject(reason ? reason : "invalid autonomous policy");
+      if (error) {
+        *error = reject_;
+      }
+      return false;
+    }
+    if (policy.autonomous && policy.loop && !track_->loopCompatible()) {
+      setReject("track_not_loop_compatible");
       if (error) {
         *error = reject_;
       }
@@ -137,6 +156,7 @@ class RunController {
       }
       return false;
     }
+    policy_ = policy;
     phase_ = RunPhase::Prepared;
     reject_[0] = '\0';
     return true;
@@ -163,6 +183,7 @@ class RunController {
         *error = reject_;
       }
       phase_ = RunPhase::Failed;
+      clearAutonomousPolicy(&policy_);
       return false;
     }
 
@@ -173,22 +194,22 @@ class RunController {
       if (error) {
         *error = reject_;
       }
-      // Do not start late.
       phase_ = RunPhase::Failed;
+      clearAutonomousPolicy(&policy_);
       return false;
     }
 
     startCoordUs_ = startCoordinatorUs;
     startLocalUs_ = clock_->coordinatorToLocal(startCoordinatorUs);
     String terr;
-    // Arm track with local millis domain (ms resolution from us).
     const uint32_t startMs = static_cast<uint32_t>(startLocalUs_ / 1000ull);
-    if (!track_->startAt(startMs, &terr)) {
+    if (!track_->startAt(startMs, policy_, &terr)) {
       setReject(terr.c_str());
       if (error) {
         *error = terr;
       }
       phase_ = RunPhase::Failed;
+      clearAutonomousPolicy(&policy_);
       return false;
     }
     phase_ = RunPhase::Armed;
@@ -200,20 +221,26 @@ class RunController {
     if (runId && runId[0] != '\0' && runId_[0] != '\0' && strcmp(runId, runId_) != 0) {
       return;
     }
-    if (phase_ == RunPhase::Running) {
-      track_->stop();
-    } else if (phase_ == RunPhase::Armed || phase_ == RunPhase::Prepared) {
+    if (phase_ == RunPhase::Running || phase_ == RunPhase::Armed || phase_ == RunPhase::Prepared) {
       track_->stop();
     }
     phase_ = RunPhase::Cancelled;
+    clearAutonomousPolicy(&policy_);
   }
 
   void onDisconnectBeforeStart() {
     if (phase_ == RunPhase::Prepared || phase_ == RunPhase::Armed || phase_ == RunPhase::Loaded) {
       track_->stop();
       phase_ = RunPhase::Cancelled;
+      clearAutonomousPolicy(&policy_);
       setReject("coordinator_disconnect_before_start");
     }
+    // Running + autonomous: do not cancel here; TrackPlayer continues.
+  }
+
+  /** True if disconnect must not tear down this run (autonomous and already running). */
+  bool shouldSurviveDisconnect() const {
+    return phase_ == RunPhase::Running && policy_.autonomous;
   }
 
   // Call every loop with local micros; returns true once when run actually starts.
@@ -222,24 +249,24 @@ class RunController {
       if (!syncStillOk) {
         track_->stop();
         phase_ = RunPhase::Failed;
+        clearAutonomousPolicy(&policy_);
         setReject("sync_lost_before_start");
         return false;
       }
-      // Pre-start safety: if local time already past start by more than uncertainty, reject.
       if (localNowUs + 1000ull < startLocalUs_) {
-        // still waiting — track player uses millis; keep phase Armed
         return false;
       }
-      // Detect start when track leaves Armed/Playing prelude.
       if (track_->phase() == TrackPhase::Playing || track_->phase() == TrackPhase::SegmentActive) {
-        actualStartLocalUs_ = localNowUs;
-        startErrorUs_ = static_cast<int64_t>(actualStartLocalUs_) - static_cast<int64_t>(startLocalUs_);
-        phase_ = RunPhase::Running;
-        return true;
+        if (track_->started()) {
+          actualStartLocalUs_ = localNowUs;
+          startErrorUs_ = static_cast<int64_t>(actualStartLocalUs_) - static_cast<int64_t>(startLocalUs_);
+          phase_ = RunPhase::Running;
+          return true;
+        }
       }
-      // If track failed to start and went Stopped without running:
       if (track_->phase() == TrackPhase::Stopped && localNowUs > startLocalUs_ + 500000ull) {
         phase_ = RunPhase::Failed;
+        clearAutonomousPolicy(&policy_);
         setReject("start_missed");
       }
       return false;
@@ -248,9 +275,12 @@ class RunController {
     if (phase_ == RunPhase::Running) {
       if (track_->phase() == TrackPhase::Completed) {
         phase_ = RunPhase::Completed;
+        clearAutonomousPolicy(&policy_);
       } else if (track_->phase() == TrackPhase::Stopped) {
         phase_ = RunPhase::Cancelled;
+        clearAutonomousPolicy(&policy_);
       }
+      // Playing / SegmentActive / next loop: stay Running.
     }
     return false;
   }
@@ -259,6 +289,7 @@ class RunController {
     if (phase_ == RunPhase::Running || phase_ == RunPhase::Armed || phase_ == RunPhase::Prepared) {
       track_->stop();
       phase_ = RunPhase::Failed;
+      clearAutonomousPolicy(&policy_);
       setReject("node_fault");
     }
   }
@@ -278,6 +309,7 @@ class RunController {
   uint64_t actualStartLocalUs_ = 0;
   int64_t startErrorUs_ = 0;
   char reject_[48] = {};
+  AutonomousPolicy policy_{};
 };
 
 inline const char* runPhaseToString(RunPhase p) {

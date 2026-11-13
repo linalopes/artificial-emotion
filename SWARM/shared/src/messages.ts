@@ -16,7 +16,20 @@ export type Intent =
   | { type: 'setParams'; nodes: NodeId[]; rpm?: number; accelMmS2?: number }
   | { type: 'clearFault'; nodes: NodeId[] }
   | { type: 'goToStart'; score: Score }
-  | { type: 'execute'; score: Score; confirmed: true; repeat: boolean }
+  | {
+      type: 'execute';
+      score: Score;
+      confirmed: true;
+      /** Mac re-arms each pass (requires coordinator). Ignored when autonomous is true. */
+      repeat: boolean;
+      /** Modules continue after Mac disconnect. Opt-in; default false. */
+      autonomous?: boolean;
+      /** Local loops on each ESP32. Requires loop-compatible score. */
+      autonomousLoop?: boolean;
+      continuous?: boolean;
+      maxLoops?: number;
+      maxRuntimeMs?: number;
+    }
   | { type: 'cancelRun' }
   | { type: 'simScenario'; scenario: SimScenario; node?: NodeId };
 
@@ -90,7 +103,28 @@ export function parseEnvelope(raw: unknown): IntentEnvelope | { error: string } 
     case 'execute': {
       if (i.confirmed !== true) return { error: 'Execute needs explicit confirmation.' };
       const r = checkScoreShape(i.score);
-      return 'error' in r ? r : ok({ type: 'execute', score: r.score, confirmed: true, repeat: i.repeat === true });
+      if ('error' in r) return r;
+      const autonomous = i.autonomous === true;
+      const autonomousLoop = i.autonomousLoop === true;
+      const continuous = i.continuous === true;
+      const maxLoops = i.maxLoops === undefined ? undefined : typeof i.maxLoops === 'number' && Number.isFinite(i.maxLoops) && i.maxLoops >= 0 ? Math.floor(i.maxLoops) : null;
+      const maxRuntimeMs = i.maxRuntimeMs === undefined ? undefined : typeof i.maxRuntimeMs === 'number' && Number.isFinite(i.maxRuntimeMs) && i.maxRuntimeMs >= 0 ? Math.floor(i.maxRuntimeMs) : null;
+      if (maxLoops === null) return { error: 'maxLoops is invalid.' };
+      if (maxRuntimeMs === null) return { error: 'maxRuntimeMs is invalid.' };
+      if (autonomous && autonomousLoop && !continuous && (maxLoops ?? 0) === 0 && (maxRuntimeMs ?? 0) === 0) {
+        return { error: 'Autonomous looping needs maxLoops, maxRuntimeMs, or continuous.' };
+      }
+      return ok({
+        type: 'execute',
+        score: r.score,
+        confirmed: true,
+        repeat: autonomous ? false : i.repeat === true,
+        ...(autonomous ? { autonomous: true } : {}),
+        ...(autonomousLoop ? { autonomousLoop: true } : {}),
+        ...(continuous ? { continuous: true } : {}),
+        ...(maxLoops !== undefined ? { maxLoops } : {}),
+        ...(maxRuntimeMs !== undefined ? { maxRuntimeMs } : {})
+      });
     }
     case 'simScenario': {
       const s = i.scenario;

@@ -9,6 +9,9 @@ export interface NodeLimits {
   maxSpeedMmS: number;
 }
 
+/** Mechanical tolerance matching firmware SWARM_LOOP_CLOSURE_MM. */
+export const LOOP_CLOSURE_MM = 1;
+
 export type IssueKind = 'structure' | 'range' | 'speed' | 'loop' | 'size';
 export interface ScoreIssue {
   kind: IssueKind;
@@ -104,9 +107,19 @@ export function validateScore(score: Score, limits: Record<NodeId, NodeLimits>):
     if (peak > lim.maxSpeedMmS + 1e-6) {
       issues.push({ kind: 'speed', node: id, tMs: peakAt, message: `${id} needs ${peak.toFixed(1)} mm/s but its current speed setting allows ${lim.maxSpeedMmS.toFixed(1)} mm/s.` });
     }
-    if (score.loop && Math.abs(tr[0].zMm - tr[tr.length - 1].zMm) > 1) {
+    if (score.loop && Math.abs(tr[0].zMm - tr[tr.length - 1].zMm) > LOOP_CLOSURE_MM) {
       issues.push({ kind: 'loop', node: id, message: `${id} ends ${Math.abs(tr[0].zMm - tr[tr.length - 1].zMm).toFixed(0)} mm away from where it starts, so the loop would jump.` });
     }
   }
   return { ok: issues.length === 0, issues, stats };
+}
+
+/** Firmware rejects autonomous looping unless first/last positions match within LOOP_CLOSURE_MM. */
+export function scoreLoopCompatible(score: Score): boolean {
+  for (const id of NODE_IDS) {
+    const tr = score.tracks[id];
+    if (!tr || tr.length < 2) return false;
+    if (Math.abs(tr[0].zMm - tr[tr.length - 1].zMm) > LOOP_CLOSURE_MM) return false;
+  }
+  return true;
 }

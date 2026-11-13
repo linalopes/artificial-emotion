@@ -92,8 +92,11 @@ void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
         c_.clock->beginSession();
       }
       if (c_.run) {
-        c_.run->onDisconnectBeforeStart();
-        // Fresh session: cancel any armed collective run.
+        // Fresh session: cancel armed/prepared runs. Do not interrupt an autonomous run
+        // that is already executing (Case E — reconnect reports state, no auto restart).
+        if (!c_.run->shouldSurviveDisconnect()) {
+          c_.run->onDisconnectBeforeStart();
+        }
       }
       SWARM_LOG("WS connected (idempotency session %lu)",
                 static_cast<unsigned long>(idem_.session()));
@@ -134,14 +137,16 @@ void ProtocolClient::handleDisconnectPolicy() {
     c_.clock->invalidate();
   }
   if (c_.run) {
-    // Before start: cancel. During execution: apply segment policy via track.
-    if (c_.run->phase() == RunPhase::Prepared || c_.run->phase() == RunPhase::Armed ||
-        c_.run->phase() == RunPhase::Loaded) {
+    // Before start: cancel. Autonomous runs that have already started continue.
+    if (c_.run->shouldSurviveDisconnect()) {
+      SWARM_LOG("Disconnect: autonomous run survives (clock invalidated)");
+    } else if (c_.run->phase() == RunPhase::Prepared || c_.run->phase() == RunPhase::Armed ||
+               c_.run->phase() == RunPhase::Loaded) {
       c_.run->onDisconnectBeforeStart();
     }
   }
 
-  // Never auto-resume choreography on later reconnect.
+  // Never auto-resume a cancelled run on later reconnect.
   c_.track->onCoordinatorDisconnected(finish);
 
   if (c_.home->active()) {
@@ -276,6 +281,17 @@ void ProtocolClient::fillStatus(JsonObject obj) const {
     obj["run_phase"] = runPhaseToString(c_.run->phase());
     obj["run_id"] = c_.run->runId();
     obj["run_start_error_us"] = c_.run->startErrorUs();
+    const auto& pol = c_.run->policy();
+    obj["autonomous"] = pol.autonomous;
+    obj["autonomous_loop"] = pol.loop;
+    obj["autonomous_continuous"] = pol.continuous;
+    obj["max_loops"] = pol.maxLoops;
+    obj["max_runtime_ms"] = pol.maxRuntimeMs;
+  }
+  if (c_.track) {
+    obj["loop_index"] = c_.track->passIndex();
+    obj["completed_passes"] = c_.track->completedPasses();
+    obj["track_loop_compatible"] = c_.track->loopCompatible();
   }
 }
 
@@ -690,13 +706,30 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
         return;
       }
     }
-    if (!c_.run->prepare(runId, c_.state->positionValid(),
+    AutonomousPolicy pol;
+    pol.autonomous = payload["autonomous"] | false;
+    pol.loop = payload["loop"] | false;
+    pol.continuous = payload["continuous"] | false;
+    pol.maxLoops = payload["max_loops"] | 0u;
+    pol.maxRuntimeMs = payload["max_runtime_ms"] | 0u;
+    if (!c_.run->prepare(runId, pol, c_.state->positionValid(),
                          c_.state->state() == ModuleState::Ready, c_.state->state() == ModuleState::Fault,
                          c_.ota->active(), c_.planner->isBusy(), c_.home->active(), &error)) {
       sendAck(messageId, false, error.c_str());
       return;
     }
-    sendAck(messageId, true, "ready_for_commit");
+    sendAck(messageId, true, pol.autonomous ? "ready_for_commit_autonomous" : "ready_for_commit");
+    {
+      JsonDocument ev;
+      JsonObject p = ev["payload"].to<JsonObject>();
+      p["run_id"] = runId;
+      p["autonomous"] = pol.autonomous;
+      p["loop"] = pol.loop;
+      p["continuous"] = pol.continuous;
+      p["max_loops"] = pol.maxLoops;
+      p["max_runtime_ms"] = pol.maxRuntimeMs;
+      sendEvent("run_prepared", ev["payload"].as<JsonObjectConst>());
+    }
     return;
   }
 
@@ -750,13 +783,15 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
       sendAck(messageId, false, error.c_str());
       return;
     }
-    sendAck(messageId, true, "run_armed");
+    sendAck(messageId, true, c_.run->autonomous() ? "run_armed_autonomous" : "run_armed");
     {
       JsonDocument ev;
       JsonObject p = ev["payload"].to<JsonObject>();
       p["run_id"] = runId;
       p["start_at_us"] = startAtUs;
       p["start_local_us"] = c_.run->startLocalUs();
+      p["autonomous"] = c_.run->autonomous();
+      p["loop"] = c_.run->policy().loop;
       sendEvent("run_armed", ev["payload"].as<JsonObjectConst>());
     }
     return;

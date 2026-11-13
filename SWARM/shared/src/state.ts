@@ -60,6 +60,9 @@ export interface RunState {
   startAtMs: number | null;
   /** True when the coordinator will start the score again after each pass. Needs the coordinator running. */
   repeat: boolean;
+  /** True when nodes were armed for autonomous continuation after Mac disconnect. */
+  autonomous: boolean;
+  autonomousLoop: boolean;
   pass: number;
   error: string | null;
   /** Last confirmed step per node, from device acknowledgments only. */

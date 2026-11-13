@@ -55,6 +55,21 @@ describe('firmware codec', () => {
     const prep = JSON.parse(codec.encodeCommand('p1', { name: 'prepare', runId: 'wave-1' }, 'Mau05'));
     expect(prep.type).toBe('prepare_run');
     expect(prep.payload).toMatchObject({ run_id: 'wave-1', auth_token: TOKEN });
+    expect(prep.payload.autonomous).toBeUndefined();
+
+    const prepAuto = JSON.parse(
+      codec.encodeCommand(
+        'p2',
+        { name: 'prepare', runId: 'wave-1', autonomous: true, loop: true, maxLoops: 3 },
+        'Mau05'
+      )
+    );
+    expect(prepAuto.payload).toMatchObject({
+      autonomous: true,
+      loop: true,
+      max_loops: 3,
+      auth_token: TOKEN
+    });
 
     const commit = JSON.parse(
       codec.encodeCommand('c1', { name: 'commit', runId: 'wave-1', startAtCoordUs: 1_500_000 }, 'Mau05')

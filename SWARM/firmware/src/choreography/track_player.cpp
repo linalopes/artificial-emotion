@@ -14,6 +14,11 @@ void TrackPlayer::begin(MotionPlanner* planner, PositionModel* position, ConfigS
   state_ = state;
   phase_ = TrackPhase::Idle;
   count_ = 0;
+  clearAutonomousPolicy(&policy_);
+  started_ = false;
+  passIndex_ = 0;
+  completedPasses_ = 0;
+  disconnectPendingStop_ = false;
 }
 
 bool TrackPlayer::validateFeasibility(String* error) const {
@@ -84,6 +89,11 @@ bool TrackPlayer::load(const char* presetId, uint32_t revision, const TrackKeyfr
   }
   phase_ = TrackPhase::Loaded;
   index_ = 0;
+  clearAutonomousPolicy(&policy_);
+  started_ = false;
+  passIndex_ = 0;
+  completedPasses_ = 0;
+  disconnectPendingStop_ = false;
   SWARM_LOG("Track loaded preset=%s rev=%lu frames=%u", presetId_,
             static_cast<unsigned long>(revision_), static_cast<unsigned>(count_));
   return true;
@@ -109,46 +119,77 @@ bool TrackPlayer::prepareStart(String* error) {
   return true;
 }
 
-bool TrackPlayer::startAt(uint32_t startAtMillisLocal, String* error) {
+bool TrackPlayer::startAt(uint32_t startAtMillisLocal, const AutonomousPolicy& policy,
+                          String* error) {
   if (phase_ != TrackPhase::Armed) {
     if (error) {
       *error = "not armed";
     }
     return false;
   }
-  startAtMs_ = startAtMillisLocal;
+  const char* reason = nullptr;
+  if (!validateAutonomousPolicy(policy, &reason)) {
+    if (error) {
+      *error = reason ? reason : "invalid autonomous policy";
+    }
+    return false;
+  }
+  if (policy.autonomous && policy.loop && !loopCompatible()) {
+    if (error) {
+      *error = "track_not_loop_compatible";
+    }
+    return false;
+  }
+  policy_ = policy;
+  epochStartMs_ = startAtMillisLocal;
   phase_ = TrackPhase::Playing;
   index_ = 0;
+  passIndex_ = 0;
+  completedPasses_ = 0;
+  started_ = false;  // becomes true when local start time is reached
   disconnectPendingStop_ = false;
-  SWARM_LOG("Track start_at local_ms=%lu (now=%lu)", static_cast<unsigned long>(startAtMillisLocal),
-            static_cast<unsigned long>(millis()));
+  SWARM_LOG("Track start_at local_ms=%lu autonomous=%d loop=%d",
+            static_cast<unsigned long>(startAtMillisLocal), policy_.autonomous ? 1 : 0,
+            policy_.loop ? 1 : 0);
   return true;
 }
 
 void TrackPlayer::stop() {
   planner_->requestControlledStop();
   phase_ = TrackPhase::Stopped;
+  started_ = false;
+  clearAutonomousPolicy(&policy_);
   if (state_->state() == ModuleState::Moving) {
     state_->setStopping();
   }
 }
 
 void TrackPlayer::onCoordinatorDisconnected(bool finishCurrentSegment) {
-  if (phase_ != TrackPhase::Playing && phase_ != TrackPhase::SegmentActive &&
-      phase_ != TrackPhase::Armed) {
+  // Case C: authorized autonomous run already started — continue full track / loops.
+  if (policy_.autonomous && started_ &&
+      (phase_ == TrackPhase::Playing || phase_ == TrackPhase::SegmentActive)) {
+    SWARM_LOG("Disconnect: autonomous run continues");
     return;
   }
-  if (phase_ == TrackPhase::Armed || phase_ == TrackPhase::Playing) {
+
+  // Case D: armed or waiting for local start — cancel; do not begin unsupervised.
+  if (phase_ == TrackPhase::Armed || (phase_ == TrackPhase::Playing && !started_)) {
     phase_ = TrackPhase::Loaded;
+    started_ = false;
+    clearAutonomousPolicy(&policy_);
+    SWARM_LOG("Disconnect: cancelled before start");
     return;
   }
-  if (finishCurrentSegment && phase_ == TrackPhase::SegmentActive) {
-    disconnectPendingStop_ = true;
-    SWARM_LOG("Disconnect: finishing current segment then stop");
-    return;
+
+  if (phase_ == TrackPhase::SegmentActive) {
+    if (finishCurrentSegment) {
+      disconnectPendingStop_ = true;
+      SWARM_LOG("Disconnect: finishing current segment then stop");
+      return;
+    }
+    stop();
+    SWARM_LOG("Disconnect: controlled stop");
   }
-  stop();
-  SWARM_LOG("Disconnect: controlled stop");
 }
 
 bool TrackPlayer::beginSegment(size_t fromIndex, String* error) {
@@ -167,15 +208,59 @@ bool TrackPlayer::beginSegment(size_t fromIndex, String* error) {
   return true;
 }
 
+uint32_t TrackPlayer::elapsedEpochMs(uint32_t nowMs) const {
+  return static_cast<uint32_t>(nowMs - epochStartMs_);
+}
+
+bool TrackPlayer::runtimeExpired(uint32_t nowMs) const {
+  return policy_.maxRuntimeMs != 0 && elapsedEpochMs(nowMs) >= policy_.maxRuntimeMs;
+}
+
+void TrackPlayer::finishPass(uint32_t nowMs) {
+  completedPasses_++;
+  if (runtimeExpired(nowMs)) {
+    phase_ = TrackPhase::Completed;
+    SWARM_LOG("Track completed (runtime expired) passes=%lu",
+              static_cast<unsigned long>(completedPasses_));
+    return;
+  }
+  if (mayStartNextLoop(policy_, completedPasses_, elapsedEpochMs(nowMs))) {
+    // Epoch-relative next pass — no delay accumulation.
+    passIndex_ = completedPasses_;
+    index_ = 0;
+    phase_ = TrackPhase::Playing;
+    SWARM_LOG("Autonomous loop pass=%lu", static_cast<unsigned long>(passIndex_));
+    return;
+  }
+  phase_ = TrackPhase::Completed;
+  SWARM_LOG("Track completed passes=%lu", static_cast<unsigned long>(completedPasses_));
+}
+
 void TrackPlayer::service() {
+  const uint32_t now = millis();
+
   if (phase_ == TrackPhase::Playing) {
-    if (static_cast<int32_t>(millis() - startAtMs_) < 0) {
+    if (static_cast<int32_t>(now - epochStartMs_) < 0) {
       return;
     }
+    if (!started_) {
+      started_ = true;
+    }
+    if (runtimeExpired(now)) {
+      phase_ = TrackPhase::Completed;
+      return;
+    }
+
     String err;
-    // Move toward first keyframe as segment 0 prelude using frames[0] as target from current.
     const int32_t first = config_->mmToSteps(frames_[0].zMm);
+    // First pass (and only when not already at start): prelude move. Loop restarts skip jump.
     if (position_->steps() != first) {
+      if (passIndex_ > 0) {
+        // Loop boundary violated mechanically — refuse silent jump.
+        phase_ = TrackPhase::Stopped;
+        state_->enterFault(FaultCode::TrackInfeasible);
+        return;
+      }
       if (!planner_->moveToSteps(first, config_->get().speedRpm, config_->get().accelerationMmS2,
                                  &err)) {
         phase_ = TrackPhase::Stopped;
@@ -183,9 +268,8 @@ void TrackPlayer::service() {
         return;
       }
       state_->setMoving();
-      // Treat as "segment" completing into index 0 ready for beginSegment(0).
       phase_ = TrackPhase::SegmentActive;
-      index_ = static_cast<size_t>(-2);  // sentinel: prelude to first keyframe
+      index_ = static_cast<size_t>(-2);
       return;
     }
     if (!beginSegment(0, &err)) {
@@ -215,11 +299,17 @@ void TrackPlayer::service() {
   if (disconnectPendingStop_) {
     phase_ = TrackPhase::Stopped;
     disconnectPendingStop_ = false;
+    started_ = false;
+    clearAutonomousPolicy(&policy_);
     SWARM_LOG("Disconnect policy: segment done, not starting next");
     return;
   }
 
-  // Prelude finished: start first timed segment.
+  if (runtimeExpired(now)) {
+    phase_ = TrackPhase::Completed;
+    return;
+  }
+
   if (index_ == static_cast<size_t>(-2)) {
     String err;
     if (!beginSegment(0, &err)) {
@@ -231,13 +321,13 @@ void TrackPlayer::service() {
 
   const size_t nextFrom = index_ + 1;
   if (nextFrom + 1 >= count_) {
-    phase_ = TrackPhase::Completed;
-    SWARM_LOG("Track completed");
+    finishPass(now);
     return;
   }
 
-  // Gate next segment on keyframe timeline (rollover-safe).
-  if (static_cast<uint32_t>(millis() - startAtMs_) < frames_[nextFrom].timeMs) {
+  const uint32_t due =
+      epochOffsetMs(passIndex_, trackDurationMs(), frames_[nextFrom].timeMs);
+  if (elapsedEpochMs(now) < due) {
     return;
   }
 
