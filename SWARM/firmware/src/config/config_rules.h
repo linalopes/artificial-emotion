@@ -61,6 +61,17 @@ inline const char* checkHardCeilingsLegal(float hardMaxRpm, float hardMaxAccel,
   return nullptr;
 }
 
+/** Homing RPM uses SWARM_ABS_MAX_HOME_RPM — not the normal motion hardMaxRpm ceiling. */
+inline const char* checkHomeRpmLegal(float homeSeekRpm, float homeBackoffRpm) {
+  if (homeSeekRpm <= 0.0f || homeSeekRpm > SWARM_ABS_MAX_HOME_RPM) {
+    return "home_seek_rpm out of range";
+  }
+  if (homeBackoffRpm <= 0.0f || homeBackoffRpm > SWARM_ABS_MAX_HOME_RPM) {
+    return "home_backoff_rpm out of range";
+  }
+  return nullptr;
+}
+
 inline bool messageTooLarge(size_t nbytes, size_t maxBytes = SWARM_MAX_WS_MESSAGE_BYTES) {
   return nbytes > maxBytes;
 }

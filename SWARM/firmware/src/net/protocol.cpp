@@ -19,6 +19,56 @@ void wsThunk(WStype_t type, uint8_t* payload, size_t length) {
   }
 }
 
+// Parse: set_wifi <ssid> <password>
+// SSIDs with spaces must be double-quoted: set_wifi "School of AI" <password>
+// Password is the remainder of the line (may contain spaces). Never log the password.
+bool parseSetWifiArgs(const String& line, String* ssidOut, String* passwordOut, String* errorOut) {
+  String rest = line.substring(9);
+  rest.trim();
+  if (rest.length() == 0) {
+    if (errorOut) {
+      *errorOut = "usage: set_wifi <ssid> <password>  or  set_wifi \"ssid with spaces\" <password>";
+    }
+    return false;
+  }
+
+  String ssid;
+  String password;
+  if (rest.charAt(0) == '"') {
+    const int endQuote = rest.indexOf('"', 1);
+    if (endQuote < 0) {
+      if (errorOut) {
+        *errorOut = "unclosed quoted ssid";
+      }
+      return false;
+    }
+    ssid = rest.substring(1, endQuote);
+    password = rest.substring(endQuote + 1);
+    password.trim();
+  } else {
+    const int sp = rest.indexOf(' ');
+    if (sp < 0) {
+      if (errorOut) {
+        *errorOut = "usage: set_wifi <ssid> <password>  or  set_wifi \"ssid with spaces\" <password>";
+      }
+      return false;
+    }
+    ssid = rest.substring(0, sp);
+    password = rest.substring(sp + 1);
+  }
+
+  if (ssid.length() == 0 || password.length() == 0) {
+    if (errorOut) {
+      *errorOut = "ssid and password required";
+    }
+    return false;
+  }
+
+  *ssidOut = ssid;
+  *passwordOut = password;
+  return true;
+}
+
 }  // namespace
 
 void ProtocolClient::begin(const SwarmControllers& ctrls) {
@@ -249,7 +299,15 @@ void ProtocolClient::fillStatus(JsonObject obj) const {
   obj["stall"] = static_cast<uint8_t>(c_.planner->lastStall());
   obj["endstop_raw_closed"] = c_.endstop->rawClosed();
   obj["endstop_debounced_closed"] = c_.endstop->debouncedClosed();
+  obj["wifi_ssid"] = c_.config->get().wifiSsid;  // never include wifi password
   obj["wifi_connected"] = c_.wifi->isConnected();
+  if (c_.wifi->isConnected()) {
+    obj["ip"] = WiFi.localIP().toString();
+  } else {
+    obj["ip"] = nullptr;
+  }
+  obj["coordinator_host"] = c_.config->get().coordinatorHost;
+  obj["coordinator_port"] = c_.config->get().coordinatorPort;
   obj["ws_linked"] = linked_;
   obj["rssi"] = c_.wifi->rssi();
   obj["config_revision"] = c_.config->get().configRevision;
@@ -515,12 +573,14 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
     p["home_recovery_max_steps"] = cfg.homeRecoveryMaxSteps;
     p["coil_hold_mode"] = static_cast<uint8_t>(cfg.coilHoldMode);
     p["disconnect_policy"] = static_cast<uint8_t>(cfg.disconnectPolicy);
+    p["wifi_ssid"] = cfg.wifiSsid;  // never include wifi password or auth_token
     p["coordinator_host"] = cfg.coordinatorHost;
     p["coordinator_port"] = cfg.coordinatorPort;
     p["config_revision"] = cfg.configRevision;
     p["hard_max_rpm"] = cfg.hardMaxRpm;
     p["hard_max_travel_mm"] = cfg.hardMaxTravelMm;
     p["abs_max_rpm"] = SWARM_ABS_MAX_RPM;
+    p["abs_max_home_rpm"] = SWARM_ABS_MAX_HOME_RPM;
     p["abs_max_travel_mm"] = SWARM_ABS_MAX_TRAVEL_MM;
     sendAck(messageId, true, "ok");
     sendJson(out);
@@ -982,6 +1042,7 @@ void ProtocolClient::handleSerialLine(const String& line) {
     Serial.println(F("Serial: status | home | stop | clear_fault | mirror on|off"));
     Serial.println(F("  set_module_id Mau01"));
     Serial.println(F("  set_wifi <ssid> <password>"));
+    Serial.println(F("  set_wifi \"ssid with spaces\" <password>"));
     Serial.println(F("  set_coordinator <host> <port>"));
     Serial.println(F("  set_token <token>"));
     Serial.println(F("  save_config | move_to_mm <mm> | json <raw>"));
@@ -1036,18 +1097,21 @@ void ProtocolClient::handleSerialLine(const String& line) {
     return;
   }
   if (s.startsWith("set_wifi ")) {
-    SwarmConfig next = c_.config->get();
-    const int sp = s.indexOf(' ', 9);
-    if (sp < 0) {
-      SWARM_LOG("usage: set_wifi <ssid> <password>");
+    String ssid;
+    String password;
+    String parseErr;
+    if (!parseSetWifiArgs(s, &ssid, &password, &parseErr)) {
+      SWARM_LOG("%s", parseErr.c_str());
       return;
     }
-    copyToFixed(next.wifiSsid, sizeof(next.wifiSsid), s.substring(9, sp).c_str());
-    copyToFixed(next.wifiPassword, sizeof(next.wifiPassword), s.substring(sp + 1).c_str());
+    SwarmConfig next = c_.config->get();
+    copyToFixed(next.wifiSsid, sizeof(next.wifiSsid), ssid.c_str());
+    copyToFixed(next.wifiPassword, sizeof(next.wifiPassword), password.c_str());
     String err;
     if (!c_.config->applyAndValidate(next, &err) || !c_.config->save()) {
       SWARM_LOG("set_wifi failed: %s", err.c_str());
     } else {
+      SWARM_LOG("wifi ssid=%s saved (password not logged)", next.wifiSsid);
       c_.wifi->requestReconnect();
     }
     return;

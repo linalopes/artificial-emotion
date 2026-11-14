@@ -121,7 +121,9 @@ bool MotionPlanner::startRawMove(int8_t motorDirection, uint32_t maxSteps, float
   rawMode_ = true;
   rawMaxSteps_ = maxSteps;
   rawStepsTaken_ = 0;
-  cruiseStepsPerSec_ = config_->rpmToStepsPerSec(constrain(speedRpm, 0.1f, config_->get().hardMaxRpm));
+  // Raw moves are homing-only: allow up to SWARM_ABS_MAX_HOME_RPM (not hardMaxRpm).
+  cruiseStepsPerSec_ =
+      config_->rpmToStepsPerSec(constrain(speedRpm, 0.1f, SWARM_ABS_MAX_HOME_RPM));
   accelStepsPerSec2_ = 0;
   currentStepsPerSec_ = cruiseStepsPerSec_;
   computeInterval();

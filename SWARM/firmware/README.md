@@ -2,9 +2,12 @@
 
 Firmware for the nine MauMau kinetic modules (`Mau01`–`Mau09`) in the Artificial Emotion **SWARM** installation.
 
-**Version:** **0.3.0** (set by PlatformIO `-D SWARM_FW_VERSION=\"0.3.0\"`)  
+**Version:** **0.3.2** (set by PlatformIO `-D SWARM_FW_VERSION=\"0.3.2\"`) — adds independent homing RPM ceiling (`SWARM_ABS_MAX_HOME_RPM` 20); normal motion still capped by `hard_max_rpm` / `SWARM_ABS_MAX_RPM` (8).  
+ 
 **Protocol:** version **1** (additive fields for autonomous playback)  
 **Installation entry:** [`../README.md`](../README.md)
+
+Wi-Fi / identity commissioning: [`docs/COMMISSIONING.md`](docs/COMMISSIONING.md) and `tools/provision_module.py`.
 
 This is a **dedicated Swarm application**. It is not a replacement for the generic Artificial Emotion Controller v1 motion-test firmware under [`../../artificial-emotion-controller-v1/`](../../artificial-emotion-controller-v1/). Do not mix the two binaries on modules intended for the nine-node install.
 
@@ -63,7 +66,9 @@ firmware/
 │   ├── PROTOCOL.md
 │   ├── COMMISSIONING.md
 │   └── OTA.md
-├── tools/mock_coordinator.py
+├── tools/
+│   ├── mock_coordinator.py
+│   └── provision_module.py     Interactive USB NVS provisioning
 └── test/                       Host (native) tests
 ```
 
@@ -94,6 +99,7 @@ Serial (examples):
 help
 set_module_id Mau01
 set_wifi <ssid> <password>
+set_wifi "ssid with spaces" <password>
 set_coordinator <mac-lan-ip> 8787
 set_token <shared-secret>
 save_config
@@ -102,6 +108,19 @@ home
 stop
 move_to_mm 50
 ```
+
+Never log or commit the Wi-Fi password or auth token. Prefer the interactive helpers:
+
+```bash
+pip install pyserial
+python3 tools/commission_next.py status
+python3 tools/commission_next.py inspect
+python3 tools/commission_next.py next          # Mau02–Mau09 sequential
+# low-level NVS-only helper:
+python3 tools/provision_module.py --module Mau0N --port /dev/cu.usbmodemXXXX
+```
+
+See [`docs/COMMISSIONING.md`](docs/COMMISSIONING.md) (Phase C.1).
 
 - **Identity:** unique `Mau01` … `Mau09` in NVS. Duplicates are rejected by the Mac coordinator.
 - **Wi-Fi / coordinator:** ESP32 is the WebSocket **client** to `ws://<host>:<port>/swarm`. Path `/swarm` is hard-coded.
@@ -166,7 +185,7 @@ Relative to the historical specification:
 3. Open-endstop recovery implemented but **off** by default.
 4. Mac coordinator + Svelte UI live in `SWARM/` (Phase B) — not in this firmware tree.
 5. OTA transfer is chunked; brief blocking on idle HTTP GET may still occur. See `docs/OTA.md`.
-6. Version history: 0.1.x robustness → **0.2.0** prepare/commit sync → **0.3.0** autonomous playback.
+6. Version history: 0.1.x → **0.2.0** prepare/commit → **0.3.0** autonomous → **0.3.1** quoted `set_wifi` → **0.3.2** independent `SWARM_ABS_MAX_HOME_RPM` (20) for homing seek/backoff only.
 
 ## Safety
 

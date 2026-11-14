@@ -1,4 +1,4 @@
-import type { Keyframe } from '@swarm/shared';
+import { isNodeId, type Keyframe } from '@swarm/shared';
 import type { Codec, DeviceCommand, DeviceEvent, Telemetry } from './protocol';
 
 /** Wire format spoken by SWARM firmware v0.2.0 (PROTOCOL.md / protocol.cpp). */
@@ -173,8 +173,8 @@ export function createFirmwareCodec(opts: FirmwareCodecOptions): Codec {
       }
 
       if (type === 'config') {
-        // Informational; not required for motion control path.
-        return null;
+        if (!nodeId || !isNodeId(nodeId)) return null;
+        return { type: 'config', nodeId, config: { ...payload } };
       }
 
       return null;
@@ -200,10 +200,19 @@ export function createFirmwareCodec(opts: FirmwareCodecOptions): Codec {
           if (cmd.accelMmS2 !== undefined) payload.acceleration_mm_s2 = cmd.accelMmS2;
           return envelope('set_config', target, messageId, withAuth(payload), source);
         }
+        case 'set_config': {
+          const payload: Record<string, unknown> = {
+            ...cmd.fields,
+            save: cmd.save === true
+          };
+          return envelope('set_config', target, messageId, withAuth(payload), source);
+        }
         case 'clear_fault':
           return envelope('clear_fault', target, messageId, withAuth({}), source);
         case 'get_config':
           return envelope('get_config', target, messageId, {}, source);
+        case 'ota_update':
+          return envelope('ota_update', target, messageId, withAuth({ url: cmd.url }), source);
         case 'load_trajectory': {
           if (cmd.keyframes.length > FW_MAX_KEYFRAMES) {
             throw new Error(`Trajectory has ${cmd.keyframes.length} keyframes; firmware allows at most ${FW_MAX_KEYFRAMES}.`);

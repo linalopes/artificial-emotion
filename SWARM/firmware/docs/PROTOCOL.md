@@ -1,6 +1,6 @@
 # Swarm v1 — Node Protocol Contract
 
-**Firmware:** 0.3.0  
+**Firmware:** 0.3.1 (protocol fields additive since 0.3.0)  
 **Transport:** WebSocket client (ESP32) → Mac coordinator  
 **Path:** `/swarm`  
 **Encoding:** UTF-8 JSON  
@@ -22,6 +22,16 @@ Every JSON object includes at least:
 | `type` | Command, `ack` / `nack`, `status`, `event`, or sync message type |
 | `source` / `module_id` | Module identity on node → Mac messages |
 | `auth_token` | Required on privileged Mac → node commands |
+
+### Status fields useful for commissioning (0.3.1+)
+
+| Field | Notes |
+|---|---|
+| `wifi_ssid` | Configured SSID only — **never** the Wi-Fi password |
+| `wifi_connected` / `ip` / `rssi` | Association state |
+| `coordinator_host` / `coordinator_port` | NVS target for `ws://host:port/swarm` |
+| `ws_linked` | WebSocket session to the Mac |
+| `firmware_version` / `provisioned` | Build and identity gate |
 
 Acks/nacks echo `message_id` and carry a `detail` string. Events use generated `message_id` values (e.g. `evt-…`).
 

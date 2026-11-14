@@ -6,3 +6,12 @@
 *.pyc
 __pycache__/
 .DS_Store
+
+# Local provisioning secrets — never commit
+tools/.local/
+tools/*.env
+tools/*.secrets
+tools/provision.local.*
+.env
+.env.*
+!.env.example

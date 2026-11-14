@@ -1,0 +1,24 @@
+SWARM Phase C.1 — operator cheat sheet (Mau02–Mau09)
+=====================================================
+
+Prerequisites
+- Hardware coordinator already running on :8787 (fleet=hardware). Do not start another.
+- Mau01 already commissioned and recorded in tools/.local/commissioning_manifest.json
+- Wi-Fi password will be prompted once and stored under tools/.local/ (gitignored)
+
+Commands (from SWARM/firmware)
+  python3 tools/commission_next.py status
+  python3 tools/commission_next.py inspect
+
+Mau02 (new ESP32 on USB — not Mau01)
+  python3 tools/commission_next.py commission --module Mau02 --coordinator <mac-lan-ip>
+
+Then Mau03–Mau09
+  1. Unplug the board you just finished
+  2. Plug the next ESP32-S3
+  3. python3 tools/commission_next.py next
+
+The tool will ask before flashing, refuse to re-id Mau01, reuse local secrets,
+verify Wi-Fi + coordinator registration, and update the local MAC manifest.
+
+No homing / no motor moves during this phase.

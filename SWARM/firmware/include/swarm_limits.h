@@ -7,6 +7,12 @@
 #define SWARM_ABS_MAX_RPM 8.0f
 #endif
 
+// Homing seek/backoff only — independent of normal motion / choreography RPM ceiling.
+// Experimental: allows faster line retract on long suspensions (Mau01 bench validation).
+#ifndef SWARM_ABS_MAX_HOME_RPM
+#define SWARM_ABS_MAX_HOME_RPM 20.0f
+#endif
+
 #ifndef SWARM_ABS_MAX_ACCEL_MM_S2
 #define SWARM_ABS_MAX_ACCEL_MM_S2 250.0f
 #endif

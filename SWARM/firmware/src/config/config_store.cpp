@@ -29,11 +29,12 @@ void ConfigStore::clampHardCeilings(SwarmConfig& c) {
   if (c.accelerationMmS2 > c.hardMaxAccelMmS2) {
     c.accelerationMmS2 = c.hardMaxAccelMmS2;
   }
-  if (c.homeSeekRpm > c.hardMaxRpm) {
-    c.homeSeekRpm = c.hardMaxRpm;
+  // Homing speeds use a separate absolute ceiling (not hardMaxRpm / choreography limit).
+  if (c.homeSeekRpm > SWARM_ABS_MAX_HOME_RPM) {
+    c.homeSeekRpm = SWARM_ABS_MAX_HOME_RPM;
   }
-  if (c.homeBackoffRpm > c.hardMaxRpm) {
-    c.homeBackoffRpm = c.hardMaxRpm;
+  if (c.homeBackoffRpm > SWARM_ABS_MAX_HOME_RPM) {
+    c.homeBackoffRpm = SWARM_ABS_MAX_HOME_RPM;
   }
 }
 
@@ -73,11 +74,8 @@ bool ConfigStore::validateConfig(const SwarmConfig& c, String* error) {
   if (c.accelerationMmS2 <= 0.0f || c.accelerationMmS2 > c.hardMaxAccelMmS2) {
     return fail("acceleration_mm_s2 out of range");
   }
-  if (c.homeSeekRpm <= 0.0f || c.homeSeekRpm > c.hardMaxRpm) {
-    return fail("home_seek_rpm out of range");
-  }
-  if (c.homeBackoffRpm <= 0.0f || c.homeBackoffRpm > c.hardMaxRpm) {
-    return fail("home_backoff_rpm out of range");
+  if (const char* homeErr = rules::checkHomeRpmLegal(c.homeSeekRpm, c.homeBackoffRpm)) {
+    return fail(homeErr);
   }
   if (c.homeSearchMaxSteps < 100 || c.homeSearchMaxSteps > SWARM_ABS_MAX_HOME_SEARCH_STEPS) {
     return fail("home_search_max_steps out of range");

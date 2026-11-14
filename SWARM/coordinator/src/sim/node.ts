@@ -146,6 +146,10 @@ export class SimNode {
         if (cmd.rpm !== undefined) this.rpm = cmd.rpm;
         if (cmd.accelMmS2 !== undefined) this.accel = cmd.accelMmS2;
         return null;
+      case 'set_config':
+        return null;
+      case 'ota_update':
+        return 'ota not supported in simulator';
       case 'cancel':
         if (this.traj?.runId === cmd.runId) this.abortRun('cancelled');
         return null;

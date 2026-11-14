@@ -4,7 +4,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { dirname, extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { parseEnvelope, type ServerMessage } from '@swarm/shared';
+import { isNodeId, parseEnvelope, type ServerMessage } from '@swarm/shared';
 import type { Config } from './config';
 import { Coordinator } from './coordinator';
 import { createFirmwareCodec } from './devices/firmware-codec';
@@ -165,6 +165,70 @@ async function http(req: IncomingMessage, res: ServerResponse, cfg: Config, coor
       }
     }
     return json(405, { error: 'method not allowed' });
+  }
+  // Hardware OTA helper (no UI): POST { node, url } → authenticated ota_update to one module.
+  if (path === '/api/fw-ota') {
+    if (cfg.fleet !== 'hardware') return json(400, { error: 'fw-ota is only available in hardware fleet mode' });
+    if (req.method !== 'POST') return json(405, { error: 'method not allowed' });
+    let body = '';
+    for await (const chunk of req) {
+      body += chunk;
+      if (body.length > 8_000) return json(413, { error: 'too large' });
+    }
+    try {
+      const parsed = body ? JSON.parse(body) : {};
+      const node = parsed.node;
+      const url = parsed.url;
+      if (!isNodeId(node)) return json(400, { error: 'node must be Mau01–Mau09' });
+      if (typeof url !== 'string' || !url.startsWith('http://')) {
+        return json(400, { error: 'url must be an http:// LAN address' });
+      }
+      if (!coordinator.device.isConnected(node)) return json(409, { error: `${node} is not connected` });
+      await coordinator.device.send(node, { name: 'ota_update', url }, 15_000);
+      coordinator.note('info', `${node} ota_update accepted for ${url}`);
+      return json(200, { ok: true, node, url, detail: 'ota started' });
+    } catch (e) {
+      return json(500, { error: e instanceof Error ? e.message : String(e) });
+    }
+  }
+  // Commissioning helper: get/set firmware NVS-backed config over the live device link (no UI).
+  if (path === '/api/fw-config') {
+    if (cfg.fleet !== 'hardware') return json(400, { error: 'fw-config is only available in hardware fleet mode' });
+    let body = '';
+    if (req.method === 'POST' || req.method === 'PUT') {
+      for await (const chunk of req) {
+        body += chunk;
+        if (body.length > 20_000) return json(413, { error: 'too large' });
+      }
+    }
+    try {
+      if (req.method === 'GET') {
+        const url = new URL(req.url ?? '/', `http://${req.headers.host ?? '127.0.0.1'}`);
+        const node = url.searchParams.get('node') ?? '';
+        if (!isNodeId(node)) return json(400, { error: 'node query must be Mau01–Mau09' });
+        if (!coordinator.device.isConnected(node)) return json(409, { error: `${node} is not connected` });
+        const config = await coordinator.device.requestConfig(node);
+        return json(200, { ok: true, node, config });
+      }
+      if (req.method === 'POST') {
+        const parsed = body ? JSON.parse(body) : {};
+        const node = parsed.node;
+        if (!isNodeId(node)) return json(400, { error: 'node must be Mau01–Mau09' });
+        if (!coordinator.device.isConnected(node)) return json(409, { error: `${node} is not connected` });
+        const fields = parsed.fields;
+        if (!fields || typeof fields !== 'object' || Array.isArray(fields)) {
+          return json(400, { error: 'fields object required' });
+        }
+        const save = parsed.save === true;
+        await coordinator.device.send(node, { name: 'set_config', save, fields });
+        const config = await coordinator.device.requestConfig(node);
+        coordinator.note('info', `${node} set_config${save ? ' (saved)' : ''} via /api/fw-config.`);
+        return json(200, { ok: true, node, saved: save, config });
+      }
+      return json(405, { error: 'method not allowed' });
+    } catch (e) {
+      return json(500, { error: e instanceof Error ? e.message : String(e) });
+    }
   }
   if (path.startsWith('/api/')) return json(404, { error: 'not found' });
 

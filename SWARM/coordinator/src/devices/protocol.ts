@@ -13,8 +13,12 @@ export type DeviceCommand =
   | { name: 'move'; targetMm: number }
   | { name: 'stop' }
   | { name: 'set_params'; rpm?: number; accelMmS2?: number }
+  /** Firmware set_config passthrough (homing / travel commissioning). Does not alter UI. */
+  | { name: 'set_config'; save?: boolean; fields: Record<string, unknown> }
   | { name: 'clear_fault' }
   | { name: 'get_config' }
+  /** Firmware HTTP OTA. url must be http:// on the LAN; auth is applied by the codec. */
+  | { name: 'ota_update'; url: string }
   | { name: 'load_trajectory'; runId: string; durationMs: number; keyframes: Keyframe[]; presetId?: string }
   | {
       name: 'prepare';
@@ -52,6 +56,7 @@ export type DeviceEvent =
   | { type: 'status'; nodeId: string; fwVersion: string; simulated: boolean; telemetry: Telemetry }
   | { type: 'ack'; messageId: string; ok: boolean; error?: string }
   | { type: 'telemetry'; telemetry: Telemetry }
+  | { type: 'config'; nodeId: string; config: Record<string, unknown> }
   | { type: 'clock_reply'; seq: number; t1: number; t2: number; t3: number; units?: 'ms' | 'us' }
   | { type: 'run_status'; runId: string; state: 'armed' | 'running' | 'finished' | 'aborted'; reason?: string };
 

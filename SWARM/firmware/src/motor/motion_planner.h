@@ -24,6 +24,7 @@ enum class StallOutcome : uint8_t {
 };
 
 // Non-blocking planner. At most one step per service() call. Missed deadlines never burst.
+// Position moves clamp to hardMaxRpm; raw/homing moves clamp to SWARM_ABS_MAX_HOME_RPM.
 class MotionPlanner {
  public:
   void begin(MotorDriver* motor, PositionModel* position, ConfigStore* config, Endstop* endstop);

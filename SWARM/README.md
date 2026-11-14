@@ -62,7 +62,7 @@ Details: [`docs/AUTONOMOUS-OPERATION.md`](docs/AUTONOMOUS-OPERATION.md).
 
 | Area | State |
 |---|---|
-| Firmware **v0.3.0** (protocol **1**) | Implemented in software |
+| Firmware **v0.3.1** (protocol **1**; 0.3.0 + commissioning Serial Wi-Fi) | Implemented in software |
 | Phase **B.1** firmware ↔ coordinator integration | Implemented (`firmware-codec.ts`, hardware fleet) |
 | Phase **B.2** autonomous playback / local looping | Implemented in software |
 | Application type-check, production build, automated tests | Previously reported successful (46/46 app; firmware host 38/38; PlatformIO build) — not re-run in this documentation pass |

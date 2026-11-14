@@ -36,6 +36,12 @@ interface Link {
   clockTimer: NodeJS.Timeout;
 }
 
+interface ConfigWaiter {
+  resolve: (config: Record<string, unknown>) => void;
+  reject: (e: Error) => void;
+  timer: NodeJS.Timeout;
+}
+
 /**
  * Owns the node connections: registration, duplicate-identity rejection, command acknowledgment
  * with timeouts, and the coordinator side of the four-timestamp clock exchange.
@@ -43,6 +49,7 @@ interface Link {
  */
 export class DeviceServer {
   private links = new Map<NodeId, Link>();
+  private configWaiters = new Map<NodeId, ConfigWaiter[]>();
 
   constructor(
     private readonly codec: Codec,
@@ -139,6 +146,11 @@ export class DeviceServer {
       p.reject(new Error('disconnected before acknowledging'));
     }
     link.pending.clear();
+    for (const w of this.configWaiters.get(link.node) ?? []) {
+      clearTimeout(w.timer);
+      w.reject(new Error('disconnected before config'));
+    }
+    this.configWaiters.delete(link.node);
     this.links.delete(link.node);
     this.handlers.onDisconnect(link.node);
   }
@@ -193,6 +205,15 @@ export class DeviceServer {
       case 'run_status':
         this.handlers.onRunStatus(link.node, ev);
         return;
+      case 'config': {
+        const waiters = this.configWaiters.get(link.node) ?? [];
+        this.configWaiters.delete(link.node);
+        for (const w of waiters) {
+          clearTimeout(w.timer);
+          w.resolve(ev.config);
+        }
+        return;
+      }
       default:
         return;
     }
@@ -234,6 +255,34 @@ export class DeviceServer {
           link.pending.delete(messageId);
           reject(new Error('send failed'));
         }
+      });
+    });
+  }
+
+  /** Ask the node for its full config payload (after get_config ack). */
+  async requestConfig(node: NodeId, timeoutMs = 5000): Promise<Record<string, unknown>> {
+    if (!this.links.has(node)) return Promise.reject(new Error('not connected'));
+    return new Promise<Record<string, unknown>>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        const list = this.configWaiters.get(node) ?? [];
+        this.configWaiters.set(
+          node,
+          list.filter((w) => w.resolve !== resolve)
+        );
+        reject(new Error(`no config payload within ${timeoutMs} ms`));
+      }, timeoutMs);
+      const waiter: ConfigWaiter = { resolve, reject, timer };
+      const list = this.configWaiters.get(node) ?? [];
+      list.push(waiter);
+      this.configWaiters.set(node, list);
+      void this.send(node, { name: 'get_config' }).catch((e) => {
+        clearTimeout(timer);
+        const cur = this.configWaiters.get(node) ?? [];
+        this.configWaiters.set(
+          node,
+          cur.filter((w) => w !== waiter)
+        );
+        reject(e instanceof Error ? e : new Error(String(e)));
       });
     });
   }
