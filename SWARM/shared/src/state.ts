@@ -48,6 +48,20 @@ export interface NodeState {
   lastTelemetryAtMs: number | null;
 }
 
+/**
+ * Same gate as collective prepare/execute.
+ * Hardware requires both the Mac estimate and the node's own clock_synced flag
+ * (firmware prepare_run checks the latter). Simulator only has the Mac estimate.
+ */
+export function clockReadyForCollective(
+  n: Pick<NodeState, 'connected' | 'clock' | 'clockSyncedFromNode'>,
+  fleet: FleetKind
+): boolean {
+  if (!n.connected || !n.clock?.synced) return false;
+  if (fleet === 'hardware') return n.clockSyncedFromNode === true;
+  return true;
+}
+
 export type RunPhase = 'idle' | 'positioning' | 'positioned' | 'loading' | 'preparing' | 'committing' | 'armed' | 'running' | 'finished' | 'failed' | 'cancelled';
 
 export interface RunState {

@@ -8,11 +8,12 @@ export const SPOOL_CIRCUMFERENCE_MM = Math.PI * SPOOL_DIAMETER_MM;
 
 /**
  * Application-side bounds for the speed control.
- * Firmware compile-time ceiling is SWARM_ABS_MAX_RPM (8). Do not raise the UI above that.
+ * Firmware compile-time ceiling is SWARM_ABS_MAX_RPM (15). Do not raise the UI above that.
  * Per-device hardMaxRpm may be lower still; the node remains authoritative.
+ * Remote hard_* ceilings remain non-writable; devices migrate NVS on 0.3.4+ boot.
  */
 export const RPM_MIN = 1;
-export const RPM_MAX = 8;
+export const RPM_MAX = 15;
 /** Matches firmware SWARM_ABS_MAX_ACCEL_MM_S2 application-side soft range used by the UI. */
 export const ACCEL_MIN_MM_S2 = 1;
 export const ACCEL_MAX_MM_S2 = 100;

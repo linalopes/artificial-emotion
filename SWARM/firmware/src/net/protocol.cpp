@@ -911,11 +911,13 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
       sendAck(messageId, false, "clock unavailable");
       return;
     }
-    const uint64_t t1 = payload["t1_us"] | 0;
-    const uint64_t t2 = payload["t2_us"] | 0;
-    const uint64_t t3 = payload["t3_us"] | 0;
-    const uint64_t t4 = payload["t4_us"] | 0;
-    const uint32_t seq = payload["sync_seq"] | 0;
+    // Must use as<uint64_t>(): `payload[...] | 0` truncates through signed 32-bit and
+    // rejects every fin once module mono time exceeds ~35.7 minutes (INT_MAX µs).
+    const uint64_t t1 = payload["t1_us"].as<uint64_t>();
+    const uint64_t t2 = payload["t2_us"].as<uint64_t>();
+    const uint64_t t3 = payload["t3_us"].as<uint64_t>();
+    const uint64_t t4 = payload["t4_us"].as<uint64_t>();
+    const uint32_t seq = payload["sync_seq"].as<uint32_t>();
     const char* reason = nullptr;
     if (!c_.clock->onSyncFin(t1, t2, t3, t4, seq, monoTimeUs(), &reason)) {
       sendAck(messageId, false, reason ? reason : "sync rejected");

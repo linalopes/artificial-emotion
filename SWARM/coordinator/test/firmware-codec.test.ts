@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NODE_IDS, generateWave, DEFAULT_PARAMS } from '@swarm/shared';
+import { NODE_IDS, generateWave, DEFAULT_PARAMS, isValidFirmwareRunId, newFirmwareRunId } from '@swarm/shared';
 import {
   FW_MAX_KEYFRAMES,
   FW_MAX_MESSAGE_BYTES,
@@ -222,24 +222,28 @@ describe('firmware codec', () => {
 
   it('keeps default generator tracks within firmware keyframe and message limits', () => {
     const score = generateWave(DEFAULT_PARAMS.wave);
+    const runId = newFirmwareRunId();
+    expect(isValidFirmwareRunId(runId)).toBe(true);
     for (const id of NODE_IDS) {
       expect(score.tracks[id].length).toBeLessThanOrEqual(FW_MAX_KEYFRAMES);
       const bytes = estimateLoadTrajectoryBytes({
-        messageId: '00000000-0000-0000-0000-000000000000',
+        messageId: 'm1',
         target: id,
-        runId: '00000000-0000-0000-0000-000000000000',
+        runId,
         presetId: 'Wave',
         keyframes: score.tracks[id],
         authToken: TOKEN
       });
       expect(bytes).toBeLessThanOrEqual(FW_MAX_MESSAGE_BYTES);
-      expect(() =>
+      const body = JSON.parse(
         codec.encodeCommand(
-          '00000000-0000-0000-0000-000000000000',
-          { name: 'load_trajectory', runId: 'r', durationMs: score.durationMs, keyframes: score.tracks[id], presetId: 'Wave' },
+          'm1',
+          { name: 'load_trajectory', runId, durationMs: score.durationMs, keyframes: score.tracks[id], presetId: 'Wave' },
           id
         )
-      ).not.toThrow();
+      );
+      expect(body.payload.run_id).toBe(runId);
+      expect(body.payload.run_id.length).toBeLessThan(32);
     }
   });
 

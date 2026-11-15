@@ -1,6 +1,6 @@
-import { randomUUID } from 'node:crypto';
 import {
   ACCEL_MAX_MM_S2, ACCEL_MIN_MM_S2, DEFAULT_TRAVEL_MAX_MM, DEFAULT_TRAVEL_MIN_MM, NODE_IDS, OPEN_INTENTS, RPM_MAX, RPM_MIN,
+  clockReadyForCollective, newFirmwareRunId,
   positionAt, rpmToMmPerS, scoreFingerprint, scoreLoopCompatible, validateScore,
   type Intent, type LogEntry, type NodeId, type NodeLimits, type NodeOutcome, type RunState, type Score, type SimScenario, type Snapshot
 } from '@swarm/shared';
@@ -9,6 +9,7 @@ import type { Config } from './config';
 import type { Codec, DeviceCommand } from './devices/protocol';
 import { DeviceServer } from './devices/server';
 import { Fleet } from './fleet';
+import { COMPLETION_GRACE_MS, expectedRunDurationMs, type AutonomousWatchOpts } from './run-duration';
 
 export interface IntentResult {
   ok: boolean;
@@ -52,6 +53,21 @@ export class Coordinator {
       onConnect: (node, info) => {
         this.fleet.connected(node, info);
         this.note('info', `${node} connected${info.simulated ? ' (simulated)' : ''}, firmware ${info.fwVersion}.`);
+        // Align the node's prepare_run gate with Mac clockMaxUncertaintyMs (runtime only, not NVS).
+        if (this.cfg.fleet === 'hardware' && this.cfg.authToken) {
+          const us = Math.round(this.cfg.clockMaxUncertaintyMs * 1000);
+          setTimeout(() => {
+            void this.device
+              .send(node, { name: 'set_config', save: false, fields: { clock_uncertainty_max_us: us } })
+              .then(() => this.note('info', `${node} clock gate set to ±${this.cfg.clockMaxUncertaintyMs} ms.`))
+              .catch((e) =>
+                this.note(
+                  'warn',
+                  `${node} could not set clock_uncertainty_max_us: ${e instanceof Error ? e.message : e}`
+                )
+              );
+          }, 300);
+        }
       },
       onDisconnect: (node) => {
         this.fleet.disconnected(node);
@@ -255,11 +271,8 @@ export class Coordinator {
       else if (n.faultCode) out.push(`${id} has fault ${n.faultCode}.`);
       else if (!n.homed) out.push(`${id} is not homed.`);
       else if (needSync) {
-        const mac = this.device.clockStatus(id)?.synced === true;
-        const node = n.clockSyncedFromNode;
-        // Firmware prepare_run requires the node's own clock_synced; sim only has Mac estimate.
-        const ok = this.codec.speaksFirmware ? mac && node === true : mac;
-        if (!ok) out.push(`${id} clock is not synchronised.`);
+        const view = { ...n, clock: this.device.clockStatus(id) };
+        if (!clockReadyForCollective(view, this.cfg.fleet)) out.push(`${id} clock is not synchronised.`);
       }
     }
     return out;
@@ -319,6 +332,12 @@ export class Coordinator {
       if (NODE_IDS.every((id) => this.atStart(score, id))) {
         this.run.phase = 'positioned';
         this.note('info', `All modules report their start positions for ${score.name}.`);
+        // Motion bursts can stall clock exchanges; drive the sync protocol while idle at start.
+        void this.awaitClocksReady(8_000).then((blockers) => {
+          if (token !== this.token) return;
+          if (blockers.length === 0) this.note('info', 'Clocks re-synchronised after go-to-start.');
+          else this.note('warn', `Clocks still catching up after go-to-start: ${blockers.join(' ')}`);
+        });
         return;
       }
       if (monoNow() > deadline) {
@@ -328,6 +347,26 @@ export class Coordinator {
       }
       await sleep(100);
     }
+  }
+
+  /** Drive the existing clock_sync protocol until every module is ready for prepare_run. */
+  private async awaitClocksReady(timeoutMs = 12_000): Promise<string[]> {
+    const deadline = Date.now() + timeoutMs;
+    let last = this.readiness(true);
+    while (Date.now() < deadline) {
+      last = this.readiness(true);
+      const clockOnly = last.filter((b) => b.includes('clock is not synchronised'));
+      const other = last.filter((b) => !b.includes('clock is not synchronised'));
+      if (other.length) return last;
+      if (clockOnly.length === 0) return [];
+      this.device.nudgeClocks((id) => {
+        const n = this.fleet.get(id);
+        const view = { ...n, clock: this.device.clockStatus(id) };
+        return !clockReadyForCollective(view, this.cfg.fleet);
+      });
+      await sleep(200);
+    }
+    return last.length ? last : this.readiness(true);
   }
 
   private async execute(
@@ -344,7 +383,8 @@ export class Coordinator {
     if (this.run.phase !== 'positioned' || this.run.scoreFingerprint !== scoreFingerprint(score)) {
       return { ok: false, error: 'Move the modules to the start of this score first (Go to start). The score has changed or was never positioned.' };
     }
-    const blockers = this.readiness(true);
+    this.note('info', 'Driving clock synchronisation before arming…');
+    const blockers = await this.awaitClocksReady();
     if (blockers.length) return { ok: false, error: blockers.join(' ') };
     const away = NODE_IDS.filter((id) => !this.atStart(score, id));
     if (away.length) return { ok: false, error: `${away.join(', ')} moved away from the start position. Go to start again.` };
@@ -379,7 +419,8 @@ export class Coordinator {
       maxRuntimeMs?: number;
     } = { autonomous: false, autonomousLoop: false, continuous: false }
   ): Promise<string | null> {
-    const runId = randomUUID();
+    // Firmware rejects strlen(run_id) >= 32 ("invalid run_id"); dashed UUIDs are 36 chars.
+    const runId = newFirmwareRunId();
     this.run = { ...this.run, runId, phase: 'loading', pass: this.run.pass + 1, startAtMs: null, error: null, perNode: {} };
     const stage = async (phase: RunState['phase'], done: string, make: (id: NodeId) => DeviceCommand | null): Promise<string | null> => {
       if (token !== this.token) return 'Cancelled.';
@@ -446,12 +487,15 @@ export class Coordinator {
           ? `${score.name} armed on nine modules, pass ${this.run.pass}. Shared start_at_us=${Math.round(startAt * 1000)}.`
           : `${score.name} armed on nine modules, pass ${this.run.pass}. Each module starts from its own clock.`
     );
-    this.watch(score, token, startAt);
+    this.watch(score, token, startAt, auto);
     return null;
   }
 
-  private watch(score: Score, token: number, startAt: number): void {
+  private watch(score: Score, token: number, startAt: number, auto: AutonomousWatchOpts): void {
     if (this.monitor) clearInterval(this.monitor);
+    // Autonomous multi-loop runs last score.durationMs × maxLoops (or maxRuntimeMs / continuous ceiling).
+    // Using only one pass duration caused premature failRun + stop around the first score length (~3–5 min).
+    const expectedMs = expectedRunDurationMs(score.durationMs, auto);
     this.monitor = setInterval(() => {
       if (token !== this.token) {
         clearInterval(this.monitor!);
@@ -459,7 +503,6 @@ export class Coordinator {
       }
       const now = monoNow();
       if (this.run.phase === 'armed' && now >= startAt) this.run.phase = 'running';
-      if (now < startAt + score.durationMs) return;
       const finished = NODE_IDS.every((id) => this.run.perNode[id] === 'finished');
       if (finished) {
         clearInterval(this.monitor!);
@@ -469,7 +512,7 @@ export class Coordinator {
           this.run.phase = 'finished';
           this.note('info', `${score.name} finished. All nine modules confirmed completion.`);
         }
-      } else if (now > startAt + score.durationMs + 4000) {
+      } else if (now > startAt + expectedMs + COMPLETION_GRACE_MS) {
         clearInterval(this.monitor!);
         const missing = NODE_IDS.filter((id) => this.run.perNode[id] !== 'finished');
         void this.failRun(`Completion was not confirmed by ${missing.join(', ')}.`);

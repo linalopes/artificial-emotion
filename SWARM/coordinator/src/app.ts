@@ -17,6 +17,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const WEB_DIST = resolve(here, '../../web/dist');
 const DATA_DIR = resolve(here, '../data');
 const PRESETS_FILE = join(DATA_DIR, 'presets.json');
+/** Built OTA image; served on the same port modules already use for /swarm. */
+const FW_BIN = resolve(here, '../../firmware/.pio/build/swarm_s3_4mb_ota/firmware.bin');
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.ico': 'image/x-icon'
@@ -145,6 +147,22 @@ async function http(req: IncomingMessage, res: ServerResponse, cfg: Config, coor
   if (path === '/api/health') {
     return json(200, { ok: true, fleet: cfg.fleet, env: cfg.env, devicePath: cfg.devicePath });
   }
+  // LAN OTA payload on the coordinator port (modules already reach :8787; avoids a flaky :8000 server).
+  if (path === '/firmware.bin' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!existsSync(FW_BIN)) return json(404, { error: 'firmware.bin missing — build swarm_s3_4mb_ota first' });
+    const st = statSync(FW_BIN);
+    res.writeHead(200, {
+      'content-type': 'application/octet-stream',
+      'content-length': st.size,
+      'cache-control': 'no-store'
+    });
+    if (req.method === 'HEAD') {
+      res.end();
+      return;
+    }
+    createReadStream(FW_BIN).pipe(res);
+    return;
+  }
   if (path === '/api/presets') {
     if (req.method === 'GET') return json(200, existsSync(PRESETS_FILE) ? JSON.parse(readFileSync(PRESETS_FILE, 'utf8')) : {});
     if (req.method === 'PUT') {
@@ -184,6 +202,12 @@ async function http(req: IncomingMessage, res: ServerResponse, cfg: Config, coor
         return json(400, { error: 'url must be an http:// LAN address' });
       }
       if (!coordinator.device.isConnected(node)) return json(409, { error: `${node} is not connected` });
+      // OTA is allowed from Fault (canOta); clear a prior ota_failed so the update can start.
+      const fault = coordinator.fleet.get(node).faultCode;
+      if (fault === 'ota_failed' || fault === 'ota_rejected') {
+        await coordinator.device.send(node, { name: 'clear_fault' });
+        coordinator.note('info', `${node} cleared ${fault} before ota_update.`);
+      }
       await coordinator.device.send(node, { name: 'ota_update', url }, 15_000);
       coordinator.note('info', `${node} ota_update accepted for ${url}`);
       return json(200, { ok: true, node, url, detail: 'ota started' });

@@ -42,7 +42,10 @@ export function wifiText(n: NodeState): string {
 export function clockText(n: NodeState): string {
   if (!n.connected) return 'n/a';
   if (!n.clock) return 'no estimate';
-  return `${n.clock.synced ? 'synced' : 'NOT synced'}, ±${n.clock.uncertaintyMs.toFixed(1)} ms, ${(n.clock.ageMs / 1000).toFixed(1)} s old`;
+  const mac = n.clock.synced ? 'mac ok' : 'mac NOT synced';
+  const node =
+    n.clockSyncedFromNode === true ? 'node ok' : n.clockSyncedFromNode === false ? 'node NOT synced' : 'node n/a';
+  return `${mac}, ${node}, ±${n.clock.uncertaintyMs.toFixed(1)} ms, ${(n.clock.ageMs / 1000).toFixed(1)} s old`;
 }
 
 export function fmtTime(ms: number): string {

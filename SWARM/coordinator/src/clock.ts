@@ -62,13 +62,17 @@ export class ClockTracker {
 
   status(now: number): ClockStatus | null {
     if (this.lastAt === null || this.samples.length === 0) return null;
-    const best = this.samples.reduce((a, b) => (b.rttMs < a.rttMs ? b : a));
+    // Match firmware ClockSync::recompute: prefer up to 3 lowest-RTT samples,
+    // offset = mean, uncertainty = max(rtt/2) among those samples.
+    const ranked = [...this.samples].sort((a, b) => a.rttMs - b.rttMs).slice(0, 3);
+    const offsetMs = ranked.reduce((s, x) => s + x.offsetMs, 0) / ranked.length;
+    const rttMs = Math.max(...ranked.map((x) => x.rttMs));
+    const uncertaintyMs = Math.max(...ranked.map((x) => x.rttMs / 2));
     const ageMs = now - this.lastAt;
-    const uncertaintyMs = best.rttMs / 2;
     return {
       synced: ageMs <= this.maxAgeMs && uncertaintyMs <= this.maxUncertaintyMs,
-      offsetMs: best.offsetMs,
-      rttMs: best.rttMs,
+      offsetMs,
+      rttMs,
       uncertaintyMs,
       ageMs
     };

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import WebSocket from 'ws';
-import { NODE_IDS, SCORE_SCHEMA, type Intent, type NodeId, type Score, type ServerMessage } from '@swarm/shared';
+import { isValidFirmwareRunId, NODE_IDS, SCORE_SCHEMA, type Intent, type NodeId, type Score, type ServerMessage } from '@swarm/shared';
 import { createApp, type App } from '../src/app';
 import { loadConfig } from '../src/config';
 import { SIM_WIRE } from '../src/devices/sim-codec';
@@ -42,7 +42,8 @@ async function positioned(score: Score) {
 }
 
 beforeEach(async () => {
-  const cfg = { ...loadConfig({}), port: 0, host: '127.0.0.1', ackTimeoutMs: 300, clockIntervalMs: 100, clockMaxAgeMs: 800, startLeadMs: 500, snapshotIntervalMs: 50 };
+  // Fleet round-robins one clock probe per tick; keep interval × 9 well under clockMaxAgeMs.
+  const cfg = { ...loadConfig({}), port: 0, host: '127.0.0.1', ackTimeoutMs: 300, clockIntervalMs: 50, clockMaxAgeMs: 2500, startLeadMs: 500, snapshotIntervalMs: 50 };
   app = await createApp(cfg, { speedFactor: 150, telemetryMs: 40, tickMs: 10, reconnectMs: 100 });
   app.coordinator.clientJoined(OP);
   await send({ type: 'claimOperator' });
@@ -203,11 +204,36 @@ describe('collective run', () => {
     expect((await send({ type: 'execute', score: changed, confirmed: true, repeat: false })).ok).toBe(false);
     expect(await send({ type: 'execute', score, confirmed: true, repeat: false })).toEqual({ ok: true });
     expect(run().phase).toBe('armed');
+    // Firmware SWARM_RUN_ID_MAX=32 (NUL incl.) — dashed UUIDs (36) were rejected as "invalid run_id".
+    expect(run().runId).toBeTruthy();
+    expect(isValidFirmwareRunId(run().runId!)).toBe(true);
+    expect(run().runId!.length).toBeLessThan(32);
     expect(Object.values(run().perNode)).toEqual(Array(9).fill('armed'));
     expect((await send({ type: 'move', nodes: ['Mau01'], targetMm: 50 })).error).toContain('run is in progress');
     await until(() => run().phase === 'running', 3000, 'running');
     await until(() => run().phase === 'finished', 5000, 'finished');
     expect(NODE_IDS.every((id) => run().perNode[id] === 'finished')).toBe(true);
+  });
+
+  it('uses firmware-legal run_ids for autonomous prepare (not dashed UUIDs)', async () => {
+    await homeAll();
+    const score = shortScore();
+    await positioned(score);
+    expect(
+      await send({
+        type: 'execute',
+        score,
+        confirmed: true,
+        repeat: false,
+        autonomous: true,
+        autonomousLoop: true,
+        maxLoops: 2
+      })
+    ).toEqual({ ok: true });
+    expect(run().autonomous).toBe(true);
+    expect(isValidFirmwareRunId(run().runId!)).toBe(true);
+    expect(run().runId!.includes('-')).toBe(false);
+    expect((await send({ type: 'cancelRun' })).ok).toBe(true);
   });
 
   it('repeats a looping score until cancelled, and cancel stops the modules', async () => {
@@ -267,15 +293,54 @@ describe('collective run', () => {
     expect(r.error).toMatch(/loop-compatible/i);
   });
 
-  it('refuses to execute when a clock is no longer synchronised', async () => {
-    await homeAll();
-    const score = shortScore();
-    await positioned(score);
-    app.sim!.scenario('clockFault', 'Mau05');
-    await until(() => app.coordinator.device.clockStatus('Mau05')?.synced === false, 3000, 'stale clock');
-    const r = await send({ type: 'execute', score, confirmed: true, repeat: false });
-    expect(r.ok).toBe(false);
-    expect(r.error).toContain('Mau05 clock is not synchronised');
-    expect(run().phase).toBe('positioned');
-  });
+  it(
+    'lets autonomous multi-loop runs finish after more than one score duration (regression: premature 1-pass deadline)',
+    async () => {
+      // Reproduces the mid-run stop: watch used score.durationMs only, so after one pass + 4s grace
+      // the coordinator sent cancel+stop while modules were still on later loops (physical ~3–5 min).
+      // duration=2000 × maxLoops=5 → expected 10s; the old wrong deadline was 2000+4000=6s.
+      await homeAll();
+      const score = shortScore(2000);
+      await positioned(score);
+      expect(
+        await send({
+          type: 'execute',
+          score,
+          confirmed: true,
+          repeat: false,
+          autonomous: true,
+          autonomousLoop: true,
+          maxLoops: 5
+        })
+      ).toEqual({ ok: true });
+      await until(() => run().phase === 'running', 3000, 'autonomous running');
+      // Past the old one-pass+grace window; coordinator must NOT have failRun'd.
+      await new Promise((r) => setTimeout(r, 2000 + 4000 + 500));
+      expect(run().phase).toBe('running');
+      expect(run().error).toBeNull();
+      await until(() => run().phase === 'finished', 12_000, 'autonomous multi-loop finished');
+      expect(NODE_IDS.every((id) => run().perNode[id] === 'finished')).toBe(true);
+      expect(app.coordinator.snapshot(OP).log.some((l) => l.message.includes('Completion was not confirmed'))).toBe(
+        false
+      );
+    },
+    30_000
+  );
+
+  it(
+    'refuses to execute when a clock cannot be re-synchronised',
+    async () => {
+      await homeAll();
+      const score = shortScore();
+      await positioned(score);
+      app.sim!.scenario('clockFault', 'Mau05');
+      await until(() => app.coordinator.device.clockStatus('Mau05')?.synced === false, 3000, 'stale clock');
+      // execute() waits briefly for the clock protocol to recover; mute means it must still fail.
+      const r = await send({ type: 'execute', score, confirmed: true, repeat: false });
+      expect(r.ok).toBe(false);
+      expect(r.error).toContain('Mau05 clock is not synchronised');
+      expect(run().phase).toBe('positioned');
+    },
+    20_000
+  );
 });

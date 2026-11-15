@@ -79,7 +79,26 @@ describe('hardware fleet (firmware protocol peer)', () => {
     const inbound: string[] = [];
     const ws = new WebSocket(`ws://127.0.0.1:${app.port}/swarm`);
     await new Promise<void>((r) => ws.on('open', () => r()));
-    ws.on('message', (d) => inbound.push(d.toString()));
+    ws.on('message', (d) => {
+      const text = d.toString();
+      inbound.push(text);
+      // Coordinator aligns clock_uncertainty_max_us on connect; ack so the send does not time out.
+      try {
+        const j = JSON.parse(text);
+        if (j.type === 'set_config') {
+          ws.send(
+            JSON.stringify({
+              protocol_version: FW_PROTOCOL_VERSION,
+              source: 'Mau01',
+              type: 'ack',
+              payload: { ref: j.message_id, ok: true, detail: 'applied' }
+            })
+          );
+        }
+      } catch {
+        /* ignore */
+      }
+    });
     ws.send(status('Mau01'));
 
     await until(() => app.coordinator.fleet.get('Mau01').connected, 3000, 'status registration');
@@ -111,6 +130,16 @@ describe('hardware fleet (firmware protocol peer)', () => {
     const fin = JSON.parse(inbound.find((m) => m.includes('clock_sync_fin'))!);
     expect(fin.payload.t4_us).toBeGreaterThan(fin.payload.t1_us);
     expect(typeof fin.payload.t1_us).toBe('number');
+
+    // Firmware acks fin before the Mac credits its tracker (serialized sync exchange).
+    ws.send(
+      JSON.stringify({
+        protocol_version: FW_PROTOCOL_VERSION,
+        source: 'Mau01',
+        type: 'ack',
+        payload: { ref: fin.message_id, ok: true, detail: 'clock_synced' }
+      })
+    );
 
     // Report synced + ready after fin (what firmware status would do).
     ws.send(status('Mau01', { state: 'READY', position_valid: true, z_mm_est: 0, clock_synced: true, endstop_debounced_closed: true }));

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PresetType } from '@swarm/shared';
+  import { clockReadyForCollective, type PresetType } from '@swarm/shared';
   import { app } from '../lib/app.svelte';
   import { fmtTime } from '../lib/status';
 
@@ -17,7 +17,7 @@
   const checks = $derived([
     { label: 'Modules connected', ok: nodes.every((n) => n.connected), detail: `${nodes.filter((n) => n.connected).length} of 9` },
     { label: 'Modules homed', ok: nodes.every((n) => n.homed), detail: `${nodes.filter((n) => n.homed).length} of 9` },
-    { label: 'Clocks synchronised', ok: nodes.every((n) => n.clock?.synced), detail: `${nodes.filter((n) => n.clock?.synced).length} of 9` },
+    { label: 'Clocks synchronised', ok: nodes.every((n) => clockReadyForCollective(n, app.simulated ? 'simulator' : 'hardware')), detail: `${nodes.filter((n) => clockReadyForCollective(n, app.simulated ? 'simulator' : 'hardware')).length} of 9` },
     { label: 'No active faults', ok: nodes.every((n) => !n.faultCode), detail: nodes.filter((n) => n.faultCode).map((n) => n.id).join(', ') || 'none' },
     { label: 'Score feasible', ok: v.ok && app.limitsReported, detail: v.ok ? (app.limitsReported ? 'validated' : 'limits not all reported') : 'see above' },
     { label: 'Software stop released', ok: !app.stopEngaged, detail: app.stopEngaged ? 'engaged' : 'yes' },

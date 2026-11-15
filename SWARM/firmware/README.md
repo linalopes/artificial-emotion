@@ -2,7 +2,8 @@
 
 Firmware for the nine MauMau kinetic modules (`Mau01`–`Mau09`) in the Artificial Emotion **SWARM** installation.
 
-**Version:** **0.3.2** (set by PlatformIO `-D SWARM_FW_VERSION=\"0.3.2\"`) — adds independent homing RPM ceiling (`SWARM_ABS_MAX_HOME_RPM` 20); normal motion still capped by `hard_max_rpm` / `SWARM_ABS_MAX_RPM` (8).  
+**Version:** **0.3.5** (set by PlatformIO `-D SWARM_FW_VERSION=\"0.3.5\"`) — clock_sync_fin parses `t*_us` as `uint64_t` (0.3.4’s `| 0` truncated past ~35.7 min uptime and broke fleet sync); motion ceiling remains `SWARM_ABS_MAX_RPM` **15** with the 0.3.4 NVS migration; homing on `SWARM_ABS_MAX_HOME_RPM` **15**; remote `hard_*` writes stay blocked.  
+ 
  
 **Protocol:** version **1** (additive fields for autonomous playback)  
 **Installation entry:** [`../README.md`](../README.md)
@@ -24,9 +25,9 @@ Baseline design intent (travel candidates, original assumptions) remains in [`..
 | Endstop | **GPIO1** — Sensor A1, mandatory **COM+NC** to GND, `INPUT_PULLUP` |
 | Spool model | Constant **15 mm** core diameter; line diameter ignored in v1 |
 | Steps model | `steps_per_mm` derived from geometry × `calibration_factor` (default `steps_per_output_rev` 4096) |
-| Default speed | **2 RPM**; remote changes clamped by hard ceilings |
+| Default speed | **15 RPM**; remote changes clamped by hard ceilings |
 | Default `max_travel_mm` | **500** (commission upward; absolute compile-time max **1500**) |
-| Absolute max RPM | **8** (`SWARM_ABS_MAX_RPM`) |
+| Absolute max RPM | **15** (`SWARM_ABS_MAX_RPM`) |
 
 NC endstop polarity for Swarm **reverses** the optional COM+NO interpretation used by some generic Controller experiments. Do not change that generic firmware to “match” Swarm.
 
@@ -185,7 +186,7 @@ Relative to the historical specification:
 3. Open-endstop recovery implemented but **off** by default.
 4. Mac coordinator + Svelte UI live in `SWARM/` (Phase B) — not in this firmware tree.
 5. OTA transfer is chunked; brief blocking on idle HTTP GET may still occur. See `docs/OTA.md`.
-6. Version history: 0.1.x → **0.2.0** prepare/commit → **0.3.0** autonomous → **0.3.1** quoted `set_wifi` → **0.3.2** independent `SWARM_ABS_MAX_HOME_RPM` (20) for homing seek/backoff only.
+6. Version history: 0.1.x → **0.2.0** prepare/commit → **0.3.0** autonomous → **0.3.1** quoted `set_wifi` → **0.3.2** independent home RPM ceiling → **0.3.3** fleet home ceiling standardized at **15 RPM** → **0.3.4** normal-motion absolute ceiling **15 RPM** with NVS migration.
 
 ## Safety
 

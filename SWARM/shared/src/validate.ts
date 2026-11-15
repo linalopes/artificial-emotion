@@ -37,7 +37,7 @@ const MAX_DURATION_MS = 4 * 60 * 60 * 1000;
 export const FW_MAX_WS_MESSAGE_BYTES = 2048;
 
 /** Conservative estimate of encoded load_trajectory size for one module. */
-export function estimateFirmwareTrackBytes(keyframes: { tMs: number; zMm: number }[], runIdLen = 36, tokenLen = 32): number {
+export function estimateFirmwareTrackBytes(keyframes: { tMs: number; zMm: number }[], runIdLen = 31, tokenLen = 32): number {
   // Envelope overhead + per-keyframe {"time_ms":N,"z_mm":N.NN},
   const per = 28;
   return 280 + runIdLen + tokenLen + keyframes.length * per;

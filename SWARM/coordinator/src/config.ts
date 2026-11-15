@@ -42,8 +42,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     authToken,
     helloTimeoutMs: 3000,
     ackTimeoutMs: 1500,
-    clockIntervalMs: 2000,
-    clockMaxUncertaintyMs: 25,
+    // Fleet round-robin probes one module per tick; keep the cadence brisk so each
+    // node still refreshes well inside clockMaxAgeMs (9 × 400 ms ≈ 3.6 s per node).
+    clockIntervalMs: 400,
+    /**
+     * Ceiling Wi-Fi RTT for nine ESP32s routinely yields max-of-3 half-RTT ≈ 25–45 ms.
+     * Keep this aligned with the runtime clock_uncertainty_max_us pushed to modules.
+     * Still ≪ startLeadMs (2500), so collective start timing stays safe.
+     */
+    clockMaxUncertaintyMs: 50,
     clockMaxAgeMs: 7000,
     startLeadMs: 2500,
     positionToleranceMm: 3,

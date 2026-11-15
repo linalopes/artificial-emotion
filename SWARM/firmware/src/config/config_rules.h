@@ -72,6 +72,25 @@ inline const char* checkHomeRpmLegal(float homeSeekRpm, float homeBackoffRpm) {
   return nullptr;
 }
 
+/**
+ * NVS migration for firmware 0.3.4: raise the legacy 6 RPM motion hard ceiling (and
+ * choreography speed) to SWARM_ABS_MAX_RPM. Homing fields are not modified.
+ * Returns true when hardMaxRpm/speedRpm were updated and should be persisted.
+ * migrationLevel is NVS key mot_ceil (0 = not yet migrated).
+ */
+inline bool applyMotionCeilingMigrationV034(float* hardMaxRpm, float* speedRpm,
+                                            uint8_t migrationLevel) {
+  if (!hardMaxRpm || !speedRpm) {
+    return false;
+  }
+  if (migrationLevel >= 1) {
+    return false;
+  }
+  *hardMaxRpm = SWARM_ABS_MAX_RPM;
+  *speedRpm = SWARM_ABS_MAX_RPM;
+  return true;
+}
+
 inline bool messageTooLarge(size_t nbytes, size_t maxBytes = SWARM_MAX_WS_MESSAGE_BYTES) {
   return nbytes > maxBytes;
 }

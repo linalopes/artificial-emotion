@@ -145,6 +145,8 @@ bool ConfigStore::begin() {
   cfg_.hardMaxAccelMmS2 = prefs.getFloat("hard_acc", cfg_.hardMaxAccelMmS2);
   cfg_.hardMaxTravelMm = prefs.getFloat("hard_trav", cfg_.hardMaxTravelMm);
   cfg_.configRevision = prefs.getUInt("cfg_rev", 0);
+  // 0 = pre-0.3.4 motion ceiling; 1 = migrated to SWARM_ABS_MAX_RPM choreography ceiling.
+  const uint8_t motionCeilMig = prefs.getUChar("mot_ceil", 0);
   prefs.end();
 
   // Always clamp ceilings first so corruption cannot raise limits.
@@ -167,6 +169,22 @@ bool ConfigStore::begin() {
       SWARM_LOG("Identity/network still invalid (%s); UNPROV", err.c_str());
       loadDefaults();
       clampHardCeilings(cfg_);
+    }
+  }
+
+  // One-shot NVS migration: legacy hard_max_rpm=6 → ABS_MAX (15) + speed_rpm=15.
+  // Identity / Wi-Fi / coordinator / homing fields are left intact. Remote hard_* writes stay blocked.
+  if (rules::applyMotionCeilingMigrationV034(&cfg_.hardMaxRpm, &cfg_.speedRpm, motionCeilMig)) {
+    clampHardCeilings(cfg_);
+    if (validateConfig(cfg_, &err)) {
+      if (save()) {
+        SWARM_LOG("Migrated motion ceiling to %.1f RPM (speed=%.1f); identity preserved",
+                  cfg_.hardMaxRpm, cfg_.speedRpm);
+      } else {
+        SWARM_LOG("Motion ceiling migration applied in RAM but NVS save failed");
+      }
+    } else {
+      SWARM_LOG("Motion ceiling migration aborted (%s)", err.c_str());
     }
   }
 
@@ -227,6 +245,8 @@ bool ConfigStore::save() {
   prefs.putFloat("hard_rpm", cfg_.hardMaxRpm);
   prefs.putFloat("hard_acc", cfg_.hardMaxAccelMmS2);
   prefs.putFloat("hard_trav", cfg_.hardMaxTravelMm);
+  // Mark 0.3.4+ motion-ceiling migration complete so boot does not re-apply.
+  prefs.putUChar("mot_ceil", 1);
   prefs.putUInt("cfg_rev", cfg_.configRevision);
   prefs.end();
   SWARM_LOG("Config saved rev=%lu", static_cast<unsigned long>(cfg_.configRevision));

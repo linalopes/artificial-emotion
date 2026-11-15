@@ -33,7 +33,17 @@ interface Link {
   clockSeq: number;
   /** seq → coordinator t1 in the same units the codec uses on the wire. */
   clockSent: Map<number, number>;
-  clockTimer: NodeJS.Timeout;
+  /**
+   * True while a req→resp→fin exchange is open.
+   * Overlapping probes overwrite the node's single pending seq and cause fin rejects
+   * while the Mac still counted the sample — UI green / execute red.
+   */
+  syncInFlight: boolean;
+  /** Seq of the open exchange; completions for any other seq must not clear this. */
+  activeSyncSeq: number | null;
+  /** Coordinator mono ms when the open exchange started (stuck detection). */
+  syncStartedAtMs: number | null;
+  syncWatchdog: NodeJS.Timeout | null;
 }
 
 interface ConfigWaiter {
@@ -50,6 +60,9 @@ interface ConfigWaiter {
 export class DeviceServer {
   private links = new Map<NodeId, Link>();
   private configWaiters = new Map<NodeId, ConfigWaiter[]>();
+  /** Round-robin index so nine modules do not probe Wi-Fi at once (inflates RTT / uncertainty). */
+  private clockTurn = 0;
+  private fleetClockTimer: NodeJS.Timeout | null = null;
 
   constructor(
     private readonly codec: Codec,
@@ -131,16 +144,117 @@ export class DeviceServer {
       clock: new ClockTracker(this.opts.clockMaxUncertaintyMs, this.opts.clockMaxAgeMs),
       clockSeq: 0,
       clockSent: new Map(),
-      clockTimer: setInterval(() => this.probeClock(link), this.opts.clockIntervalMs)
+      syncInFlight: false,
+      activeSyncSeq: null,
+      syncStartedAtMs: null,
+      syncWatchdog: null
     };
     this.links.set(node, link);
-    for (let i = 0; i < 4; i++) setTimeout(() => this.probeClock(link), 50 + i * 120);
+    this.ensureFleetClockTimer();
+    // One staggered first probe; ongoing cadence is fleet round-robin (probeClockTurn).
+    setTimeout(() => this.probeClock(link), 50 + this.links.size * 80);
     return link;
+  }
+
+  private ensureFleetClockTimer(): void {
+    if (this.fleetClockTimer) return;
+    this.fleetClockTimer = setInterval(() => this.probeClockTurn(), this.opts.clockIntervalMs);
+  }
+
+  private stopFleetClockTimerIfIdle(): void {
+    if (this.links.size > 0 || !this.fleetClockTimer) return;
+    clearInterval(this.fleetClockTimer);
+    this.fleetClockTimer = null;
+  }
+
+  private syncExchangeBudgetMs(): number {
+    return Math.max(this.opts.ackTimeoutMs * 3, 5000) + 1000;
+  }
+
+  /** True when an open exchange has outlived its watchdog budget (wedged). */
+  private syncLooksWedged(link: Link, now: number): boolean {
+    if (!link.syncInFlight || link.syncStartedAtMs === null) return false;
+    return now - link.syncStartedAtMs > this.syncExchangeBudgetMs();
+  }
+
+  /** Probe at most one connected module per tick to keep sync RTT low on a busy LAN. */
+  private probeClockTurn(): void {
+    const nodes = [...this.links.keys()].sort();
+    if (nodes.length === 0) return;
+    const now = monoNow();
+    for (let i = 0; i < nodes.length; i++) {
+      const id = nodes[(this.clockTurn + i) % nodes.length]!;
+      const link = this.links.get(id);
+      if (!link) continue;
+      // Recover wedged exchanges only — never abort a fresh probe just because there are no samples yet.
+      if (this.syncLooksWedged(link, now)) this.forceEndSync(link, 'wedged exchange recovery');
+      if (link.syncInFlight) continue;
+      this.clockTurn = (this.clockTurn + i + 1) % nodes.length;
+      this.probeClock(link);
+      return;
+    }
+  }
+
+  /**
+   * Drive one sync exchange toward modules that fail `need`, else the normal turn.
+   * Used before prepare_run so the existing protocol restores readiness without raising gates.
+   */
+  nudgeClocks(need: (node: NodeId) => boolean): void {
+    const nodes = [...this.links.keys()].sort();
+    const now = monoNow();
+    for (const id of nodes) {
+      if (!need(id)) continue;
+      const link = this.links.get(id);
+      if (!link) continue;
+      if (link.syncInFlight) {
+        if (this.syncLooksWedged(link, now)) this.forceEndSync(link, 'nudge preempt');
+        else continue;
+      }
+      this.probeClock(link);
+      return;
+    }
+    this.probeClockTurn();
+  }
+
+  private clearSyncWatchdog(link: Link): void {
+    if (link.syncWatchdog) {
+      clearTimeout(link.syncWatchdog);
+      link.syncWatchdog = null;
+    }
+  }
+
+  /** Complete the open exchange only when `seq` is still the active one. */
+  private endSyncExchange(link: Link, seq: number): void {
+    if (link.activeSyncSeq !== seq) return;
+    this.clearSyncWatchdog(link);
+    link.syncInFlight = false;
+    link.activeSyncSeq = null;
+    link.syncStartedAtMs = null;
+  }
+
+  private forceEndSync(link: Link, reason: string): void {
+    const seq = link.activeSyncSeq;
+    if (seq !== null) {
+      const finId = `sync-fin-${seq}`;
+      const pendingFin = link.pending.get(finId);
+      if (pendingFin) {
+        clearTimeout(pendingFin.timer);
+        link.pending.delete(finId);
+      }
+      link.clockSent.delete(seq);
+    }
+    this.clearSyncWatchdog(link);
+    if (link.syncInFlight) {
+      this.handlers.onLog('warn', `${link.node} clock sync reset (${reason}).`);
+    }
+    link.syncInFlight = false;
+    link.activeSyncSeq = null;
+    link.syncStartedAtMs = null;
   }
 
   private unregister(link: Link): void {
     if (this.links.get(link.node) !== link) return;
-    clearInterval(link.clockTimer);
+    this.clearSyncWatchdog(link);
     for (const p of link.pending.values()) {
       clearTimeout(p.timer);
       p.reject(new Error('disconnected before acknowledging'));
@@ -152,16 +266,43 @@ export class DeviceServer {
     }
     this.configWaiters.delete(link.node);
     this.links.delete(link.node);
+    this.stopFleetClockTimerIfIdle();
     this.handlers.onDisconnect(link.node);
   }
 
   private probeClock(link: Link): void {
     if (this.links.get(link.node) !== link || link.ws.readyState !== link.ws.OPEN) return;
+    if (link.syncInFlight) return;
     const seq = ++link.clockSeq;
     if (link.clockSent.size > 16) link.clockSent.clear();
     const t1 = this.codec.speaksFirmware ? monoNowUs() : monoNow();
     link.clockSent.set(seq, t1);
-    link.ws.send(this.codec.encodeClockRequest(seq, t1, link.node));
+    link.syncInFlight = true;
+    link.activeSyncSeq = seq;
+    link.syncStartedAtMs = monoNow();
+    // Bound the whole req→resp→fin cycle. Always release this seq — never leave the
+    // fleet timer unable to schedule because a fin ack raced with the next probe.
+    const watchdogMs = Math.max(this.opts.ackTimeoutMs * 3, 5000);
+    link.syncWatchdog = setTimeout(() => {
+      if (this.links.get(link.node) !== link) return;
+      if (link.activeSyncSeq !== seq) return;
+      const finId = `sync-fin-${seq}`;
+      const pendingFin = link.pending.get(finId);
+      if (pendingFin) {
+        clearTimeout(pendingFin.timer);
+        link.pending.delete(finId);
+      }
+      link.clockSent.delete(seq);
+      this.handlers.onLog('warn', `${link.node} clock sync timed out (seq ${seq}).`);
+      this.endSyncExchange(link, seq);
+    }, watchdogMs);
+    link.ws.send(this.codec.encodeClockRequest(seq, t1, link.node), (err) => {
+      if (err && this.links.get(link.node) === link) {
+        link.clockSent.delete(seq);
+        this.handlers.onLog('warn', `${link.node} clock_sync_req send failed (seq ${seq}).`);
+        this.endSyncExchange(link, seq);
+      }
+    });
   }
 
   private handle(link: Link, ev: DeviceEvent, t4: number): void {
@@ -172,7 +313,15 @@ export class DeviceServer {
         link.pending.delete(ev.messageId);
         clearTimeout(p.timer);
         if (ev.ok) p.resolve();
-        else p.reject(new Error(ev.error ?? 'refused by the module'));
+        else {
+          if (String(ev.messageId).startsWith('sync-fin-')) {
+            this.handlers.onLog(
+              'warn',
+              `${link.node} clock_sync_fin refused: ${ev.error ?? 'refused by the module'}`
+            );
+          }
+          p.reject(new Error(ev.error ?? 'refused by the module'));
+        }
         return;
       }
       case 'telemetry':
@@ -187,18 +336,46 @@ export class DeviceServer {
         return;
       case 'clock_reply': {
         const t1 = link.clockSent.get(ev.seq);
-        if (t1 === undefined) return;
+        if (t1 === undefined) {
+          this.handlers.onLog('warn', `${link.node} clock_sync_resp for unknown seq ${ev.seq}.`);
+          return;
+        }
+        // Ignore replies that are not for the active exchange (stale / overlapped).
+        if (link.activeSyncSeq !== ev.seq) {
+          link.clockSent.delete(ev.seq);
+          this.handlers.onLog('warn', `${link.node} clock_sync_resp for stale seq ${ev.seq} (active ${link.activeSyncSeq}).`);
+          return;
+        }
         link.clockSent.delete(ev.seq);
         const units = ev.units ?? (this.codec.speaksFirmware ? 'us' : 'ms');
         if (units === 'us' && this.codec.encodeClockFin) {
-          link.ws.send(
-            this.codec.encodeClockFin(ev.seq, { t1, t2: ev.t2, t3: ev.t3, t4 }, link.node),
-            () => undefined
-          );
-          // Store tracker samples in milliseconds for shared ClockStatus.
-          link.clock.add({ t1: t1 / 1000, t2: ev.t2 / 1000, t3: ev.t3 / 1000, t4: t4 / 1000 });
+          // Only credit the Mac tracker after the node accepts fin (matches firmware clock_synced).
+          const messageId = `sync-fin-${ev.seq}`;
+          const sample = { t1: t1 / 1000, t2: ev.t2 / 1000, t3: ev.t3 / 1000, t4: t4 / 1000 };
+          const timer = setTimeout(() => {
+            link.pending.delete(messageId);
+            this.endSyncExchange(link, ev.seq);
+          }, this.opts.ackTimeoutMs);
+          link.pending.set(messageId, {
+            resolve: () => {
+              link.clock.add(sample);
+              this.endSyncExchange(link, ev.seq);
+            },
+            reject: () => {
+              this.endSyncExchange(link, ev.seq);
+            },
+            timer
+          });
+          link.ws.send(this.codec.encodeClockFin(ev.seq, { t1, t2: ev.t2, t3: ev.t3, t4 }, link.node), (err) => {
+            if (err) {
+              clearTimeout(timer);
+              link.pending.delete(messageId);
+              this.endSyncExchange(link, ev.seq);
+            }
+          });
         } else {
           link.clock.add({ t1, t2: ev.t2, t3: ev.t3, t4 });
+          this.endSyncExchange(link, ev.seq);
         }
         return;
       }
@@ -288,6 +465,10 @@ export class DeviceServer {
   }
 
   close(): void {
+    if (this.fleetClockTimer) {
+      clearInterval(this.fleetClockTimer);
+      this.fleetClockTimer = null;
+    }
     for (const link of [...this.links.values()]) link.ws.close();
   }
 }

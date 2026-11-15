@@ -35,7 +35,7 @@ describe('generators', () => {
       const s = generate(type, DEFAULT_PARAMS[type]);
       expect('score' in checkScoreShape(JSON.parse(JSON.stringify(s)))).toBe(true);
       for (const id of NODE_IDS) expect(s.tracks[id][0].zMm).toBe(s.tracks[id].at(-1)!.zMm);
-      expect(validateScore(s, limits(rpmToMmPerS(12))).ok).toBe(true);
+      expect(validateScore(s, limits(rpmToMmPerS(15))).ok).toBe(true);
     }
   });
   it('wave propagates: neighbours along the diagonal are phase shifted', () => {

@@ -48,7 +48,7 @@ Collective starts must **not** use legacy `start_at` / `delay_ms`.
 
 - Max keyframes per track: 32 (`FW_MAX_KEYFRAMES`)
 - Max inbound WS message: 2048 bytes
-- UI RPM max: 8 (`SWARM_ABS_MAX_RPM`); device `hardMaxRpm` may be lower
+- UI RPM max: 15 (`SWARM_ABS_MAX_RPM`); device `hardMaxRpm` may be lower; remote `hard_*` ceilings are not writable
 - Default travel assumption when a node has not reported: 0–500 mm
 
 ## Implemented in B.2 (software)

@@ -30,11 +30,11 @@ struct SwarmConfig {
 
   int8_t retractDirection = -1;
   float maxTravelMm = 500.0f;
-  float speedRpm = 2.0f;
+  float speedRpm = 15.0f;
   float accelerationMmS2 = 20.0f;
 
-  float homeSeekRpm = 1.0f;
-  float homeBackoffRpm = 1.0f;
+  float homeSeekRpm = 15.0f;
+  float homeBackoffRpm = 6.0f;
   uint32_t homeSearchMaxSteps = 20000;
   uint32_t homeTimeoutMs = 60000;
   float homeOffsetMm = 2.0f;
@@ -45,7 +45,7 @@ struct SwarmConfig {
   DisconnectPolicy disconnectPolicy = DisconnectPolicy::FinishSegmentThenStop;
 
   // Runtime ceilings — always clamped to compile-time absolute maxima on load/validate.
-  float hardMaxRpm = 6.0f;
+  float hardMaxRpm = 15.0f;
   float hardMaxAccelMmS2 = 200.0f;
   float hardMaxTravelMm = 1500.0f;
 

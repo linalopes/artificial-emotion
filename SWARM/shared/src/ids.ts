@@ -6,6 +6,22 @@ export function isNodeId(v: unknown): v is NodeId {
   return typeof v === 'string' && (NODE_IDS as readonly string[]).includes(v);
 }
 
+/**
+ * Firmware `SWARM_RUN_ID_MAX` is 32 bytes including the NUL terminator
+ * (`strlen(runId) >= 32` → "invalid run_id"). A full UUID (36 chars) is rejected.
+ */
+export const FW_RUN_ID_MAX_LEN = 31;
+
+/** Same gate as firmware RunController::loadRun / bindLoadedTrack. */
+export function isValidFirmwareRunId(runId: string): boolean {
+  return runId.length > 0 && runId.length <= FW_RUN_ID_MAX_LEN;
+}
+
+/** Compact run id that fits the firmware buffer (not a dashed UUID). */
+export function newFirmwareRunId(uuid: string = globalThis.crypto.randomUUID()): string {
+  return uuid.replace(/-/g, '').slice(0, FW_RUN_ID_MAX_LEN);
+}
+
 /** Grid position. Row 0 is the back row (Mau01..Mau03), column 0 is the left column. */
 export function gridOf(id: NodeId): { col: number; row: number; index: number } {
   const index = NODE_IDS.indexOf(id);

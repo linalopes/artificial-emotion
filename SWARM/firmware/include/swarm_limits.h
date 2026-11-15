@@ -4,13 +4,13 @@
 // These are firmware safety clamps — not physically validated operating points.
 
 #ifndef SWARM_ABS_MAX_RPM
-#define SWARM_ABS_MAX_RPM 8.0f
+#define SWARM_ABS_MAX_RPM 15.0f
 #endif
 
-// Homing seek/backoff only — independent of normal motion / choreography RPM ceiling.
-// Experimental: allows faster line retract on long suspensions (Mau01 bench validation).
+// Homing seek/backoff only — independent code path from normal motion / choreography.
+// Magnitude may match SWARM_ABS_MAX_RPM; remote hard_* ceilings remain non-writable.
 #ifndef SWARM_ABS_MAX_HOME_RPM
-#define SWARM_ABS_MAX_HOME_RPM 20.0f
+#define SWARM_ABS_MAX_HOME_RPM 15.0f
 #endif
 
 #ifndef SWARM_ABS_MAX_ACCEL_MM_S2

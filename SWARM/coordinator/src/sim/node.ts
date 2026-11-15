@@ -18,6 +18,10 @@ interface Trajectory {
   startAt: number | null;
   started: boolean;
   autonomous?: boolean;
+  loop?: boolean;
+  continuous?: boolean;
+  maxLoops?: number;
+  maxRuntimeMs?: number;
 }
 
 /**
@@ -181,6 +185,10 @@ export class SimNode {
         }
         this.traj.prepared = true;
         this.traj.autonomous = cmd.autonomous === true;
+        this.traj.loop = cmd.loop === true;
+        this.traj.continuous = cmd.continuous === true;
+        this.traj.maxLoops = cmd.maxLoops ?? 0;
+        this.traj.maxRuntimeMs = cmd.maxRuntimeMs ?? 0;
         return null;
       case 'commit':
         if (!this.traj || this.traj.runId !== cmd.runId || !this.traj.prepared) return 'run not prepared';
@@ -203,6 +211,18 @@ export class SimNode {
     const runId = this.traj.runId;
     this.traj = null;
     if (active) this.emit({ type: 'run_status', runId, state: 'aborted', reason });
+  }
+
+  /** Mirrors firmware mayStartNextLoop: finish when the authorized autonomous bound is met. */
+  private autonomousPassDone(tr: Trajectory, elapsedMs: number, durationMs: number): boolean {
+    if (!tr.autonomous || !tr.loop) return elapsedMs >= durationMs;
+    if (tr.maxRuntimeMs && tr.maxRuntimeMs > 0 && elapsedMs >= tr.maxRuntimeMs) return true;
+    if (tr.continuous) return false;
+    const completedPasses = durationMs > 0 ? Math.floor(elapsedMs / durationMs) : 0;
+    if (tr.maxLoops && tr.maxLoops > 0) return completedPasses >= tr.maxLoops;
+    // Runtime-only bound already handled above; if still under runtime with no maxLoops, keep going.
+    if (tr.maxRuntimeMs && tr.maxRuntimeMs > 0) return false;
+    return elapsedMs >= durationMs;
   }
 
   // ---- motor model ----------------------------------------------------------------------
@@ -237,10 +257,14 @@ export class SimNode {
           tr.started = true;
           this.emit({ type: 'run_status', runId: tr.runId, state: 'running' });
         }
-        this.target = Math.max(this.limitMin, Math.min(this.limitMax, positionAt(tr.score, this.id, t)));
-        if (t >= tr.score.durationMs) {
+        const duration = tr.score.durationMs;
+        const looping = tr.autonomous === true && tr.loop === true;
+        const localT = looping && duration > 0 ? t % duration : t;
+        this.target = Math.max(this.limitMin, Math.min(this.limitMax, positionAt(tr.score, this.id, localT, looping)));
+        if (this.autonomousPassDone(tr, t, duration)) {
+          const runId = tr.runId;
           this.traj = null;
-          this.emit({ type: 'run_status', runId: tr.runId, state: 'finished' });
+          this.emit({ type: 'run_status', runId, state: 'finished' });
         }
       }
     }
