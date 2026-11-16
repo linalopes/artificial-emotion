@@ -7,3 +7,6 @@ web/node_modules/
 !.env.example
 *.secrets
 provision.local.*
+presets.json
+coordinator/data/coordinator-events.jsonl
+coordinator/data/*.jsonl

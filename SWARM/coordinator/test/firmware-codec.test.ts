@@ -220,6 +220,29 @@ describe('firmware codec', () => {
     expect(t.faultCode).toBeNull();
   });
 
+  it('surfaces fault only while firmware state is FAULT (ignores sticky fault after stop desync)', () => {
+    const stuck = telemetryFromStatus({
+      state: 'UNHOMED',
+      fault: 'track_infeasible',
+      position_valid: false,
+      z_mm_est: null,
+      clock_synced: true
+    });
+    expect(stuck.faultCode).toBeNull();
+    expect(stuck.homed).toBe(false);
+
+    const real = telemetryFromStatus({
+      state: 'FAULT',
+      fault: 'track_infeasible',
+      position_valid: false,
+      z_mm_est: 120,
+      clock_synced: true
+    });
+    expect(real.faultCode).toBe('track_infeasible');
+    expect(real.homed).toBe(false);
+    expect(real.positionMm).toBeNull();
+  });
+
   it('keeps default generator tracks within firmware keyframe and message limits', () => {
     const score = generateWave(DEFAULT_PARAMS.wave);
     const runId = newFirmwareRunId();

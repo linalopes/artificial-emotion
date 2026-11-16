@@ -48,6 +48,12 @@ export interface Telemetry {
   limitMaxMm: number | null;
   /** From firmware status.clock_synced when present. */
   clockSynced?: boolean;
+  /** Firmware status fields used to reconcile after reconnect (optional). */
+  runId?: string | null;
+  loopIndex?: number | null;
+  completedPasses?: number | null;
+  positionValid?: boolean | null;
+  autonomous?: boolean | null;
 }
 
 export type DeviceEvent =

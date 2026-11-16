@@ -1,0 +1,306 @@
+{
+  "captured_at": "2026-11-15T17:47:22Z",
+  "run": {
+    "phase": "idle",
+    "runId": null,
+    "scoreName": null,
+    "scoreFingerprint": null,
+    "durationMs": 0,
+    "startAtMs": null,
+    "repeat": false,
+    "autonomous": false,
+    "autonomousLoop": false,
+    "pass": 0,
+    "error": null,
+    "perNode": {}
+  },
+  "stop": {
+    "engaged": false,
+    "atMs": null
+  },
+  "serverTimeMs": 24481.758333,
+  "log_tail": [
+    {
+      "atMs": 1794764814853,
+      "level": "error",
+      "message": "Mau06 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794764814866,
+      "level": "info",
+      "message": "Mau09 connected, firmware 0.3.5."
+    },
+    {
+      "atMs": 1794764814866,
+      "level": "error",
+      "message": "Mau09 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794764814867,
+      "level": "info",
+      "message": "Mau08 connected, firmware 0.3.5."
+    },
+    {
+      "atMs": 1794764814867,
+      "level": "error",
+      "message": "Mau08 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794764814867,
+      "level": "info",
+      "message": "Mau03 connected, firmware 0.3.5."
+    },
+    {
+      "atMs": 1794764814867,
+      "level": "error",
+      "message": "Mau03 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794764814878,
+      "level": "info",
+      "message": "Mau05 connected, firmware 0.3.5."
+    },
+    {
+      "atMs": 1794764814878,
+      "level": "error",
+      "message": "Mau05 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794764814888,
+      "level": "info",
+      "message": "Mau07 connected, firmware 0.3.5."
+    },
+    {
+      "atMs": 1794764814889,
+      "level": "error",
+      "message": "Mau07 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794764815157,
+      "level": "info",
+      "message": "Mau02 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815230,
+      "level": "info",
+      "message": "Mau06 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815230,
+      "level": "info",
+      "message": "Mau03 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815230,
+      "level": "info",
+      "message": "Mau01 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815230,
+      "level": "info",
+      "message": "Mau05 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815230,
+      "level": "info",
+      "message": "Mau08 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815231,
+      "level": "info",
+      "message": "Mau09 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815231,
+      "level": "info",
+      "message": "Mau07 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794764815231,
+      "level": "info",
+      "message": "Mau04 clock gate set to \u00b150 ms."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "Mau01",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 23.854000000301767,
+        "ageMs": 2092.1688329999997
+      }
+    },
+    {
+      "id": "Mau02",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 26.634500000220214,
+        "ageMs": 1780.0226250000014
+      }
+    },
+    {
+      "id": "Mau03",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 22.566499999836083,
+        "ageMs": 1371.6606250000004
+      }
+    },
+    {
+      "id": "Mau04",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 36.15299999983472,
+        "ageMs": 964.1575830000002
+      }
+    },
+    {
+      "id": "Mau05",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 31.62699999983579,
+        "ageMs": 555.4504579999993
+      }
+    },
+    {
+      "id": "Mau06",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 21.756999999836125,
+        "ageMs": 146.53141699999833
+      }
+    },
+    {
+      "id": "Mau07",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 36.59599999983584,
+        "ageMs": 3318.3982920000017
+      }
+    },
+    {
+      "id": "Mau08",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 22.651499999836005,
+        "ageMs": 2909.940208
+      }
+    },
+    {
+      "id": "Mau09",
+      "connected": true,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "positionValid": null,
+      "endstop": true,
+      "rpm": 15,
+      "clockSyncedFromNode": true,
+      "clock": {
+        "synced": true,
+        "uncertaintyMs": 35.23100000030172,
+        "ageMs": 2490.7050420000014
+      }
+    }
+  ]
+}

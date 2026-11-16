@@ -1,0 +1,1 @@
+[coord] [2026-11-15T07:03:34.075Z] INFO Breathing armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.

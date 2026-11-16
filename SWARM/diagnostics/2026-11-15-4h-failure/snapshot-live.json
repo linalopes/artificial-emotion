@@ -1,0 +1,504 @@
+{
+  "fleet": "hardware",
+  "serverTimeMs": 43232815.604458,
+  "wallTimeMs": 1794750210011,
+  "nodes": [
+    {
+      "id": "Mau01",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -59,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977375,
+      "travelSinceHomeMm": 75253.5840000011,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2430542.158166668,
+        "rttMs": 61.95600000023842,
+        "uncertaintyMs": 30.97800000011921,
+        "ageMs": 1429.403417006135
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209600
+    },
+    {
+      "id": "Mau02",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -60,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977383,
+      "travelSinceHomeMm": 75105.29240000133,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2421394.899,
+        "rttMs": 51.49199999123812,
+        "uncertaintyMs": 25.74599999561906,
+        "ageMs": 1020.1772919967771
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750210005
+    },
+    {
+      "id": "Mau03",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -63,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977396,
+      "travelSinceHomeMm": 75045.76660000067,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2411935.454333333,
+        "rttMs": 49.56800000369549,
+        "uncertaintyMs": 24.784000001847744,
+        "ageMs": 637.4387079998851
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209385
+    },
+    {
+      "id": "Mau04",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -56,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977383,
+      "travelSinceHomeMm": 75103.22160000095,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2397906.1426666663,
+        "rttMs": 66.99499999731779,
+        "uncertaintyMs": 33.497499998658895,
+        "ageMs": 198.75358299911022
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209828
+    },
+    {
+      "id": "Mau05",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -54,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977375,
+      "travelSinceHomeMm": 75174.94410000107,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2385949.953333333,
+        "rttMs": 74.24899999797344,
+        "uncertaintyMs": 37.12449999898672,
+        "ageMs": 3477.0506250038743
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209550
+    },
+    {
+      "id": "Mau06",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -81,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977383,
+      "travelSinceHomeMm": 75041.3668000011,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2376722.8251666673,
+        "rttMs": 51.599999994039536,
+        "uncertaintyMs": 25.799999997019768,
+        "ageMs": 3095.354332998395
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209929
+    },
+    {
+      "id": "Mau07",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -59,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977384,
+      "travelSinceHomeMm": 75050.62140000134,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2366712.9189999998,
+        "rttMs": 63.50799999386072,
+        "uncertaintyMs": 31.75399999693036,
+        "ageMs": 2657.8715829998255
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209370
+    },
+    {
+      "id": "Mau08",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -63,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977375,
+      "travelSinceHomeMm": 75038.92780000104,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2358026.3825000003,
+        "rttMs": 73.04999999701977,
+        "uncertaintyMs": 36.524999998509884,
+        "ageMs": 2247.446249999106
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209780
+    },
+    {
+      "id": "Mau09",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.5",
+      "homed": false,
+      "homing": false,
+      "moving": false,
+      "faultCode": "track_infeasible",
+      "positionMm": null,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -56,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794706977369,
+      "travelSinceHomeMm": 75093.9593000011,
+      "clock": {
+        "synced": true,
+        "offsetMs": 2348225.614333333,
+        "rttMs": 53.13499999046326,
+        "uncertaintyMs": 26.56749999523163,
+        "ageMs": 1840.0237919986248
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794750209191
+    }
+  ],
+  "stop": {
+    "engaged": false,
+    "atMs": null
+  },
+  "run": {
+    "phase": "failed",
+    "runId": "4285db64e5634a1595b8e6f7052a96f",
+    "scoreName": "Wave",
+    "scoreFingerprint": "4eef727e",
+    "durationMs": 240000,
+    "startAtMs": null,
+    "repeat": false,
+    "autonomous": true,
+    "autonomousLoop": true,
+    "pass": 1,
+    "error": "Mau07 disconnected during running.",
+    "perNode": {
+      "Mau01": "running",
+      "Mau05": "running",
+      "Mau06": "running",
+      "Mau03": "running",
+      "Mau09": "running",
+      "Mau07": "running",
+      "Mau02": "running",
+      "Mau08": "running",
+      "Mau04": "running"
+    }
+  },
+  "operatorClientId": "8215b2a3-3458-460b-b7dd-b217bb741493",
+  "clients": 2,
+  "you": {
+    "clientId": "82621139-d9fd-4919-97ea-d176d209f047",
+    "isOperator": false
+  },
+  "log": [
+    {
+      "atMs": 1794750022620,
+      "level": "warn",
+      "message": "Mau03 clock_sync_resp for unknown seq 21."
+    },
+    {
+      "atMs": 1794750022620,
+      "level": "warn",
+      "message": "Mau03 clock_sync_resp for unknown seq 22."
+    },
+    {
+      "atMs": 1794750022620,
+      "level": "warn",
+      "message": "Mau03 clock_sync_resp for unknown seq 23."
+    },
+    {
+      "atMs": 1794750022627,
+      "level": "warn",
+      "message": "Mau03 clock_sync_resp for unknown seq 24."
+    },
+    {
+      "atMs": 1794750022631,
+      "level": "warn",
+      "message": "Mau01 clock_sync_resp for unknown seq 23."
+    },
+    {
+      "atMs": 1794750022631,
+      "level": "warn",
+      "message": "Mau01 clock_sync_resp for unknown seq 24."
+    },
+    {
+      "atMs": 1794750022631,
+      "level": "warn",
+      "message": "Mau01 clock_sync_resp for unknown seq 25."
+    },
+    {
+      "atMs": 1794750022631,
+      "level": "warn",
+      "message": "Mau01 clock_sync_resp for unknown seq 26."
+    },
+    {
+      "atMs": 1794750022631,
+      "level": "warn",
+      "message": "Mau03 clock_sync_resp for unknown seq 25."
+    },
+    {
+      "atMs": 1794750022638,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 16."
+    },
+    {
+      "atMs": 1794750022686,
+      "level": "warn",
+      "message": "Mau03 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794750022697,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 17."
+    },
+    {
+      "atMs": 1794750022697,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 18."
+    },
+    {
+      "atMs": 1794750022697,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 19."
+    },
+    {
+      "atMs": 1794750022697,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 20."
+    },
+    {
+      "atMs": 1794750022720,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 21."
+    },
+    {
+      "atMs": 1794750022720,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 22."
+    },
+    {
+      "atMs": 1794750022720,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 23."
+    },
+    {
+      "atMs": 1794750022731,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 18."
+    },
+    {
+      "atMs": 1794750022763,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 19."
+    },
+    {
+      "atMs": 1794750022764,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 20."
+    },
+    {
+      "atMs": 1794750022764,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 21."
+    },
+    {
+      "atMs": 1794750022764,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 22."
+    },
+    {
+      "atMs": 1794750022833,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 23."
+    },
+    {
+      "atMs": 1794750022833,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 24."
+    },
+    {
+      "atMs": 1794750022833,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 25."
+    },
+    {
+      "atMs": 1794750022833,
+      "level": "warn",
+      "message": "Mau04 clock_sync_resp for unknown seq 26."
+    },
+    {
+      "atMs": 1794750022898,
+      "level": "warn",
+      "message": "Mau04 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794750023560,
+      "level": "warn",
+      "message": "Mau01 clock_sync_resp for unknown seq 27."
+    },
+    {
+      "atMs": 1794750023572,
+      "level": "warn",
+      "message": "Mau01 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794750024213,
+      "level": "warn",
+      "message": "Mau05 clock sync timed out (seq 25)."
+    },
+    {
+      "atMs": 1794750024770,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 24."
+    },
+    {
+      "atMs": 1794750024773,
+      "level": "warn",
+      "message": "Mau05 clock_sync_resp for unknown seq 25."
+    },
+    {
+      "atMs": 1794750027391,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794750031426,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794750040106,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794750090648,
+      "level": "warn",
+      "message": "Mau03 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794750093032,
+      "level": "warn",
+      "message": "Mau09 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794750093687,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794750138721,
+      "level": "warn",
+      "message": "Mau06 clock_sync_fin refused: rtt out of range"
+    }
+  ]
+}

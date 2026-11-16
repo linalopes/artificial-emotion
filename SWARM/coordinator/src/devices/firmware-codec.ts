@@ -42,6 +42,10 @@ export function telemetryFromStatus(payload: Record<string, unknown>): Telemetry
   const state = str(payload.state) ?? '';
   const positionValid = payload.position_valid === true;
   const z = num(payload.z_mm_est);
+  // Firmware 0.3.5 could leave fault_ set after stop exited FAULT (UNHOMED/STOPPING).
+  // Only surface a fault while state is FAULT — matches canHome() and avoids sticky UI FAULT.
+  const rawFault = faultCode(payload.fault);
+  const fault = state === 'FAULT' ? rawFault : null;
   return {
     positionMm: positionValid && z !== null ? z : null,
     targetMm: null,
@@ -49,13 +53,18 @@ export function telemetryFromStatus(payload: Record<string, unknown>): Telemetry
     homing: state === 'HOMING',
     moving: state === 'MOVING' || state === 'STOPPING',
     endstop: typeof payload.endstop_debounced_closed === 'boolean' ? payload.endstop_debounced_closed : null,
-    faultCode: faultCode(payload.fault),
+    faultCode: fault,
     rssiDbm: num(payload.rssi),
     rpm: num(payload.speed_rpm),
     accelMmS2: num(payload.acceleration_mm_s2),
     limitMinMm: 0,
     limitMaxMm: num(payload.max_travel_mm),
-    clockSynced: payload.clock_synced === true
+    clockSynced: payload.clock_synced === true,
+    runId: str(payload.run_id),
+    loopIndex: num(payload.loop_index),
+    completedPasses: num(payload.completed_passes),
+    positionValid,
+    autonomous: typeof payload.autonomous === 'boolean' ? payload.autonomous : null
   };
 }
 

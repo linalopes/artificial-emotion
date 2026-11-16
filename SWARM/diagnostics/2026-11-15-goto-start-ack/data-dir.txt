@@ -1,0 +1,6 @@
+total 120
+drwxr-xr-x@ 5 linalopes  staff    160 Nov 15 14:54 .
+drwxr-xr-x@ 8 linalopes  staff    256 Nov 15 02:44 ..
+-rw-r--r--@ 1 linalopes  staff      0 Nov 13 10:56 .gitkeep
+-rw-r--r--@ 1 linalopes  staff  55502 Nov 15 18:04 coordinator-events.jsonl
+-rw-r--r--@ 1 linalopes  staff    397 Nov 15 01:42 presets.json

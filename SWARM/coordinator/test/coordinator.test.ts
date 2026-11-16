@@ -43,7 +43,17 @@ async function positioned(score: Score) {
 
 beforeEach(async () => {
   // Fleet round-robins one clock probe per tick; keep interval × 9 well under clockMaxAgeMs.
-  const cfg = { ...loadConfig({}), port: 0, host: '127.0.0.1', ackTimeoutMs: 300, clockIntervalMs: 50, clockMaxAgeMs: 2500, startLeadMs: 500, snapshotIntervalMs: 50 };
+  const cfg = {
+    ...loadConfig({}),
+    port: 0,
+    host: '127.0.0.1',
+    ackTimeoutMs: 300,
+    clockIntervalMs: 50,
+    clockMaxAgeMs: 2500,
+    startLeadMs: 500,
+    snapshotIntervalMs: 50,
+    eventLogPath: null
+  };
   app = await createApp(cfg, { speedFactor: 150, telemetryMs: 40, tickMs: 10, reconnectMs: 100 });
   app.coordinator.clientJoined(OP);
   await send({ type: 'claimOperator' });
@@ -260,9 +270,13 @@ describe('collective run', () => {
     await until(() => node('Mau06').faultCode === 'HOMING_FAILED');
     expect((await send({ type: 'home', nodes: ['Mau06'] })).outcomes![0].error).toContain('clear it first');
     expect((await send({ type: 'clearFault', nodes: ['Mau06'] })).ok).toBe(true);
+    // Success means telemetry confirmed UNHOMED — not merely clear_fault ACK.
+    expect(node('Mau06').faultCode).toBeNull();
+    expect(node('Mau06').homed).toBe(false);
+    expect((await send({ type: 'home', nodes: ['Mau06'] })).ok).toBe(true);
   });
 
-  it('fails the run when a module disconnects during playback', async () => {
+  it('fails the run when a module disconnects during non-autonomous playback', async () => {
     await homeAll();
     const score = shortScore(3000);
     await positioned(score);
@@ -271,6 +285,164 @@ describe('collective run', () => {
     app.sim!.scenario('disconnect', 'Mau07');
     await until(() => run().phase === 'failed', 3000, 'failure');
     expect(run().error).toContain('Mau07 disconnected');
+  });
+
+  it(
+    'keeps autonomous running when one module disconnects; others continue; reconnect reconciles',
+    async () => {
+      await homeAll();
+      const score = shortScore(2500);
+      await positioned(score);
+      expect(
+        await send({
+          type: 'execute',
+          score,
+          confirmed: true,
+          repeat: false,
+          autonomous: true,
+          autonomousLoop: true,
+          maxLoops: 2
+        })
+      ).toEqual({ ok: true });
+      await until(() => run().phase === 'running', 3000, 'autonomous running');
+      app.sim!.scenario('disconnect', 'Mau07');
+      await until(() => run().perNode.Mau07 === 'disconnected', 3000, 'Mau07 marked disconnected');
+      expect(run().phase).toBe('running');
+      expect(run().error).toBeNull();
+      await new Promise((r) => setTimeout(r, 400));
+      expect(run().phase).toBe('running');
+      app.sim!.scenario('reconnect', 'Mau07');
+      await until(() => node('Mau07').connected, 3000, 'Mau07 back');
+      await until(() => run().phase === 'finished', 15_000, 'autonomous finished');
+      expect(run().error).toBeNull();
+      await until(() => run().perNode.Mau07 === 'finished', 8_000, 'Mau07 finished');
+    },
+    40_000
+  );
+
+  it(
+    'does not cancel the fleet when one module faults during autonomous playback',
+    async () => {
+      await homeAll();
+      const score = shortScore(4000);
+      await positioned(score);
+      await send({
+        type: 'execute',
+        score,
+        confirmed: true,
+        repeat: false,
+        autonomous: true,
+        autonomousLoop: true,
+        maxLoops: 2
+      });
+      await until(() => run().phase === 'running', 3000);
+      app.sim!.scenario('homingFault', 'Mau06');
+      await until(() => run().perNode.Mau06 === 'faulted' || run().perNode.Mau06 === 'aborted', 3000);
+      expect(run().phase).toBe('running');
+      expect(run().error).toBeNull();
+      await until(() => run().phase === 'finished', 15_000, 'others finish');
+      expect(['faulted', 'aborted']).toContain(run().perNode.Mau06);
+    },
+    30_000
+  );
+
+  it(
+    'does not failRun when every module drops during autonomous running (Mac loss / link storm)',
+    async () => {
+      await homeAll();
+      const score = shortScore(3000);
+      await positioned(score);
+      await send({
+        type: 'execute',
+        score,
+        confirmed: true,
+        repeat: false,
+        autonomous: true,
+        autonomousLoop: true,
+        maxLoops: 2
+      });
+      await until(() => run().phase === 'running', 3000);
+      for (const id of NODE_IDS) app.sim!.scenario('disconnect', id);
+      await until(() => NODE_IDS.every((id) => run().perNode[id] === 'disconnected'), 5000);
+      expect(run().phase).toBe('running');
+      expect(run().error).toBeNull();
+      for (const id of NODE_IDS) app.sim!.scenario('reconnect', id);
+      await until(() => run().phase === 'finished', 20_000, 'finish after full reconnect');
+    },
+    40_000
+  );
+
+  it(
+    'serializes operator cancel then immediate goToStart so move acks are not starved',
+    async () => {
+      // Regression: cancel+stop and goToStart overlapping caused 9/9 "no acknowledgment within 1500 ms".
+      await homeAll();
+      const score = shortScore(3500);
+      await positioned(score);
+      await send({
+        type: 'execute',
+        score,
+        confirmed: true,
+        repeat: false,
+        autonomous: true,
+        autonomousLoop: true,
+        maxLoops: 2
+      });
+      await until(() => run().phase === 'running', 3000, 'running');
+      const cancelP = send({ type: 'cancelRun' });
+      await new Promise((r) => setTimeout(r, 30));
+      const goP = send({ type: 'goToStart', score });
+      const cancel = await cancelP;
+      expect(cancel.ok).toBe(true);
+      const go = await goP;
+      expect(go.ok).toBe(true);
+      expect(go.error ?? '').not.toMatch(/no acknowledgment/);
+      await until(() => run().phase === 'positioned', 10_000, 're-positioned after cancel');
+    },
+    25_000
+  );
+
+  it('still fails if a module disconnects before autonomous start', async () => {
+    await app.close();
+    const cfg = {
+      ...loadConfig({}),
+      port: 0,
+      host: '127.0.0.1',
+      ackTimeoutMs: 300,
+      clockIntervalMs: 50,
+      clockMaxAgeMs: 2500,
+      startLeadMs: 2500,
+      snapshotIntervalMs: 50,
+      eventLogPath: null as string | null
+    };
+    app = await createApp(cfg, { speedFactor: 150, telemetryMs: 40, tickMs: 10, reconnectMs: 100 });
+    app.coordinator.clientJoined(OP);
+    await send({ type: 'claimOperator' });
+    await until(
+      () =>
+        NODE_IDS.every(
+          (id) => node(id).connected && node(id).lastTelemetryAtMs !== null && app.coordinator.device.clockStatus(id)?.synced === true
+        ),
+      6000,
+      'nine synced'
+    );
+    await homeAll();
+    const score = shortScore(2000);
+    await positioned(score);
+    const execP = send({
+      type: 'execute',
+      score,
+      confirmed: true,
+      repeat: false,
+      autonomous: true,
+      autonomousLoop: true,
+      maxLoops: 2
+    });
+    await until(() => run().phase === 'armed', 5000, 'armed before start');
+    app.sim!.scenario('disconnect', 'Mau03');
+    await until(() => run().phase === 'failed', 4000, 'fail before start');
+    expect(run().error).toContain('Mau03 disconnected');
+    await execP;
   });
 
   it('rejects autonomous looping when the score is not loop-compatible', async () => {

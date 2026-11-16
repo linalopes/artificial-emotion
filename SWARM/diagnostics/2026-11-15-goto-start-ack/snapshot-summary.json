@@ -1,0 +1,344 @@
+{
+  "run": {
+    "phase": "failed",
+    "runId": null,
+    "scoreName": "Wave",
+    "scoreFingerprint": "4eef727e",
+    "durationMs": 240000,
+    "startAtMs": null,
+    "repeat": false,
+    "autonomous": false,
+    "autonomousLoop": false,
+    "pass": 0,
+    "error": "Go to start was not accepted: Mau01 no acknowledgment within 1500 ms; Mau02 no acknowledgment within 1500 ms; Mau03 no acknowledgment within 1500 ms; Mau04 no acknowledgment within 1500 ms; Mau05 no acknowledgment within 1500 ms; Mau06 no acknowledgment within 1500 ms; Mau07 no acknowledgment within 1500 ms; Mau08 no acknowledgment within 1500 ms; Mau09 no acknowledgment within 1500 ms.",
+    "perNode": {}
+  },
+  "stop": {
+    "engaged": false,
+    "atMs": null
+  },
+  "log_tail": [
+    {
+      "atMs": 1794760505842,
+      "level": "warn",
+      "message": "Mau01 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794760656777,
+      "level": "warn",
+      "message": "Mau08 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794760674069,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794760719153,
+      "level": "warn",
+      "message": "Mau08 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794760932296,
+      "level": "warn",
+      "message": "Mau06 clock sync timed out (seq 1069)."
+    },
+    {
+      "atMs": 1794760963530,
+      "level": "warn",
+      "message": "Run cancelled by the operator."
+    },
+    {
+      "atMs": 1794760965981,
+      "level": "info",
+      "message": "Moving all modules to the start of Wave."
+    },
+    {
+      "atMs": 1794760966537,
+      "level": "warn",
+      "message": "stop: Mau01 no acknowledgment within 1500 ms; Mau02 no acknowledgment within 1500 ms; Mau03 no acknowledgment within 1500 ms; Mau04 no acknowledgment within 1500 ms; Mau05 no acknowledgment within 1500 ms; Mau06 no acknowledgment within 1500 ms; Mau07 no acknowledgment within 1500 ms; Mau08 no acknowledgment within 1500 ms; Mau09 no acknowledgment within 1500 ms."
+    },
+    {
+      "atMs": 1794760967483,
+      "level": "error",
+      "message": "Run failed: Go to start was not accepted: Mau01 no acknowledgment within 1500 ms; Mau02 no acknowledgment within 1500 ms; Mau03 no acknowledgment within 1500 ms; Mau04 no acknowledgment within 1500 ms; Mau05 no acknowledgment within 1500 ms; Mau06 no acknowledgment within 1500 ms; Mau07 no acknowledgment within 1500 ms; Mau08 no acknowledgment within 1500 ms; Mau09 no acknowledgment within 1500 ms. Stopping all modules."
+    },
+    {
+      "atMs": 1794760968991,
+      "level": "error",
+      "message": "Stop was NOT confirmed by Mau01, Mau02, Mau03, Mau04, Mau05, Mau06, Mau07, Mau08, Mau09."
+    },
+    {
+      "atMs": 1794760971821,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794760992425,
+      "level": "warn",
+      "message": "Mau04 clock sync timed out (seq 1082)."
+    },
+    {
+      "atMs": 1794761052600,
+      "level": "warn",
+      "message": "Mau07 clock sync timed out (seq 1092)."
+    },
+    {
+      "atMs": 1794761108401,
+      "level": "warn",
+      "message": "Mau08 disconnected."
+    },
+    {
+      "atMs": 1794761108503,
+      "level": "info",
+      "message": "Mau08 connected, firmware 0.3.5."
+    },
+    {
+      "atMs": 1794761108503,
+      "level": "error",
+      "message": "Mau08 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761108888,
+      "level": "info",
+      "message": "Mau08 clock gate set to \u00b150 ms."
+    },
+    {
+      "atMs": 1794761110886,
+      "level": "error",
+      "message": "Mau07 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761110899,
+      "level": "error",
+      "message": "Mau03 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761111353,
+      "level": "error",
+      "message": "Mau04 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761111368,
+      "level": "error",
+      "message": "Mau01 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761111487,
+      "level": "error",
+      "message": "Mau06 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761111511,
+      "level": "error",
+      "message": "Mau02 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761111547,
+      "level": "error",
+      "message": "Mau09 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761111979,
+      "level": "error",
+      "message": "Mau05 reports fault track_infeasible."
+    },
+    {
+      "atMs": 1794761112742,
+      "level": "warn",
+      "message": "Mau05 clock sync timed out (seq 1107)."
+    },
+    {
+      "atMs": 1794761218673,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761281795,
+      "level": "warn",
+      "message": "Mau06 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761365316,
+      "level": "warn",
+      "message": "Mau07 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761431982,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761523015,
+      "level": "warn",
+      "message": "Mau04 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761627367,
+      "level": "warn",
+      "message": "Mau03 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761694040,
+      "level": "warn",
+      "message": "Mau07 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761773390,
+      "level": "warn",
+      "message": "Mau06 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761840267,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761913585,
+      "level": "warn",
+      "message": "Mau04 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794761977584,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794762064730,
+      "level": "warn",
+      "message": "Mau03 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794762136709,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794762241485,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "Mau01",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 33.910499999299645,
+      "clockAge": 2182.189083000645,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau02",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 27.246499999891967,
+      "clockAge": 1819.1593329999596,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau03",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 28.692999999970198,
+      "clockAge": 1362.3425409998745,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau04",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 33.38950000097975,
+      "clockAge": 947.8946250006557,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau05",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 28.29550000000745,
+      "clockAge": 540.2204580008984,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau06",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 29.773000000510365,
+      "clockAge": 130.87183300033212,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau07",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 37.019000000320375,
+      "clockAge": 3304.887333000079,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau08",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 26.71000000042841,
+      "clockAge": 3001.7375409994274,
+      "fromNode": true,
+      "fw": "0.3.5"
+    },
+    {
+      "id": "Mau09",
+      "connected": true,
+      "homed": false,
+      "moving": false,
+      "fault": "track_infeasible",
+      "pos": null,
+      "clockSynced": true,
+      "clockUnc": 32.056499999482185,
+      "clockAge": 2591.5023330003023,
+      "fromNode": true,
+      "fw": "0.3.5"
+    }
+  ],
+  "clock_synced_count": 9,
+  "from_node_count": 9,
+  "moving_count": 0
+}

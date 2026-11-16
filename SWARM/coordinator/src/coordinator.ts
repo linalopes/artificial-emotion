@@ -6,8 +6,9 @@ import {
 } from '@swarm/shared';
 import { monoNow } from './clock';
 import type { Config } from './config';
-import type { Codec, DeviceCommand } from './devices/protocol';
+import type { Codec, DeviceCommand, Telemetry } from './devices/protocol';
 import { DeviceServer } from './devices/server';
+import { DurableLog } from './durable-log';
 import { Fleet } from './fleet';
 import { COMPLETION_GRACE_MS, expectedRunDurationMs, type AutonomousWatchOpts } from './run-duration';
 
@@ -37,22 +38,54 @@ export class Coordinator {
   readonly fleet = new Fleet();
   readonly device: DeviceServer;
   readonly codec: Codec;
+  readonly durable: DurableLog;
   private log: LogEntry[] = [];
   private stop = { engaged: false, atMs: null as number | null };
   private run: RunState = idleRun();
+  /** Last autonomous watch options (for disconnect/fault policy and expected end). */
+  private runAuto: AutonomousWatchOpts = { autonomous: false, autonomousLoop: false, continuous: false };
+  private expectedEndAtMs: number | null = null;
   /** Incremented to abandon whatever asynchronous run flow is in progress. */
   private token = 0;
   private operator: string | null = null;
   private clients = new Set<string>();
   private monitor: NodeJS.Timeout | null = null;
+  /** Serializes cancel/stop vs go-to-start so command floods cannot starve acknowledgments. */
+  private fleetIo: Promise<void> = Promise.resolve();
   sim: SimControl | null = null;
+
+  private enqueueFleetIo<T>(fn: () => Promise<T>): Promise<T> {
+    const run = this.fleetIo.then(fn, fn);
+    this.fleetIo = run.then(
+      () => undefined,
+      () => undefined
+    );
+    return run;
+  }
 
   constructor(private readonly cfg: Config, codec: Codec) {
     this.codec = codec;
+    this.durable = new DurableLog(cfg.eventLogPath);
     this.device = new DeviceServer(codec, cfg, {
       onConnect: (node, info) => {
+        const wasInRun = ACTIVE.has(this.run.phase) && this.run.perNode[node] === 'disconnected';
         this.fleet.connected(node, info);
         this.note('info', `${node} connected${info.simulated ? ' (simulated)' : ''}, firmware ${info.fwVersion}.`);
+        this.durable.write({
+          kind: wasInRun ? 'reconnect_reconcile' : 'connect',
+          nodeId: node,
+          runId: this.run.runId,
+          message: `${node} connected (fw ${info.fwVersion})`,
+          detail: { simulated: info.simulated, wasInRun, phase: this.run.phase }
+        });
+        if (wasInRun) {
+          // Do not re-arm or replay. Wait for status / run_status from the module.
+          this.run.perNode[node] = 'reconnected';
+          this.note(
+            'info',
+            `${node} reconnected during autonomous run ${this.run.runId ?? '?'}; reconciling from module reports (no trajectory replay).`
+          );
+        }
         // Align the node's prepare_run gate with Mac clockMaxUncertaintyMs (runtime only, not NVS).
         if (this.cfg.fleet === 'hardware' && this.cfg.authToken) {
           const us = Math.round(this.cfg.clockMaxUncertaintyMs * 1000);
@@ -72,14 +105,57 @@ export class Coordinator {
       onDisconnect: (node) => {
         this.fleet.disconnected(node);
         this.note('warn', `${node} disconnected.`);
-        if (ACTIVE.has(this.run.phase)) void this.failRun(`${node} disconnected during ${this.run.phase}.`);
+        this.durable.write({
+          kind: 'disconnect',
+          nodeId: node,
+          runId: this.run.runId,
+          message: `${node} disconnected`,
+          detail: { phase: this.run.phase, autonomous: this.run.autonomous, autonomousStarted: this.autonomousStarted() }
+        });
+        if (!ACTIVE.has(this.run.phase)) return;
+        // Autonomous playback already underway: firmware continues locally; do not fleet-cancel.
+        if (this.autonomousStarted()) {
+          this.run.perNode[node] = 'disconnected';
+          this.note(
+            'warn',
+            `${node} link lost during autonomous run — fleet continues; module keeps its authorized trajectory if already started.`
+          );
+          return;
+        }
+        void this.failRun(`${node} disconnected during ${this.run.phase}.`, { initiator: 'coordinator:disconnect' });
       },
       onTelemetry: (node, t) => {
         const before = this.fleet.get(node).faultCode;
         this.fleet.telemetry(node, t, Date.now());
+        this.reconcileAutonomousTelemetry(node, t);
         if (t.faultCode && t.faultCode !== before) {
           this.note('error', `${node} reports fault ${t.faultCode}.`);
-          if (ACTIVE.has(this.run.phase)) void this.failRun(`${node} reported fault ${t.faultCode} during ${this.run.phase}.`);
+          this.durable.write({
+            kind: 'fault',
+            nodeId: node,
+            runId: this.run.runId,
+            message: `${node} firmware FAULT ${t.faultCode}`,
+            detail: {
+              fault: t.faultCode,
+              phase: this.run.phase,
+              positionValid: t.positionValid ?? null,
+              loopIndex: t.loopIndex ?? null,
+              completedPasses: t.completedPasses ?? null
+            }
+          });
+          if (!ACTIVE.has(this.run.phase)) return;
+          // Communication loss ≠ FAULT. A local fault stops that module only during autonomous runs.
+          if (this.autonomousStarted()) {
+            this.run.perNode[node] = 'faulted';
+            this.note(
+              'error',
+              `${node} faulted (${t.faultCode}) during autonomous run — other modules are not cancelled.`
+            );
+            return;
+          }
+          void this.failRun(`${node} reported fault ${t.faultCode} during ${this.run.phase}.`, {
+            initiator: 'coordinator:fault'
+          });
         }
       },
       onRunStatus: (node, ev) => {
@@ -89,16 +165,83 @@ export class Coordinator {
           return;
         }
         this.run.perNode[node] = ev.state;
-        if (ev.state === 'aborted' && ACTIVE.has(this.run.phase)) void this.failRun(`${node} aborted the run${ev.reason ? `: ${ev.reason}` : ''}.`);
+        if (ev.state === 'finished') {
+          this.durable.write({
+            kind: 'completion',
+            nodeId: node,
+            runId: ev.runId,
+            message: `${node} reported run_completed`,
+            detail: { state: ev.state }
+          });
+        }
+        if (ev.state === 'aborted' && ACTIVE.has(this.run.phase)) {
+          if (this.autonomousStarted()) {
+            this.run.perNode[node] = 'aborted';
+            this.note('warn', `${node} aborted autonomous run${ev.reason ? `: ${ev.reason}` : ''} — fleet not cancelled.`);
+            this.durable.write({
+              kind: 'warn',
+              nodeId: node,
+              runId: ev.runId,
+              message: `${node} aborted`,
+              detail: { reason: ev.reason ?? null }
+            });
+            return;
+          }
+          void this.failRun(`${node} aborted the run${ev.reason ? `: ${ev.reason}` : ''}.`, {
+            initiator: 'coordinator:abort'
+          });
+        }
       },
       onLog: (level, message) => this.note(level, message)
     });
   }
 
+  /** True once an autonomous collective run has crossed the shared start time. */
+  private autonomousStarted(): boolean {
+    return this.run.autonomous === true && this.run.phase === 'running';
+  }
+
+  /** After reconnect, adopt module-reported run progress without replaying a trajectory. */
+  private reconcileAutonomousTelemetry(node: NodeId, t: Telemetry): void {
+    if (!this.run.autonomous || !this.run.runId || !ACTIVE.has(this.run.phase)) return;
+    if (t.runId && t.runId !== this.run.runId) return;
+    const prev = this.run.perNode[node];
+    if (prev === 'disconnected' || prev === 'reconnected') {
+      this.durable.write({
+        kind: 'reconnect_reconcile',
+        nodeId: node,
+        runId: this.run.runId,
+        message: `${node} status after reconnect`,
+        detail: {
+          runId: t.runId ?? null,
+          loopIndex: t.loopIndex ?? null,
+          completedPasses: t.completedPasses ?? null,
+          positionValid: t.positionValid ?? null,
+          autonomous: t.autonomous ?? null,
+          fault: t.faultCode,
+          moving: t.moving,
+          homed: t.homed
+        }
+      });
+    }
+    if (t.faultCode) {
+      this.run.perNode[node] = 'faulted';
+      return;
+    }
+    if (t.completedPasses != null && t.completedPasses > 0 && !t.moving && t.positionValid) {
+      // Heuristic for firmware status without a fresh run_completed event after offline finish.
+      if (prev === 'reconnected' || prev === 'disconnected' || prev === 'running') {
+        /* keep running until explicit finished unless we already have finished */
+      }
+    }
+  }
+
   note(level: LogEntry['level'], message: string): void {
-    this.log.push({ atMs: Date.now(), level, message });
+    if (!this.durable.accept(level, message)) return;
+    const atMs = Date.now();
+    this.log.push({ atMs, level, message });
     if (this.log.length > 200) this.log.shift();
-    const line = `[${new Date().toISOString()}] ${level.toUpperCase()} ${message}`;
+    const line = `[${new Date(atMs).toISOString()}] ${level.toUpperCase()} ${message}`;
     if (level === 'error') console.error(line);
     else console.log(line);
   }
@@ -174,7 +317,7 @@ export class Coordinator {
         return this.perNode(intent.nodes, () => null, { name: 'set_params', rpm: intent.rpm, accelMmS2: intent.accelMmS2 });
       }
       case 'clearFault':
-        return this.perNode(intent.nodes, () => null, { name: 'clear_fault' });
+        return this.clearFaults(intent.nodes);
       case 'goToStart':
         return this.goToStart(intent.score);
       case 'execute':
@@ -221,6 +364,62 @@ export class Coordinator {
     return failed.length ? { ok: false, error: failed.map((o) => `${o.node} ${o.error}`).join('; '), outcomes } : { ok: true, outcomes };
   }
 
+  /**
+   * clear_fault ACK alone is not recovery — firmware 0.3.5 could ACK while leaving a sticky
+   * fault string. Success requires subsequent telemetry with no fault (FAULT → UNHOMED).
+   */
+  private async clearFaults(nodes: NodeId[]): Promise<IntentResult> {
+    const outcomes = await Promise.all(
+      nodes.map(async (node): Promise<NodeOutcome> => {
+        const n = this.fleet.get(node);
+        if (!n.connected) return { node, ok: false, error: 'is not connected' };
+        try {
+          await this.device.send(node, { name: 'clear_fault' });
+        } catch (e) {
+          return { node, ok: false, error: msg(e) };
+        }
+        const cleared = await this.waitUntil(() => !this.fleet.get(node).faultCode, 2000);
+        if (!cleared) {
+          return {
+            node,
+            ok: false,
+            error: `acknowledged clear_fault but still reports fault ${this.fleet.get(node).faultCode ?? 'unknown'}`
+          };
+        }
+        if (this.fleet.get(node).homed) {
+          return { node, ok: false, error: 'cleared fault but still reports homed; expected UNHOMED' };
+        }
+        return { node, ok: true };
+      })
+    );
+    const failed = outcomes.filter((o) => !o.ok);
+    if (failed.length) {
+      this.note('warn', `clear fault: ${failed.map((o) => `${o.node} ${o.error}`).join('; ')}.`);
+    }
+    const done = outcomes.filter((o) => o.ok).map((o) => o.node);
+    if (done.length) {
+      this.note('info', `clear fault confirmed (UNHOMED) on ${done.join(', ')}.`);
+      this.durable.write({
+        kind: 'info',
+        message: `clear_fault confirmed`,
+        detail: { nodes: done }
+      });
+    }
+    return failed.length
+      ? { ok: false, error: failed.map((o) => `${o.node} ${o.error}`).join('; '), outcomes }
+      : { ok: true, outcomes };
+  }
+
+  private async waitUntil(pred: () => boolean, timeoutMs: number): Promise<boolean> {
+    const start = Date.now();
+    if (pred()) return true;
+    while (Date.now() - start < timeoutMs) {
+      await new Promise((r) => setTimeout(r, 40));
+      if (pred()) return true;
+    }
+    return pred();
+  }
+
   private motion(nodes: NodeId[], cmd: DeviceCommand, refuse: (n: ReturnType<Fleet['get']>) => string | null): Promise<IntentResult> {
     if (this.stop.engaged) return Promise.resolve({ ok: false, error: 'Software stop is engaged. Release it first.' });
     if (ACTIVE.has(this.run.phase)) return Promise.resolve({ ok: false, error: 'A run is in progress. Stop it before moving modules by hand.' });
@@ -232,17 +431,30 @@ export class Coordinator {
   // ---- stop -----------------------------------------------------------------------------
 
   private async stopAll(reason: string): Promise<IntentResult> {
-    this.token++;
-    const runId = this.run.runId;
-    if (ACTIVE.has(this.run.phase) || this.run.phase === 'positioned') {
-      this.run = { ...this.run, phase: 'cancelled', error: reason, startAtMs: null };
-    }
-    this.note('warn', reason);
-    const connected = NODE_IDS.filter((id) => this.fleet.get(id).connected);
-    if (runId) await Promise.allSettled(connected.map((id) => this.device.send(id, { name: 'cancel', runId })));
-    if (connected.length === 0) return { ok: true, outcomes: [] };
-    const res = await this.perNode(connected, () => null, { name: 'stop' });
-    return res.ok ? res : { ...res, error: `Stop was NOT confirmed by: ${res.outcomes!.filter((o) => !o.ok).map((o) => o.node).join(', ')}. Use the physical power cut-off if they are moving.` };
+    return this.enqueueFleetIo(async () => {
+      this.token++;
+      const runId = this.run.runId;
+      if (ACTIVE.has(this.run.phase) || this.run.phase === 'positioned') {
+        this.run = { ...this.run, phase: 'cancelled', error: reason, startAtMs: null };
+      }
+      this.note('warn', reason);
+      this.durable.write({
+        kind: 'cancel_stop',
+        runId,
+        message: reason,
+        detail: { initiator: 'operator_or_stop', connected: NODE_IDS.filter((id) => this.fleet.get(id).connected) }
+      });
+      const connected = NODE_IDS.filter((id) => this.fleet.get(id).connected);
+      if (runId) await Promise.allSettled(connected.map((id) => this.device.send(id, { name: 'cancel', runId })));
+      if (connected.length === 0) return { ok: true, outcomes: [] };
+      const res = await this.perNode(connected, () => null, { name: 'stop' });
+      return res.ok
+        ? res
+        : {
+            ...res,
+            error: `Stop was NOT confirmed by: ${res.outcomes!.filter((o) => !o.ok).map((o) => o.node).join(', ')}. Use the physical power cut-off if they are moving.`
+          };
+    });
   }
 
   private async engageStop(): Promise<IntentResult> {
@@ -284,34 +496,52 @@ export class Coordinator {
   }
 
   private async goToStart(score: Score): Promise<IntentResult> {
-    if (ACTIVE.has(this.run.phase)) return { ok: false, error: 'A run is already in progress.' };
-    const blockers = this.readiness(false);
-    if (blockers.length) return { ok: false, error: blockers.join(' ') };
-    const bad = this.checkScore(score);
-    if (bad) return { ok: false, error: bad };
+    return this.enqueueFleetIo(async () => {
+      // After any in-flight cancel/stop (serialized), re-check readiness.
+      // Stop / connectivity / faults must win over score-speed messaging (engageStop
+      // may also clamp RPM, which would otherwise surface as a misleading speed error).
+      if (ACTIVE.has(this.run.phase)) return { ok: false, error: 'A run is already in progress.' };
+      const again = this.readiness(false);
+      if (again.length) return { ok: false, error: again.join(' ') };
+      const bad = this.checkScore(score);
+      if (bad) return { ok: false, error: bad };
 
-    const token = ++this.token;
-    this.run = { ...idleRun(), phase: 'positioning', scoreName: score.name, scoreFingerprint: scoreFingerprint(score), durationMs: score.durationMs };
-    this.note('info', `Moving all modules to the start of ${score.name}.`);
-    const results = await Promise.all(
-      NODE_IDS.map(async (id) => {
-        try {
-          await this.device.send(id, { name: 'move', targetMm: positionAt(score, id, 0) });
-          this.run.perNode[id] = 'moving to start';
-          return null;
-        } catch (e) {
-          return `${id} ${msg(e)}`;
-        }
-      })
-    );
-    if (token !== this.token) return { ok: false, error: 'Cancelled.' };
-    const failed = results.filter((r): r is string => r !== null);
-    if (failed.length) {
-      await this.failRun(`Go to start was not accepted: ${failed.join('; ')}.`);
-      return { ok: false, error: this.run.error ?? 'Go to start failed.' };
-    }
-    void this.awaitPositioned(score, token);
-    return { ok: true };
+      const token = ++this.token;
+      this.run = {
+        ...idleRun(),
+        phase: 'positioning',
+        scoreName: score.name,
+        scoreFingerprint: scoreFingerprint(score),
+        durationMs: score.durationMs
+      };
+      this.note('info', `Moving all modules to the start of ${score.name}.`);
+      this.durable.write({
+        kind: 'info',
+        message: `goToStart ${score.name}`,
+        detail: { score: score.name, fingerprint: scoreFingerprint(score) }
+      });
+      const results = await Promise.all(
+        NODE_IDS.map(async (id) => {
+          try {
+            await this.device.send(id, { name: 'move', targetMm: positionAt(score, id, 0) });
+            this.run.perNode[id] = 'moving to start';
+            return null;
+          } catch (e) {
+            return `${id} ${msg(e)}`;
+          }
+        })
+      );
+      if (token !== this.token) return { ok: false, error: 'Cancelled.' };
+      const failed = results.filter((r): r is string => r !== null);
+      if (failed.length) {
+        await this.failRun(`Go to start was not accepted: ${failed.join('; ')}.`, {
+          initiator: 'coordinator:goToStart'
+        });
+        return { ok: false, error: this.run.error ?? 'Go to start failed.' };
+      }
+      void this.awaitPositioned(score, token);
+      return { ok: true };
+    });
   }
 
   private atStart(score: Score, id: NodeId): boolean {
@@ -479,6 +709,9 @@ export class Coordinator {
     }
     this.run.phase = 'armed';
     this.run.startAtMs = startAt;
+    this.runAuto = auto;
+    const expectedMs = expectedRunDurationMs(score.durationMs, auto);
+    this.expectedEndAtMs = startAt + expectedMs;
     this.note(
       'info',
       auto.autonomous
@@ -487,14 +720,42 @@ export class Coordinator {
           ? `${score.name} armed on nine modules, pass ${this.run.pass}. Shared start_at_us=${Math.round(startAt * 1000)}.`
           : `${score.name} armed on nine modules, pass ${this.run.pass}. Each module starts from its own clock.`
     );
+    this.durable.write({
+      kind: 'run_start',
+      runId,
+      message: `${score.name} armed`,
+      detail: {
+        score: score.name,
+        durationMs: score.durationMs,
+        startAtMs: startAt,
+        expectedEndAtMs: this.expectedEndAtMs,
+        autonomous: auto.autonomous,
+        autonomousLoop: auto.autonomousLoop,
+        continuous: auto.continuous,
+        maxLoops: auto.maxLoops ?? null,
+        maxRuntimeMs: auto.maxRuntimeMs ?? null,
+        pass: this.run.pass
+      }
+    });
+    this.durable.write({
+      kind: 'run_expected_end',
+      runId,
+      message: `Expected completion window ends at +${expectedMs + COMPLETION_GRACE_MS}ms from start (incl. grace)`,
+      detail: { expectedMs, graceMs: COMPLETION_GRACE_MS, expectedEndAtMs: this.expectedEndAtMs }
+    });
     this.watch(score, token, startAt, auto);
     return null;
+  }
+
+  /** Node has finished, faulted, or aborted — no longer expected to report finished. */
+  private nodeSettled(id: NodeId): boolean {
+    const s = this.run.perNode[id];
+    return s === 'finished' || s === 'faulted' || s === 'aborted';
   }
 
   private watch(score: Score, token: number, startAt: number, auto: AutonomousWatchOpts): void {
     if (this.monitor) clearInterval(this.monitor);
     // Autonomous multi-loop runs last score.durationMs × maxLoops (or maxRuntimeMs / continuous ceiling).
-    // Using only one pass duration caused premature failRun + stop around the first score length (~3–5 min).
     const expectedMs = expectedRunDurationMs(score.durationMs, auto);
     this.monitor = setInterval(() => {
       if (token !== this.token) {
@@ -502,7 +763,66 @@ export class Coordinator {
         return;
       }
       const now = monoNow();
-      if (this.run.phase === 'armed' && now >= startAt) this.run.phase = 'running';
+      if (this.run.phase === 'armed' && now >= startAt) {
+        this.run.phase = 'running';
+        this.durable.write({
+          kind: 'run_phase',
+          runId: this.run.runId,
+          message: `${score.name} phase → running`,
+          detail: { startAtMs: startAt }
+        });
+      }
+
+      if (auto.autonomous && this.run.phase === 'running') {
+        // Disconnected modules may still be playing locally; do not require them for Mac-side success.
+        const away = NODE_IDS.filter((id) => this.run.perNode[id] === 'disconnected');
+        const tracked = NODE_IDS.filter((id) => this.run.perNode[id] !== 'disconnected');
+        const trackedSettled = tracked.length > 0 && tracked.every((id) => this.nodeSettled(id));
+        if (trackedSettled && away.length === 0) {
+          clearInterval(this.monitor!);
+          this.run.phase = 'finished';
+          const anyFault = tracked.some((id) => this.run.perNode[id] === 'faulted' || this.run.perNode[id] === 'aborted');
+          this.note(
+            'info',
+            anyFault
+              ? `${score.name} finished on Mac (some modules faulted/aborted locally; fleet was not cancelled).`
+              : `${score.name} finished. All nine modules confirmed completion.`
+          );
+          this.durable.write({
+            kind: 'run_complete',
+            runId: this.run.runId,
+            message: `${score.name} finished`,
+            detail: { perNode: { ...this.run.perNode }, anyFault }
+          });
+          return;
+        }
+        if (now > startAt + expectedMs + COMPLETION_GRACE_MS) {
+          const missingConnected = NODE_IDS.filter(
+            (id) => this.fleet.get(id).connected && this.run.perNode[id] !== 'disconnected' && !this.nodeSettled(id)
+          );
+          if (missingConnected.length === 0) {
+            clearInterval(this.monitor!);
+            this.run.phase = 'finished';
+            this.note(
+              'warn',
+              `${score.name} Mac watch ended: connected modules settled; still disconnected: ${away.join(', ') || 'none'}. Not stopping the fleet.`
+            );
+            this.durable.write({
+              kind: 'run_complete',
+              runId: this.run.runId,
+              message: `${score.name} watch ended without fleet stop`,
+              detail: { away, perNode: { ...this.run.perNode } }
+            });
+            return;
+          }
+          clearInterval(this.monitor!);
+          void this.failRun(`Completion was not confirmed by ${missingConnected.join(', ')}.`, {
+            initiator: 'coordinator:completion_watch'
+          });
+        }
+        return;
+      }
+
       const finished = NODE_IDS.every((id) => this.run.perNode[id] === 'finished');
       if (finished) {
         clearInterval(this.monitor!);
@@ -511,22 +831,43 @@ export class Coordinator {
         } else {
           this.run.phase = 'finished';
           this.note('info', `${score.name} finished. All nine modules confirmed completion.`);
+          this.durable.write({
+            kind: 'run_complete',
+            runId: this.run.runId,
+            message: `${score.name} finished`,
+            detail: { perNode: { ...this.run.perNode } }
+          });
         }
       } else if (now > startAt + expectedMs + COMPLETION_GRACE_MS) {
         clearInterval(this.monitor!);
         const missing = NODE_IDS.filter((id) => this.run.perNode[id] !== 'finished');
-        void this.failRun(`Completion was not confirmed by ${missing.join(', ')}.`);
+        void this.failRun(`Completion was not confirmed by ${missing.join(', ')}.`, {
+          initiator: 'coordinator:completion_watch'
+        });
       }
     }, 50);
   }
 
   /** Abandons the run, records why, and asks every connected node to cancel and stop. */
-  private async failRun(reason: string): Promise<void> {
+  private async failRun(reason: string, opts?: { initiator?: string }): Promise<void> {
     if (!ACTIVE.has(this.run.phase)) return;
     this.token++;
     const runId = this.run.runId;
+    const initiator = opts?.initiator ?? 'coordinator:failRun';
     this.run = { ...this.run, phase: 'failed', error: reason, startAtMs: null };
     this.note('error', `Run failed: ${reason} Stopping all modules.`);
+    this.durable.write({
+      kind: 'run_failed',
+      runId,
+      message: reason,
+      detail: { initiator, stopping: true }
+    });
+    this.durable.write({
+      kind: 'cancel_stop',
+      runId,
+      message: `cancel+stop after failRun: ${reason}`,
+      detail: { initiator }
+    });
     const connected = NODE_IDS.filter((id) => this.fleet.get(id).connected);
     if (runId) await Promise.allSettled(connected.map((id) => this.device.send(id, { name: 'cancel', runId })));
     const res = await Promise.allSettled(connected.map((id) => this.device.send(id, { name: 'stop' })));

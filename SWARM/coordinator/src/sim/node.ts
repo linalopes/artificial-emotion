@@ -52,6 +52,8 @@ export class SimNode {
   private readonly limitMin = 0;
   private readonly limitMax = 1000;
   private traj: Trajectory | null = null;
+  /** If the run finished while the WS was down, re-emit on reconnect (autonomous survives disconnect). */
+  private pendingFinishedRunId: string | null = null;
   private lastTick = performance.now();
 
   constructor(
@@ -103,7 +105,17 @@ export class SimNode {
     if (this.stopped || this.offline || (this.ws && this.ws.readyState <= WebSocket.OPEN)) return;
     const ws = new WebSocket(this.url);
     this.ws = ws;
-    ws.on('open', () => this.emit({ type: 'hello', nodeId: this.id, fwVersion: 'sim-0.2.0', simulated: true }));
+    ws.on('open', () => {
+      this.emit({ type: 'hello', nodeId: this.id, fwVersion: 'sim-0.2.0', simulated: true });
+      // Reconcile: autonomous may have finished offline; never auto-replay a trajectory.
+      if (this.pendingFinishedRunId) {
+        const runId = this.pendingFinishedRunId;
+        this.pendingFinishedRunId = null;
+        this.emit({ type: 'run_status', runId, state: 'finished' });
+      } else if (this.traj?.started && this.traj.startAt !== null) {
+        this.emit({ type: 'run_status', runId: this.traj.runId, state: 'running' });
+      }
+    });
     ws.on('message', (data) => this.receive(data.toString()));
     ws.on('error', () => {});
     ws.on('close', () => {
@@ -113,7 +125,13 @@ export class SimNode {
   }
 
   private emit(ev: DeviceEvent): void {
-    if (this.ws?.readyState === WebSocket.OPEN) this.ws.send(simEncodeEvent(ev));
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(simEncodeEvent(ev));
+      return;
+    }
+    if (ev.type === 'run_status' && ev.state === 'finished') {
+      this.pendingFinishedRunId = ev.runId;
+    }
   }
 
   private receive(text: string): void {
@@ -131,6 +149,10 @@ export class SimNode {
     }
     const error = this.apply(m.cmd);
     this.emit({ type: 'ack', messageId: m.message_id, ok: error === null, ...(error ? { error } : {}) });
+    // clear_fault recovery is confirmed from telemetry (FAULT → UNHOMED), not the ack alone.
+    if (error === null && m.cmd.name === 'clear_fault') {
+      this.emit({ type: 'telemetry', telemetry: this.telemetry() });
+    }
   }
 
   // ---- commands -------------------------------------------------------------------------
@@ -141,10 +163,15 @@ export class SimNode {
         this.homing = false;
         this.target = this.pos;
         this.vel = 0;
+        this.pendingFinishedRunId = null;
         this.abortRun('stopped');
         return null;
       case 'clear_fault':
+        // Mirror firmware: FAULT → UNHOMED, position invalid until re-home.
         this.fault = null;
+        this.homed = false;
+        this.homing = false;
+        this.vel = 0;
         return null;
       case 'set_params':
         if (cmd.rpm !== undefined) this.rpm = cmd.rpm;
@@ -155,7 +182,10 @@ export class SimNode {
       case 'ota_update':
         return 'ota not supported in simulator';
       case 'cancel':
-        if (this.traj?.runId === cmd.runId) this.abortRun('cancelled');
+        if (this.traj?.runId === cmd.runId) {
+          this.pendingFinishedRunId = null;
+          this.abortRun('cancelled');
+        }
         return null;
     }
     if (this.fault) return `fault ${this.fault}`;

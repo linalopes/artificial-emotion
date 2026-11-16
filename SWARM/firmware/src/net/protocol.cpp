@@ -485,6 +485,10 @@ void ProtocolClient::operatorStop() {
   c_.track->stop();
   if (c_.home->active()) {
     c_.home->abortToUnhomed();
+  } else if (c_.state->state() == ModuleState::Fault) {
+    // Stay in FAULT with the latched code. Motions are already stopped; clear_fault
+    // must remain the only recovery path (FAULT → UNHOMED).
+    c_.planner->requestControlledStop();
   } else {
     c_.planner->requestControlledStop();
     c_.state->setStopping();

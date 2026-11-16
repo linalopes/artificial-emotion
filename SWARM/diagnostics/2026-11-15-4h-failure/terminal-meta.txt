@@ -1,0 +1,12 @@
+---
+pid: 26271
+cwd: "/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM"
+command: "# Restart SWARM control so DeviceServer clock serialization is live\ncd \"/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM\"\nTOKEN=$(python3 -c \"import json; print(json.load(open('firmware/tools/.local/credentials.json'))['auth_token'])\")\n# Stop existing dev stack\npkill -f \"SWARM/node_modules/.bin/concurrently\" 2>/dev/null || true\npkill -f \"SWARM/node_modules/.bin/tsx watch\" 2>/dev/null || true\npkill -f \"SWARM/web/node_modules/.bin/vite\" 2>/dev/null || true\nsleep 2\nexport SWARM_FLEET=hardware\nexport SWARM_AUTH_TOKEN=\"$TOKEN\"\nexport SWARM_HOST=0.0.0.0\nexport SWARM_PORT=8787\nnpm run dev\n"
+status: running  
+started_at: 2026-11-15T00:23:26.325Z
+running_for_ms: 47915489 
+---
+
+> swarm-control@0.1.0 dev
+> concurrently -k -n coord,web -c magenta,cyan "npm run dev -w coordinator" "npm run dev -w web"
+

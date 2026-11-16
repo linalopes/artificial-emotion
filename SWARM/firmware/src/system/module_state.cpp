@@ -30,7 +30,13 @@ void ModuleStateMachine::setReady() {
 
 void ModuleStateMachine::setMoving() { state_ = ModuleState::Moving; }
 
-void ModuleStateMachine::setStopping() { state_ = ModuleState::Stopping; }
+void ModuleStateMachine::setStopping() {
+  // Never leave FAULT via stop/decel — that desynced fault_ from state_ and made
+  // clear_fault a no-op while still ACKing success (track_infeasible sticky recovery bug).
+  if (state_ != ModuleState::Fault && state_ != ModuleState::Updating) {
+    state_ = ModuleState::Stopping;
+  }
+}
 
 void ModuleStateMachine::setUpdating() { state_ = ModuleState::Updating; }
 
@@ -41,10 +47,14 @@ void ModuleStateMachine::enterFault(FaultCode code) {
 }
 
 void ModuleStateMachine::clearFault() {
-  if (state_ == ModuleState::Fault) {
+  // Clear whenever a fault code is latched — including the desync where stop left
+  // UNHOMED/STOPPING while fault_ remained set. Always land in UNHOMED; never validate position.
+  if (state_ == ModuleState::Fault || fault_ != FaultCode::None) {
     fault_ = FaultCode::None;
-    state_ = ModuleState::Unhomed;
-    positionValid_ = false;
+    if (state_ != ModuleState::Updating) {
+      state_ = ModuleState::Unhomed;
+      positionValid_ = false;
+    }
   }
 }
 

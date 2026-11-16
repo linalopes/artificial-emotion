@@ -1,0 +1,67 @@
+600:[coord] [2026-11-15T00:40:43.236Z] INFO Moving all modules to the start of Wave.
+602:[coord] [2026-11-15T00:40:52.633Z] INFO Moving all modules to the start of Wave.
+617:[coord] [2026-11-15T00:41:16.215Z] INFO Moving all modules to the start of Wave.
+620:[coord] [2026-11-15T00:42:22.781Z] INFO Moving all modules to the start of Wave.
+1845:[coord] [2026-11-15T00:56:09.964Z] ERROR Mau01 reports fault ota_failed.
+1853:[coord] [2026-11-15T00:56:12.521Z] ERROR Mau02 reports fault ota_failed.
+1861:[coord] [2026-11-15T00:56:14.944Z] ERROR Mau03 reports fault ota_failed.
+1868:[coord] [2026-11-15T00:56:16.829Z] ERROR Mau04 reports fault ota_failed.
+1875:[coord] [2026-11-15T00:56:18.939Z] ERROR Mau05 reports fault ota_failed.
+1882:[coord] [2026-11-15T00:56:20.937Z] ERROR Mau06 reports fault ota_failed.
+1889:[coord] [2026-11-15T00:56:22.967Z] ERROR Mau07 reports fault ota_failed.
+1899:[coord] [2026-11-15T00:56:25.888Z] ERROR Mau08 reports fault ota_failed.
+1906:[coord] [2026-11-15T00:56:27.960Z] ERROR Mau09 reports fault ota_failed.
+2677:[coord] [2026-11-15T01:01:25.611Z] ERROR Mau05 reports fault ota_failed.
+2679:[coord] [2026-11-15T01:01:25.625Z] ERROR Mau06 reports fault ota_failed.
+2681:[coord] [2026-11-15T01:01:25.629Z] ERROR Mau03 reports fault ota_failed.
+2683:[coord] [2026-11-15T01:01:25.631Z] ERROR Mau09 reports fault ota_failed.
+2685:[coord] [2026-11-15T01:01:25.632Z] ERROR Mau01 reports fault ota_failed.
+2687:[coord] [2026-11-15T01:01:25.633Z] ERROR Mau02 reports fault ota_failed.
+2689:[coord] [2026-11-15T01:01:25.634Z] ERROR Mau07 reports fault ota_failed.
+2691:[coord] [2026-11-15T01:01:25.635Z] ERROR Mau04 reports fault ota_failed.
+2693:[coord] [2026-11-15T01:01:25.655Z] ERROR Mau08 reports fault ota_failed.
+2742:[coord] [2026-11-15T01:01:29.149Z] ERROR Mau05 reports fault ota_failed.
+2744:[coord] [2026-11-15T01:01:29.161Z] ERROR Mau08 reports fault ota_failed.
+2746:[coord] [2026-11-15T01:01:29.162Z] ERROR Mau06 reports fault ota_failed.
+2748:[coord] [2026-11-15T01:01:29.162Z] ERROR Mau09 reports fault ota_failed.
+2750:[coord] [2026-11-15T01:01:29.164Z] ERROR Mau03 reports fault ota_failed.
+2752:[coord] [2026-11-15T01:01:29.167Z] ERROR Mau04 reports fault ota_failed.
+2754:[coord] [2026-11-15T01:01:29.167Z] ERROR Mau01 reports fault ota_failed.
+2756:[coord] [2026-11-15T01:01:29.173Z] ERROR Mau02 reports fault ota_failed.
+2758:[coord] [2026-11-15T01:01:29.184Z] ERROR Mau07 reports fault ota_failed.
+2807:[coord] [2026-11-15T01:01:32.612Z] ERROR Mau08 reports fault ota_failed.
+2809:[coord] [2026-11-15T01:01:32.617Z] ERROR Mau05 reports fault ota_failed.
+2811:[coord] [2026-11-15T01:01:32.629Z] ERROR Mau02 reports fault ota_failed.
+2813:[coord] [2026-11-15T01:01:32.630Z] ERROR Mau06 reports fault ota_failed.
+2815:[coord] [2026-11-15T01:01:32.630Z] ERROR Mau01 reports fault ota_failed.
+2817:[coord] [2026-11-15T01:01:32.637Z] ERROR Mau03 reports fault ota_failed.
+2819:[coord] [2026-11-15T01:01:32.637Z] ERROR Mau07 reports fault ota_failed.
+2821:[coord] [2026-11-15T01:01:32.694Z] ERROR Mau04 reports fault ota_failed.
+2823:[coord] [2026-11-15T01:01:32.699Z] ERROR Mau09 reports fault ota_failed.
+2868:[coord] [2026-11-15T01:01:42.097Z] ERROR Mau04 reports fault ota_failed.
+2955:[coord] [2026-11-15T01:02:15.352Z] ERROR Mau05 reports fault ota_failed.
+3084:[coord] [2026-11-15T01:02:48.633Z] ERROR Mau06 reports fault ota_failed.
+3217:[coord] [2026-11-15T01:03:24.161Z] ERROR Mau07 reports fault ota_failed.
+3254:[coord] [2026-11-15T01:03:35.352Z] ERROR Mau09 reports fault ota_failed.
+3307:[coord] [2026-11-15T01:05:44.544Z] ERROR Mau02 reports fault endstop_ambiguous.
+3308:[coord] [2026-11-15T01:05:55.944Z] INFO clear fault acknowledged by Mau02.
+3310:[coord] [2026-11-15T01:06:58.321Z] ERROR Mau02 reports fault endstop_ambiguous.
+3311:[coord] [2026-11-15T01:07:01.074Z] INFO clear fault acknowledged by Mau02.
+3313:[coord] [2026-11-15T01:07:59.073Z] INFO Moving all modules to the start of Wave.
+3317:[coord] [2026-11-15T01:08:49.644Z] ERROR Run failed: loading failed: Mau01 invalid run_id; Mau02 invalid run_id; Mau03 invalid run_id; Mau04 invalid run_id; Mau05 invalid run_id; Mau06 invalid run_id; Mau07 invalid run_id; Mau08 invalid run_id; Mau09 invalid run_id. Stopping all modules.
+3318:[coord] [2026-11-15T01:09:14.139Z] INFO Moving all modules to the start of Wave.
+3322:[coord] [2026-11-15T01:09:21.076Z] ERROR Run failed: loading failed: Mau01 invalid run_id; Mau02 invalid run_id; Mau03 invalid run_id; Mau04 invalid run_id; Mau05 invalid run_id; Mau06 invalid run_id; Mau07 invalid run_id; Mau08 invalid run_id; Mau09 invalid run_id. Stopping all modules.
+3497:[coord] [2026-11-15T01:15:11.575Z] INFO Moving all modules to the start of Wave.
+3504:[coord] [2026-11-15T01:16:40.770Z] INFO Moving all modules to the start of Breathing.
+3513:[coord] [2026-11-15T01:17:22.321Z] INFO Breathing armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.
+3515:[coord] [2026-11-15T01:22:28.796Z] ERROR Run failed: Completion was not confirmed by Mau01, Mau02, Mau03, Mau04, Mau05, Mau06, Mau07, Mau08, Mau09. Stopping all modules.
+3516:[coord] [2026-11-15T01:23:20.600Z] INFO Moving all modules to the start of Breathing.
+3520:[coord] [2026-11-15T01:23:34.990Z] INFO Breathing armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.
+3529:[coord] [2026-11-15T01:28:41.274Z] ERROR Run failed: Completion was not confirmed by Mau01, Mau02, Mau03, Mau04, Mau05, Mau06, Mau07, Mau08, Mau09. Stopping all modules.
+3778:[coord] [2026-11-15T01:41:16.597Z] INFO Moving all modules to the start of Breathing.
+7829:[coord] [2026-11-15T06:37:28.103Z] INFO Moving all modules to the start of Wave.
+7838:[coord] [2026-11-15T06:37:45.455Z] INFO Wave armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.
+8032:[coord] [2026-11-15T06:49:44.718Z] INFO Wave finished. All nine modules confirmed completion.
+8305:[coord] [2026-11-15T07:03:04.708Z] INFO Moving all modules to the start of Wave.
+8308:[coord] [2026-11-15T07:03:09.943Z] INFO Moving all modules to the start of Breathing.
+8322:[coord] [2026-11-15T07:03:34.075Z] INFO Breathing armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.

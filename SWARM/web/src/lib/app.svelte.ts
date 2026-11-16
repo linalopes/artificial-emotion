@@ -186,7 +186,17 @@ class AppState {
       }, 15000);
       const done = (r: Result) => {
         clearTimeout(timer);
-        if (!quiet) this.notice = r.ok ? { ok: true, text: `${describe(intent)}: acknowledged.` } : { ok: false, text: `${describe(intent)} failed. ${r.error ?? ''}` };
+        if (!quiet) {
+          if (r.ok) {
+            const text =
+              intent.type === 'clearFault'
+                ? `${describe(intent)}: confirmed UNHOMED (re-home required).`
+                : `${describe(intent)}: acknowledged.`;
+            this.notice = { ok: true, text };
+          } else {
+            this.notice = { ok: false, text: `${describe(intent)} failed. ${r.error ?? ''}` };
+          }
+        }
         resolve(r);
       };
       this.pending.set(id, done);

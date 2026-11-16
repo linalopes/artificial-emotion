@@ -177,8 +177,21 @@ export class DeviceServer {
     return now - link.syncStartedAtMs > this.syncExchangeBudgetMs();
   }
 
+  /** True when any link awaits a command ack (not clock fin). */
+  private commandsInFlight(): boolean {
+    for (const link of this.links.values()) {
+      for (const id of link.pending.keys()) {
+        if (!String(id).startsWith('sync-fin-')) return true;
+      }
+    }
+    return false;
+  }
+
   /** Probe at most one connected module per tick to keep sync RTT low on a busy LAN. */
   private probeClockTurn(): void {
+    // Do not start new clock exchanges while motion/cancel/stop acks are outstanding —
+    // overlapping Wi-Fi traffic was observed to starve command acknowledgments (1500 ms timeouts).
+    if (this.commandsInFlight()) return;
     const nodes = [...this.links.keys()].sort();
     if (nodes.length === 0) return;
     const now = monoNow();
@@ -200,6 +213,7 @@ export class DeviceServer {
    * Used before prepare_run so the existing protocol restores readiness without raising gates.
    */
   nudgeClocks(need: (node: NodeId) => boolean): void {
+    if (this.commandsInFlight()) return;
     const nodes = [...this.links.keys()].sort();
     const now = monoNow();
     for (const id of nodes) {
@@ -409,10 +423,18 @@ export class DeviceServer {
     return this.links.get(node)?.clock.toNodeTime(coordMs, monoNow()) ?? null;
   }
 
-  /** Resolves when the node acknowledges. Rejects on refusal, timeout or disconnect. */
+  /**
+   * Resolves when the node acknowledges. Rejects on refusal, timeout or disconnect.
+   * While a command is pending, fleet clock probing pauses (see probeClockTurn) so
+   * ack traffic is not competing with sync exchanges on a busy nine-node LAN.
+   */
   send(node: NodeId, cmd: DeviceCommand, timeoutMs = this.opts.ackTimeoutMs): Promise<void> {
     const link = this.links.get(node);
     if (!link || link.ws.readyState !== link.ws.OPEN) return Promise.reject(new Error('not connected'));
+    // Avoid starting a new sync on this link under a command; finish/clear wedged ones.
+    if (link.syncInFlight && this.syncLooksWedged(link, monoNow())) {
+      this.forceEndSync(link, 'command preempt');
+    }
     const messageId = randomUUID();
     let encoded: string;
     try {

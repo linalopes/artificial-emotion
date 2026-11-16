@@ -25,6 +25,11 @@ export interface Config {
   /** How close a module must be to its start position before Execute is allowed. */
   positionToleranceMm: number;
   snapshotIntervalMs: number;
+  /**
+   * Append-only JSONL path for durable run/fault/disconnect events.
+   * Empty / "off" disables. Default: data/coordinator-events.jsonl
+   */
+  eventLogPath: string | null;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -54,6 +59,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     clockMaxAgeMs: 7000,
     startLeadMs: 2500,
     positionToleranceMm: 3,
-    snapshotIntervalMs: 100
+    snapshotIntervalMs: 100,
+    eventLogPath: (() => {
+      const raw = env.SWARM_EVENT_LOG;
+      if (raw === '' || raw === 'off' || raw === '0') return null;
+      if (typeof raw === 'string' && raw.length > 0) return raw;
+      return 'data/coordinator-events.jsonl';
+    })()
   };
 }

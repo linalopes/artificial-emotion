@@ -1,0 +1,6 @@
+{
+  "terminal_path": "/Users/linalopes/.cursor/projects/Users-linalopes-Documents-Lina-s-PKM-03-INITIATIVES-2026-Artificial-Emotion/terminals/755315.txt",
+  "terminal_bytes": 1049563,
+  "terminal_lines": 12195,
+  "note": "Cursor terminal capture appears capped near 1MB; after Breathing arm 07:03:34Z the file contains only clock_sync_fin spam through 10:37:30Z and is missing the live run failure events retained in coordinator RunState."
+}
