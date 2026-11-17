@@ -17,6 +17,7 @@ rsvp:
 eventUrl:
 
 cover:
+galleryTag:
 gallery: []
 
 threads: []

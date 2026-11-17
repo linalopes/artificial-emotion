@@ -17,6 +17,7 @@ rsvp: https://luma.com/piaavgin
 eventUrl:
 
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1790888389/event-open-research.webp
+galleryTag: open-research-studio-2026
 gallery:
   - type: image
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1790889911/IMG_6103.webp

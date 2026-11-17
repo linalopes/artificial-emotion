@@ -7,6 +7,7 @@
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import {
   getCloudinaryFolderMedia,
+  getCloudinaryTagMedia,
   mergeGallerySources,
   normalizeGalleryFolder,
   type GalleryItem,
@@ -122,6 +123,20 @@ export async function resolveResearchGallery(
   const manual = entry.data.gallery.filter((item) => item.src.trim());
   if (!folder) return manual;
   return mergeGallerySources(await getCloudinaryFolderMedia(folder), manual);
+}
+
+/**
+ * Event Documentation gallery: Cloudinary tag assets (if set) plus unique
+ * manual `gallery` items. Tag listing is build-time Admin API only.
+ * Does not use the homepage Visual Archive tag (`gallery`).
+ */
+export async function resolveEventGallery(
+  entry: CollectionEntry<'events'>,
+): Promise<GalleryItem[]> {
+  const tag = entry.data.galleryTag?.trim() || undefined;
+  const manual = entry.data.gallery.filter((item) => item.src.trim());
+  if (!tag) return manual;
+  return mergeGallerySources(await getCloudinaryTagMedia(tag), manual);
 }
 
 /* --------------------------------------------------------------------------

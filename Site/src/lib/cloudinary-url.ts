@@ -129,3 +129,53 @@ export function cloudinaryGalleryImageUrl(src: string): string {
 export function cloudinaryLargeImageUrl(src: string): string {
   return cloudinaryScaledImageUrl(src, LIGHTBOX_WIDTH);
 }
+
+/**
+ * Force-download delivery URL for a Cloudinary image or video.
+ * Non-Cloudinary URLs are returned unchanged (browser `download` may still apply same-origin).
+ */
+export function cloudinaryAttachmentUrl(src: string, filename?: string): string {
+  const trimmed = src.trim();
+  if (!trimmed) return trimmed;
+
+  try {
+    const url = new URL(trimmed);
+    if (!isCloudinaryHost(url.hostname)) return trimmed;
+
+    const match = /\/(image|video)\/(upload|fetch|private|authenticated)\//.exec(url.pathname);
+    if (!match || match.index === undefined) return trimmed;
+
+    const markerEnd = match.index + match[0].length;
+    const head = url.pathname.slice(0, markerEnd);
+    const segments = url.pathname.slice(markerEnd).split('/').filter(Boolean);
+    if (segments.length === 0) return trimmed;
+
+    const versionAt = segments.findIndex(isVersionSegment);
+    let transformEnd = 0;
+    if (versionAt >= 0) {
+      transformEnd = versionAt;
+    } else {
+      while (transformEnd < segments.length - 1 && isTransformSegment(segments[transformEnd] ?? '')) {
+        transformEnd += 1;
+      }
+    }
+
+    const existing = segments
+      .slice(0, transformEnd)
+      .flatMap((part) => part.split(','))
+      .filter(Boolean)
+      .filter((token) => {
+        const key = transformKey(token);
+        return key !== 'fl';
+      });
+
+    const safeName = filename?.trim().replace(/[^\w.\-]+/g, '_') || undefined;
+    const attachment = safeName ? `fl_attachment:${safeName}` : 'fl_attachment';
+    const transform = [...existing, attachment].join(',');
+    const rest = segments.slice(transformEnd);
+    url.pathname = `${head}${[transform, ...rest].filter(Boolean).join('/')}`;
+    return url.toString();
+  } catch {
+    return trimmed;
+  }
+}

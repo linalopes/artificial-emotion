@@ -1,5 +1,6 @@
 ---
 import { cloudinaryVideoPoster, type GalleryItem } from '../lib/cloudinary';
+import { cloudinaryAttachmentUrl } from '../lib/cloudinary-url';
 import { mediaSrc } from '../lib/paths';
 import GalleryImage from './GalleryImage.astro';
 
@@ -20,6 +21,23 @@ const videoPoster = (item: GalleryItem) => {
 const thumbSrc = (item: GalleryItem) => {
   if (item.type === 'image') return mediaSrc(item.src);
   return videoPoster(item);
+};
+
+const downloadName = (src: string) => {
+  try {
+    const path = new URL(src).pathname;
+    const base = path.split('/').pop() || 'media';
+    return decodeURIComponent(base);
+  } catch {
+    const base = src.split('/').pop() || 'media';
+    return base.split('?')[0] || 'media';
+  }
+};
+
+const downloadHref = (item: GalleryItem) => {
+  const source = mediaSrc(item.src);
+  const name = downloadName(source);
+  return cloudinaryAttachmentUrl(source, name);
 };
 ---
 
@@ -50,17 +68,36 @@ const thumbSrc = (item: GalleryItem) => {
                 {item.type === 'image' ? (
                   <GalleryImage src={item.src} alt={item.alt} caption={caption} />
                 ) : (
-                  <video
-                    src={mediaSrc(item.src)}
-                    poster={videoPoster(item)}
-                    controls
-                    playsinline
-                    muted
-                    preload="metadata"
-                    aria-label={videoAlt}
-                  ></video>
+                  <button
+                    type="button"
+                    class="research-gallery__video-open"
+                    data-lightbox-video
+                    data-lightbox-src={mediaSrc(item.src)}
+                    data-lightbox-poster={videoPoster(item)}
+                    data-lightbox-caption={caption}
+                    aria-haspopup="dialog"
+                    aria-controls="gallery-lightbox"
+                    aria-label={videoAlt ? `Play video: ${videoAlt}` : 'Play video'}
+                  >
+                    {videoPoster(item) ? (
+                      <img src={videoPoster(item)} alt="" />
+                    ) : (
+                      <span class="research-gallery__video-fallback">Video</span>
+                    )}
+                    <span class="research-gallery__play research-gallery__play--large" aria-hidden="true"></span>
+                  </button>
                 )}
-                {caption && <figcaption>{caption}</figcaption>}
+                <div class="research-gallery__meta">
+                  {caption && <figcaption>{caption}</figcaption>}
+                  <a
+                    class="research-gallery__download"
+                    href={downloadHref(item)}
+                    download={downloadName(mediaSrc(item.src))}
+                    rel="noopener noreferrer"
+                  >
+                    Download {item.type === 'video' ? 'video' : 'image'}
+                  </a>
+                </div>
               </figure>
             );
           })}
@@ -181,7 +218,7 @@ const thumbSrc = (item: GalleryItem) => {
   }
 
   .research-gallery__slide :global(img),
-  .research-gallery__slide video {
+  .research-gallery__video-open img {
     display: block;
     width: 100%;
     height: auto;
@@ -190,12 +227,62 @@ const thumbSrc = (item: GalleryItem) => {
     background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
   }
 
+  .research-gallery__video-open {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+
+  .research-gallery__video-fallback {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 14rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
+  }
+
+  .research-gallery__play--large {
+    background: color-mix(in srgb, var(--color-deep-purple) 22%, transparent);
+  }
+
+  .research-gallery__play--large::after {
+    border-width: 0.55rem 0 0.55rem 0.85rem;
+  }
+
+  .research-gallery__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.35rem 1rem;
+    margin-top: var(--space-2);
+  }
+
   .research-gallery__slide figcaption {
     max-width: none;
-    margin: var(--space-2) 0 0;
+    margin: 0;
     font-size: var(--text-xs);
     line-height: var(--leading-snug);
     color: var(--fg-muted);
+  }
+
+  .research-gallery__download {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--fg-muted);
+  }
+
+  .research-gallery__download:hover,
+  .research-gallery__download:focus-visible {
+    color: var(--color-link);
   }
 
   .research-gallery__bar {
@@ -310,7 +397,7 @@ const thumbSrc = (item: GalleryItem) => {
 
   @media (max-width: 39.99rem) {
     .research-gallery__slide :global(img),
-    .research-gallery__slide video {
+    .research-gallery__video-open img {
       height: auto;
       max-height: 22rem;
     }

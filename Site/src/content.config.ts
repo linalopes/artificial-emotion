@@ -261,6 +261,12 @@ const events = defineCollection({
     eventUrl: optional(z.url()),
     cover: optional(mediaRef),
     gallery,
+    /**
+     * Cloudinary tag listed at build time for this event’s Documentation gallery.
+     * Merged with manually declared `gallery` items (tag assets win on duplicate identity).
+     * Distinct from the homepage Visual Archive tag (`gallery`).
+     */
+    galleryTag: optional(z.string()),
     threads,
     tags,
     related,

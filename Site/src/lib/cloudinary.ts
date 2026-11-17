@@ -507,8 +507,11 @@ export async function getCloudinaryTagMedia(tag: string): Promise<GalleryItem[]>
       listPages(credentials, `resources/video/tags/${encodeURIComponent(name)}`, search),
     ]);
 
-    return [...images, ...videos]
-      .filter((resource) => isSupportedResource(resource) && hasExactTag(resource, name))
+    return sortResources(
+      [...images, ...videos].filter(
+        (resource) => isSupportedResource(resource) && hasExactTag(resource, name),
+      ),
+    )
       .map(toGalleryItem)
       .filter((item): item is GalleryItem => item !== undefined);
   } catch (error) {

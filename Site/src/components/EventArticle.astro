@@ -1,11 +1,12 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import GalleryImage from './GalleryImage.astro';
+import type { GalleryItem } from '../lib/cloudinary';
 import GenerativeWaves from './GenerativeWaves.astro';
 import MermaidScript from './MermaidScript.astro';
 import ModelViewerScript from './ModelViewerScript.astro';
 import PagefindMeta from './PagefindMeta.astro';
 import RelatedEntries from './RelatedEntries.astro';
+import ResearchGallery from './ResearchGallery.astro';
 import {
   formatDate,
   formatEventTime,
@@ -28,9 +29,11 @@ import { COLLECTION_LABELS_SINGULAR, EVENT_TYPE_LABELS, THREAD_LABELS } from '..
 
 interface Props {
   entry: CollectionEntry<'events'>;
+  /** Resolved Documentation gallery (Cloudinary tag + unique manual items). */
+  gallery?: GalleryItem[];
 }
 
-const { entry } = Astro.props;
+const { entry, gallery } = Astro.props;
 const { data } = entry;
 
 const statusLabel = data.status.charAt(0).toUpperCase() + data.status.slice(1);
@@ -65,9 +68,9 @@ const articleHtml = [aboutHtml, programHtml, documentationHtml, reflectionHtml].
 const hasModels = hasModelViewerMarkup(articleHtml);
 const hasMermaid = hasMermaidMarkup(articleHtml);
 
-const galleryItems = data.gallery.filter((item) => item.src.trim());
-const galleryLayout = galleryItems.length <= 3 ? String(galleryItems.length) : '3';
+const galleryItems = (gallery ?? data.gallery).filter((item) => item.src.trim());
 const coverSrc = data.cover?.trim() ? mediaSrc(data.cover.trim()) : undefined;
+const showDocumentation = Boolean(documentationHtml) || galleryItems.length > 0;
 
 const related = await resolveRelated(data.related, `events/${entry.id}`);
 const backlinks = await getBacklinks('events', entry.id);
@@ -208,10 +211,11 @@ const relatedCards = related.map((item) => {
     }
 
     {
-      documentationHtml && (
-        <section class="event-notes" aria-labelledby="event-documentation-heading">
+      showDocumentation && (
+        <section class="event-notes event-documentation" aria-labelledby="event-documentation-heading">
           <h2 id="event-documentation-heading">Documentation</h2>
-          <div class="event-about__prose" set:html={documentationHtml} />
+          {documentationHtml && <div class="event-about__prose" set:html={documentationHtml} />}
+          {galleryItems.length > 0 && <ResearchGallery items={galleryItems} />}
         </section>
       )
     }
@@ -221,36 +225,6 @@ const relatedCards = related.map((item) => {
         <section class="event-notes" aria-labelledby="event-reflection-heading">
           <h2 id="event-reflection-heading">Reflection</h2>
           <div class="event-about__prose" set:html={reflectionHtml} />
-        </section>
-      )
-    }
-
-    {
-      galleryItems.length > 0 && (
-        <section class="event-gallery-section" aria-label="Gallery" data-pagefind-ignore data-gallery-lightbox>
-          <ul class:list={['event-gallery', `event-gallery--${galleryLayout}`]}>
-            {
-              galleryItems.map((item) => (
-                <li>
-                  <figure>
-                    {item.type === 'image' ? (
-                      <GalleryImage src={item.src} alt={item.alt} caption={item.caption} />
-                    ) : (
-                      <video
-                        src={mediaSrc(item.src)}
-                        poster={item.poster ? mediaSrc(item.poster) : undefined}
-                        controls
-                        playsinline
-                        preload="metadata"
-                        aria-label={item.caption || undefined}
-                      />
-                    )}
-                    {item.caption?.trim() && <figcaption>{item.caption.trim()}</figcaption>}
-                  </figure>
-                </li>
-              ))
-            }
-          </ul>
         </section>
       )
     }
@@ -607,62 +581,14 @@ const relatedCards = related.map((item) => {
     }
   }
 
-  .event-gallery-section {
-    min-width: 0;
-  }
-
-  .event-gallery {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    min-width: 0;
-  }
-
-  .event-gallery > li {
-    min-width: 0;
-    max-width: none;
-  }
-
-  .event-gallery figure {
-    display: grid;
-    gap: 0.45rem;
-    margin: 0;
-    min-width: 0;
-  }
-
-  .event-gallery img,
-  .event-gallery video {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    background: color-mix(in srgb, var(--color-gray-green) 42%, var(--color-white));
-  }
-
-  .event-gallery--1 {
-    max-width: 38rem;
-  }
-
-  .event-gallery--1 img,
-  .event-gallery--1 video {
-    aspect-ratio: 16 / 10;
-  }
-
-  .event-gallery figcaption {
-    max-width: none;
-    font-size: var(--text-xs);
-    line-height: var(--leading-snug);
-    color: var(--fg-muted);
-  }
-
   .event-notes {
     display: grid;
     gap: var(--space-4);
     min-width: 0;
+  }
+
+  .event-documentation :global(.research-gallery) {
+    margin-top: var(--space-2);
   }
 
   .event-related {
@@ -769,16 +695,6 @@ const relatedCards = related.map((item) => {
     color: var(--fg-muted);
     border: 1px solid var(--rule);
     border-radius: 50%;
-  }
-
-  @media (min-width: 40rem) {
-    .event-gallery--2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .event-gallery--3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
   }
 
   @media (max-width: 29.99rem) {
