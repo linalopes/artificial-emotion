@@ -70,6 +70,11 @@ Site/
 | `/references/[id]/`  | `src/pages/references/[id].astro`  |
 | `/events/`           | `src/pages/events/index.astro`     |
 | `/events/[id]/`      | `src/pages/events/[id].astro`      |
+| `/atelier/projection-screen/` | `src/pages/atelier/projection-screen.astro` — standalone community-funded atelier infrastructure page (not in main nav) |
+
+Funding progress for `/atelier/projection-screen/` is intentionally static/manual
+in v1. Update the `raised` value in `src/data/projection-screen.ts` and
+rebuild/deploy.
 
 Only primary-collection entries with `draft: false` get listing and detail
 pages. Research Thread pages always exist for the three canonical ids so
