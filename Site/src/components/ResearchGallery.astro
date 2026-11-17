@@ -1,5 +1,9 @@
 ---
-import { cloudinaryVideoPoster, type GalleryItem } from '../lib/cloudinary';
+import {
+  cloudinaryVideoPlaybackSrc,
+  cloudinaryVideoPoster,
+  type GalleryItem,
+} from '../lib/cloudinary';
 import { cloudinaryAttachmentUrl } from '../lib/cloudinary-url';
 import { mediaSrc } from '../lib/paths';
 import GalleryImage from './GalleryImage.astro';
@@ -16,6 +20,11 @@ const videoPoster = (item: GalleryItem) => {
   if (item.type !== 'video') return undefined;
   const poster = item.poster || cloudinaryVideoPoster(item.src);
   return poster ? mediaSrc(poster) : undefined;
+};
+
+const videoSrc = (item: GalleryItem) => {
+  if (item.type !== 'video') return mediaSrc(item.src);
+  return mediaSrc(cloudinaryVideoPlaybackSrc(item.src));
 };
 
 const thumbSrc = (item: GalleryItem) => {
@@ -35,6 +44,7 @@ const downloadName = (src: string) => {
 };
 
 const downloadHref = (item: GalleryItem) => {
+  // Keep downloads on the original asset URL (not the q_auto playback derivative).
   const source = mediaSrc(item.src);
   const name = downloadName(source);
   return cloudinaryAttachmentUrl(source, name);
@@ -68,24 +78,20 @@ const downloadHref = (item: GalleryItem) => {
                 {item.type === 'image' ? (
                   <GalleryImage src={item.src} alt={item.alt} caption={caption} />
                 ) : (
-                  <button
-                    type="button"
-                    class="research-gallery__video-open"
-                    data-lightbox-video
-                    data-lightbox-src={mediaSrc(item.src)}
-                    data-lightbox-poster={videoPoster(item)}
-                    data-lightbox-caption={caption}
-                    aria-haspopup="dialog"
-                    aria-controls="gallery-lightbox"
-                    aria-label={videoAlt ? `Play video: ${videoAlt}` : 'Play video'}
-                  >
-                    {videoPoster(item) ? (
-                      <img src={videoPoster(item)} alt="" />
-                    ) : (
-                      <span class="research-gallery__video-fallback">Video</span>
-                    )}
-                    <span class="research-gallery__play research-gallery__play--large" aria-hidden="true"></span>
-                  </button>
+                  <div class="research-gallery__video">
+                    <video
+                      src={videoSrc(item)}
+                      poster={videoPoster(item)}
+                      controls
+                      playsinline
+                      muted
+                      preload="metadata"
+                      aria-label={videoAlt}
+                    ></video>
+                    <p class="research-gallery__video-error" data-video-error hidden>
+                      This video could not be played in the browser.
+                    </p>
+                  </div>
                 )}
                 <div class="research-gallery__meta">
                   {caption && <figcaption>{caption}</figcaption>}
@@ -218,7 +224,7 @@ const downloadHref = (item: GalleryItem) => {
   }
 
   .research-gallery__slide :global(img),
-  .research-gallery__video-open img {
+  .research-gallery__slide video {
     display: block;
     width: 100%;
     height: auto;
@@ -227,31 +233,22 @@ const downloadHref = (item: GalleryItem) => {
     background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
   }
 
-  .research-gallery__video-open {
-    position: relative;
-    display: block;
-    width: 100%;
-  }
-
-  .research-gallery__video-fallback {
+  .research-gallery__video {
     display: grid;
-    place-items: center;
-    width: 100%;
-    min-height: 14rem;
+    gap: 0.45rem;
+  }
+
+  .research-gallery__video-error {
+    margin: 0;
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--fg-muted);
-    background: color-mix(in srgb, var(--color-gray-green) 28%, var(--color-white));
+    color: var(--color-pink);
   }
 
-  .research-gallery__play--large {
-    background: color-mix(in srgb, var(--color-deep-purple) 22%, transparent);
-  }
-
-  .research-gallery__play--large::after {
-    border-width: 0.55rem 0 0.55rem 0.85rem;
+  .research-gallery__video-error[hidden] {
+    display: none;
   }
 
   .research-gallery__meta {
@@ -397,7 +394,7 @@ const downloadHref = (item: GalleryItem) => {
 
   @media (max-width: 39.99rem) {
     .research-gallery__slide :global(img),
-    .research-gallery__video-open img {
+    .research-gallery__slide video {
       height: auto;
       max-height: 22rem;
     }

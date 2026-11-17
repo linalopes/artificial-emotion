@@ -163,10 +163,33 @@ export function mountResearchGallery(root: HTMLElement): void {
     playSafe(video);
   };
 
+  const clearVideoError = (slide: HTMLElement | undefined) => {
+    const error = slide?.querySelector<HTMLElement>('[data-video-error]');
+    if (error) error.hidden = true;
+  };
+
+  const showVideoError = (video: HTMLVideoElement) => {
+    const error = video.closest('[data-slide]')?.querySelector<HTMLElement>('[data-video-error]');
+    if (error) error.hidden = false;
+  };
+
+  const restartActiveVideo = () => {
+    const video = activeVideo();
+    if (!video) return;
+    clearVideoError(activeSlide());
+    userPausedVideo = false;
+    resetVideo(video);
+    if (canAutoplayVideo()) playSafe(video);
+  };
+
   const show = (nextIndex: number, origin: 'auto' | 'manual' = 'manual') => {
     const wrapped = ((nextIndex % total) + total) % total;
     if (ready && wrapped === index) {
-      if (origin === 'manual') noteManual();
+      if (origin === 'manual') {
+        noteManual();
+        // Reselecting the current video thumb restarts muted playback from 0.
+        if (activeVideo()) restartActiveVideo();
+      }
       return;
     }
 
@@ -187,6 +210,7 @@ export function mountResearchGallery(root: HTMLElement): void {
     root.setAttribute('data-index', String(index));
 
     userPausedVideo = false;
+    clearVideoError(activeSlide());
     pauseInactiveVideos();
     startActiveVideo();
     if (origin === 'manual') noteManual();
@@ -280,6 +304,19 @@ export function mountResearchGallery(root: HTMLElement): void {
       userPausedVideo = false;
       if (prefersReducedMotion() || document.hidden) return;
       show(index + 1, 'auto');
+    },
+    true,
+  );
+
+  root.addEventListener(
+    'error',
+    (event) => {
+      if (!(event.target instanceof HTMLVideoElement)) return;
+      showVideoError(event.target);
+      if (event.target.closest('[data-slide]') !== activeSlide()) return;
+      userPausedVideo = false;
+      stopAdvance();
+      scheduleAdvance();
     },
     true,
   );

@@ -4,7 +4,7 @@
  * public delivery URLs only, then shuffles them once per page load.
  */
 import type { GalleryItem } from './cloudinary';
-import { cloudinaryVideoPoster } from './cloudinary';
+import { cloudinaryVideoPlaybackSrc, cloudinaryVideoPoster } from './cloudinary';
 import {
   cloudinaryGalleryImageUrl,
   cloudinaryGalleryPosterUrl,
@@ -51,8 +51,8 @@ export function prepareVisualArchive(items: GalleryItem[]): VisualArchiveAsset[]
     assets.push({
       type: 'video',
       src: poster,
-      // Original delivery URL. A width/height resize squares portrait phone videos.
-      largeSrc: source,
+      // q_auto derivative so HTML5 playback gets moov-first MP4s.
+      largeSrc: cloudinaryVideoPlaybackSrc(source),
       alt: item.alt?.trim() || caption || '',
       caption,
     });

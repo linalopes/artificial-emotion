@@ -320,12 +320,9 @@ function pickAlt(resource: CloudinaryResource): string {
   return firstField(context, ALT_KEYS) || firstField(structured, ALT_KEYS) || '';
 }
 
-/**
- * Still frame from a Cloudinary video delivery URL.
- * Inserts `so_auto` (representative frame) and requests JPG.
- * Does not require a separate uploaded thumbnail.
- */
-export function cloudinaryVideoPoster(src: string): string | undefined {
+function splitCloudinaryVideoUpload(src: string):
+  | { url: URL; head: string; transformParts: string[]; rest: string[] }
+  | undefined {
   try {
     const url = new URL(src.trim());
     if (!url.hostname.includes('cloudinary.com')) return undefined;
@@ -338,21 +335,56 @@ export function cloudinaryVideoPoster(src: string): string | undefined {
     const versionAt = segments.findIndex((part) => /^v\d+$/.test(part));
     const transformParts = versionAt === -1 ? [] : segments.slice(0, versionAt);
     const rest = versionAt === -1 ? segments : segments.slice(versionAt);
-    const withoutOffset = transformParts
-      .map((part) =>
-        part
-          .split(',')
-          .filter((token) => token.length > 0 && !token.startsWith('so_'))
-          .join(','),
-      )
-      .filter(Boolean);
-
-    url.pathname = `${head}${['so_auto', ...withoutOffset, ...rest].join('/')}`;
-    url.pathname = url.pathname.replace(/\.[a-z0-9]+$/i, '.jpg');
-    return url.toString();
+    return { url, head, transformParts, rest };
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Still frame from a Cloudinary video delivery URL.
+ * Inserts `so_auto` (representative frame) and requests JPG.
+ * Does not require a separate uploaded thumbnail.
+ */
+export function cloudinaryVideoPoster(src: string): string | undefined {
+  const parts = splitCloudinaryVideoUpload(src);
+  if (!parts) return undefined;
+
+  const withoutOffset = parts.transformParts
+    .map((part) =>
+      part
+        .split(',')
+        .filter((token) => token.length > 0 && !token.startsWith('so_'))
+        .join(','),
+    )
+    .filter(Boolean);
+
+  parts.url.pathname = `${parts.head}${['so_auto', ...withoutOffset, ...parts.rest].join('/')}`;
+  parts.url.pathname = parts.url.pathname.replace(/\.[a-z0-9]+$/i, '.jpg');
+  return parts.url.toString();
+}
+
+/**
+ * Browser-playable Cloudinary video URL.
+ *
+ * Raw uploads can ship with the MP4 `moov` atom after `mdat` (no faststart).
+ * Large files then stall or fail in HTML5 `<video>` until the whole object
+ * downloads. Inserting `q_auto` forces a derived delivery with `moov` first.
+ * Idempotent if a quality transform is already present; non-Cloudinary URLs
+ * pass through unchanged.
+ */
+export function cloudinaryVideoPlaybackSrc(src: string): string {
+  const trimmed = src.trim();
+  const parts = splitCloudinaryVideoUpload(trimmed);
+  if (!parts) return trimmed;
+
+  const hasQuality = parts.transformParts.some((part) =>
+    part.split(',').some((token) => token.startsWith('q_')),
+  );
+  if (hasQuality) return trimmed;
+
+  parts.url.pathname = `${parts.head}${['q_auto', ...parts.transformParts, ...parts.rest].join('/')}`;
+  return parts.url.toString();
 }
 
 function pickPoster(resource: CloudinaryResource, src: string): string | undefined {
