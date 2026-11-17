@@ -236,10 +236,6 @@ const description =
                 </p>
               </div>
 
-              {/*
-                Contribute pair: CTA + optional Stripe QR.
-                Set projectionScreenFund.qrSrc when a QR asset is available.
-              */}
               <div class:list={['screen-contribute', qrSrc && 'screen-contribute--with-qr']}>
                 <div class="screen-contribute__primary">
                   <a
@@ -259,11 +255,12 @@ const description =
                     <figure class="screen-contribute__qr">
                       <img
                         src={qrSrc}
-                        alt="QR code for the Stripe contribution page"
+                        alt="QR code to contribute to the atelier projection screen via Stripe"
                         width="180"
                         height="180"
+                        decoding="async"
                       />
-                      <figcaption>Scan to open Stripe</figcaption>
+                      <figcaption>Scan to contribute via Stripe</figcaption>
                     </figure>
                   )
                 }
@@ -677,12 +674,14 @@ const description =
 
   .screen-contribute__qr {
     margin: 0;
-    max-width: 11rem;
+    width: clamp(10rem, 42vw, 12.5rem);
   }
 
   .screen-contribute__qr img {
     width: 100%;
     height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
     border: 1px solid var(--rule);
     background: var(--color-white);
   }

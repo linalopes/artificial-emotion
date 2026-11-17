@@ -8,17 +8,14 @@
 export const projectionScreenFund = {
   goal: 460,
   /** Manually updated total received toward this campaign. */
-  raised: 0,
+  raised: 20,
   currency: 'CHF',
   stripeUrl: 'https://donate.stripe.com/7sY6oGbB581H5XL8Vfcwg00',
   productUrl:
     'https://www.galaxus.ch/en/s1/product/avtek-cinema-electric-300p-projection-screen-16-9-131-3327-cm-131-13098-169-projector-screens-30701272?offertype=retail&offerid=406802',
   productName: 'Avtek Cinema Electric 300P',
-  /**
-   * Optional Stripe QR image path (site-root or remote HTTPS).
-   * Leave unset until an asset is added under `public/`.
-   */
-  qrSrc: undefined as string | undefined,
+  /** Stripe payment QR (served from `public/`). */
+  qrSrc: '/projection-screen.png',
 } as const;
 
 export type ProjectionScreenFund = typeof projectionScreenFund;
