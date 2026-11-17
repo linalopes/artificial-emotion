@@ -1,0 +1,137 @@
+{
+  "at": "2026-11-17T16:52:39.843Z",
+  "stop": {
+    "engaged": true,
+    "atMs": 1794934327955
+  },
+  "runPhase": "cancelled",
+  "dt": 4.007,
+  "nodes": [
+    {
+      "id": "Mau01",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        341.3836,
+        341.3836
+      ],
+      "dpos": 0,
+      "telemAgeB": 992,
+      "connected": true
+    },
+    {
+      "id": "Mau02",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        322.3315,
+        322.3315
+      ],
+      "dpos": 0,
+      "telemAgeB": 564,
+      "connected": true
+    },
+    {
+      "id": "Mau03",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        244.7543,
+        244.7543
+      ],
+      "dpos": 0,
+      "telemAgeB": 155,
+      "connected": true
+    },
+    {
+      "id": "Mau04",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        315.8428,
+        315.8428
+      ],
+      "dpos": 0,
+      "telemAgeB": 432,
+      "connected": true
+    },
+    {
+      "id": "Mau05",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        254.4069,
+        254.4069
+      ],
+      "dpos": 0,
+      "telemAgeB": 20,
+      "connected": true
+    },
+    {
+      "id": "Mau06",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        138.0928,
+        138.0928
+      ],
+      "dpos": 0,
+      "telemAgeB": 633,
+      "connected": true
+    },
+    {
+      "id": "Mau07",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        244.6162,
+        244.6162
+      ],
+      "dpos": 0,
+      "telemAgeB": 204,
+      "connected": true
+    },
+    {
+      "id": "Mau08",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        369.9846,
+        369.9846
+      ],
+      "dpos": 0,
+      "telemAgeB": 32425,
+      "connected": true
+    },
+    {
+      "id": "Mau09",
+      "moving": [
+        false,
+        false
+      ],
+      "pos": [
+        189.646,
+        189.646
+      ],
+      "dpos": 0,
+      "telemAgeB": 383,
+      "connected": true
+    }
+  ]
+}

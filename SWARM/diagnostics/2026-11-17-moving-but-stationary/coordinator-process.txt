@@ -1,0 +1,2 @@
+  PID STARTED                       ELAPSED COMMAND
+15934 Tue Nov 17 09:34:32 2026     08:15:34 /usr/local/bin/node --require /Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/node_modules/tsx/dist/preflight.cjs --import file:///Users/linalopes/Documents/Lina's%20PKM/03-INITIATIVES/2026%20Artificial%20Emotion/SWARM/node_modules/tsx/dist/loader.mjs src/main.ts

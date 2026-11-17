@@ -1,0 +1,128 @@
+{
+  "dt": 10.008,
+  "run": {
+    "phase": "running",
+    "runId": "21133e3756d74d1bb81b0660712151e",
+    "scoreName": "Wave",
+    "scoreFingerprint": "4eef727e",
+    "durationMs": 240000,
+    "startAtMs": 2986148.55825,
+    "repeat": false,
+    "autonomous": true,
+    "autonomousLoop": true,
+    "pass": 1,
+    "error": null,
+    "perNode": {
+      "Mau05": "running",
+      "Mau06": "reconnected",
+      "Mau01": "running",
+      "Mau09": "running",
+      "Mau08": "running",
+      "Mau07": "running",
+      "Mau03": "running",
+      "Mau02": "running",
+      "Mau04": "running"
+    }
+  },
+  "delta": [
+    {
+      "id": "Mau01",
+      "dpos": 108.974,
+      "rate": 10.889,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 940
+    },
+    {
+      "id": "Mau02",
+      "dpos": 33.617,
+      "rate": 3.359,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 510
+    },
+    {
+      "id": "Mau03",
+      "dpos": -116.74,
+      "rate": -11.665,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 100
+    },
+    {
+      "id": "Mau04",
+      "dpos": 15.578,
+      "rate": 1.557,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 797
+    },
+    {
+      "id": "Mau05",
+      "dpos": -103.187,
+      "rate": -10.31,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 391
+    },
+    {
+      "id": "Mau06",
+      "dpos": -106.132,
+      "rate": -10.605,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 534
+    },
+    {
+      "id": "Mau07",
+      "dpos": -109.308,
+      "rate": -10.922,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 154
+    },
+    {
+      "id": "Mau08",
+      "dpos": 0,
+      "rate": 0,
+      "moving": [
+        false,
+        false
+      ],
+      "endstop": true,
+      "telemAgeB": 155026
+    },
+    {
+      "id": "Mau09",
+      "dpos": -109.055,
+      "rate": -10.897,
+      "moving": [
+        true,
+        true
+      ],
+      "endstop": true,
+      "telemAgeB": 336
+    }
+  ]
+}

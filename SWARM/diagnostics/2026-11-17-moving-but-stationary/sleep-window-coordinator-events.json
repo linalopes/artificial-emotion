@@ -1,0 +1,586 @@
+{
+  "source": "/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/coordinator/data/coordinator-events.jsonl",
+  "window_utc": [
+    "2026-11-17T16:20:00+00:00",
+    "2026-11-17T16:55:00+00:00"
+  ],
+  "kind_counts": {
+    "warn": 8,
+    "disconnect": 1,
+    "reconnect_reconcile": 26,
+    "cancel_stop": 2
+  },
+  "events": [
+    {
+      "at": "2026-11-17T16:32:36.045Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 1 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 1
+      }
+    },
+    {
+      "at": "2026-11-17T16:46:39.504Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 31 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 31
+      }
+    },
+    {
+      "at": "2026-11-17T16:47:39.817Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 106 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 106
+      }
+    },
+    {
+      "at": "2026-11-17T16:48:39.972Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 101 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 101
+      }
+    },
+    {
+      "at": "2026-11-17T16:49:40.780Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 286 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 286
+      }
+    },
+    {
+      "at": "2026-11-17T16:50:41.472Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 28 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 28
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:44.803Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 18 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 18
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:46.476Z",
+      "kind": "disconnect",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 disconnected",
+      "detail": {
+        "phase": "running",
+        "autonomous": true,
+        "autonomousStarted": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:46.612Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 connected (fw 0.3.7)",
+      "detail": {
+        "simulated": false,
+        "wasInRun": true,
+        "phase": "running"
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:46.612Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:47.445Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:48.450Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:49.441Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:50.313Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:51.315Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:52.311Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:53.311Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:53.486Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:54.488Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:55.482Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:56.534Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:57.174Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:58.175Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:59.171Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:00.173Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:00.347Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:01.350Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:02.347Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:03.344Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:03.932Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:04.933Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:05.930Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:06.927Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:07.106Z",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:07.955Z",
+      "kind": "cancel_stop",
+      "nodeId": null,
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Software stop engaged.",
+      "detail": {
+        "initiator": "operator_or_stop",
+        "connected": [
+          "Mau01",
+          "Mau02",
+          "Mau03",
+          "Mau04",
+          "Mau05",
+          "Mau06",
+          "Mau07",
+          "Mau08",
+          "Mau09"
+        ]
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:10.958Z",
+      "kind": "cancel_stop",
+      "nodeId": null,
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "message": "Stop all requested.",
+      "detail": {
+        "initiator": "operator_or_stop",
+        "connected": [
+          "Mau01",
+          "Mau02",
+          "Mau03",
+          "Mau04",
+          "Mau05",
+          "Mau06",
+          "Mau07",
+          "Mau08",
+          "Mau09"
+        ]
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:49.780Z",
+      "kind": "warn",
+      "nodeId": null,
+      "runId": null,
+      "message": "Suppressed 9 repetitive clock-sync diagnostic(s) in the last interval.",
+      "detail": {
+        "suppressed": 9
+      }
+    }
+  ]
+}

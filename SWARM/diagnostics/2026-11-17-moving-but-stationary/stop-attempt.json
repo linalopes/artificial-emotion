@@ -1,0 +1,224 @@
+{
+  "at": "2026-11-17T16:52:16.964Z",
+  "results": [
+    {
+      "type": "result",
+      "id": "diag-mwkxjzbk-s1972",
+      "ok": false,
+      "error": "Another browser already holds control.",
+      "intentType": "claimOperator"
+    },
+    {
+      "type": "result",
+      "id": "diag-mwkxjzbl-wnq6k",
+      "ok": false,
+      "error": "Stop was NOT confirmed by: Mau08. Use the physical power cut-off if they are moving.",
+      "outcomes": [
+        {
+          "node": "Mau01",
+          "ok": true
+        },
+        {
+          "node": "Mau02",
+          "ok": true
+        },
+        {
+          "node": "Mau03",
+          "ok": true
+        },
+        {
+          "node": "Mau04",
+          "ok": true
+        },
+        {
+          "node": "Mau05",
+          "ok": true
+        },
+        {
+          "node": "Mau06",
+          "ok": true
+        },
+        {
+          "node": "Mau07",
+          "ok": true
+        },
+        {
+          "node": "Mau08",
+          "ok": false,
+          "error": "no acknowledgment within 1500 ms"
+        },
+        {
+          "node": "Mau09",
+          "ok": true
+        }
+      ],
+      "intentType": "engageStop"
+    },
+    {
+      "type": "result",
+      "id": "diag-mwkxk1n2-kod90",
+      "ok": false,
+      "error": "Stop was NOT confirmed by: Mau08. Use the physical power cut-off if they are moving.",
+      "outcomes": [
+        {
+          "node": "Mau01",
+          "ok": true
+        },
+        {
+          "node": "Mau02",
+          "ok": true
+        },
+        {
+          "node": "Mau03",
+          "ok": true
+        },
+        {
+          "node": "Mau04",
+          "ok": true
+        },
+        {
+          "node": "Mau05",
+          "ok": true
+        },
+        {
+          "node": "Mau06",
+          "ok": true
+        },
+        {
+          "node": "Mau07",
+          "ok": true
+        },
+        {
+          "node": "Mau08",
+          "ok": false,
+          "error": "no acknowledgment within 1500 ms"
+        },
+        {
+          "node": "Mau09",
+          "ok": true
+        }
+      ],
+      "intentType": "stopAll"
+    }
+  ],
+  "stop": {
+    "engaged": true,
+    "atMs": 1794934327955
+  },
+  "run": {
+    "phase": "cancelled",
+    "runId": "21133e3756d74d1bb81b0660712151e",
+    "scoreName": "Wave",
+    "scoreFingerprint": "4eef727e",
+    "durationMs": 240000,
+    "startAtMs": null,
+    "repeat": false,
+    "autonomous": true,
+    "autonomousLoop": true,
+    "pass": 1,
+    "error": "Software stop engaged.",
+    "perNode": {
+      "Mau05": "running",
+      "Mau06": "reconnected",
+      "Mau01": "running",
+      "Mau09": "running",
+      "Mau08": "running",
+      "Mau07": "running",
+      "Mau03": "running",
+      "Mau02": "running",
+      "Mau04": "running"
+    }
+  },
+  "nodes": [
+    {
+      "id": "Mau01",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 341.3836,
+      "endstop": true,
+      "telemAgeMs": 180
+    },
+    {
+      "id": "Mau02",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 322.3315,
+      "endstop": true,
+      "telemAgeMs": 743
+    },
+    {
+      "id": "Mau03",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 244.7543,
+      "endstop": true,
+      "telemAgeMs": 399
+    },
+    {
+      "id": "Mau04",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 315.8428,
+      "endstop": true,
+      "telemAgeMs": 28
+    },
+    {
+      "id": "Mau05",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 254.4069,
+      "endstop": true,
+      "telemAgeMs": 621
+    },
+    {
+      "id": "Mau06",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 138.0928,
+      "endstop": true,
+      "telemAgeMs": 232
+    },
+    {
+      "id": "Mau07",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 244.6162,
+      "endstop": true,
+      "telemAgeMs": 414
+    },
+    {
+      "id": "Mau08",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 369.9846,
+      "endstop": true,
+      "telemAgeMs": 9546
+    },
+    {
+      "id": "Mau09",
+      "connected": true,
+      "moving": false,
+      "homing": false,
+      "faultCode": null,
+      "positionMm": 189.646,
+      "endstop": true,
+      "telemAgeMs": 570
+    }
+  ]
+}

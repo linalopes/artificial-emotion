@@ -1,0 +1,751 @@
+{
+  "capturedAt": "2026-11-17T16:50:11.994Z",
+  "sampleIntervalMs": 2500,
+  "run": {
+    "t0": {
+      "phase": "running",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "scoreName": "Wave",
+      "scoreFingerprint": "4eef727e",
+      "durationMs": 240000,
+      "startAtMs": 2986148.55825,
+      "repeat": false,
+      "autonomous": true,
+      "autonomousLoop": true,
+      "pass": 1,
+      "error": null,
+      "perNode": {
+        "Mau05": "running",
+        "Mau06": "running",
+        "Mau01": "running",
+        "Mau09": "running",
+        "Mau08": "running",
+        "Mau07": "running",
+        "Mau03": "running",
+        "Mau02": "running",
+        "Mau04": "running"
+      }
+    },
+    "t1": {
+      "phase": "running",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "scoreName": "Wave",
+      "scoreFingerprint": "4eef727e",
+      "durationMs": 240000,
+      "startAtMs": 2986148.55825,
+      "repeat": false,
+      "autonomous": true,
+      "autonomousLoop": true,
+      "pass": 1,
+      "error": null,
+      "perNode": {
+        "Mau05": "running",
+        "Mau06": "running",
+        "Mau01": "running",
+        "Mau09": "running",
+        "Mau08": "running",
+        "Mau07": "running",
+        "Mau03": "running",
+        "Mau02": "running",
+        "Mau04": "running"
+      }
+    },
+    "t2": {
+      "phase": "running",
+      "runId": "21133e3756d74d1bb81b0660712151e",
+      "scoreName": "Wave",
+      "scoreFingerprint": "4eef727e",
+      "durationMs": 240000,
+      "startAtMs": 2986148.55825,
+      "repeat": false,
+      "autonomous": true,
+      "autonomousLoop": true,
+      "pass": 1,
+      "error": null,
+      "perNode": {
+        "Mau05": "running",
+        "Mau06": "running",
+        "Mau01": "running",
+        "Mau09": "running",
+        "Mau08": "running",
+        "Mau07": "running",
+        "Mau03": "running",
+        "Mau02": "running",
+        "Mau04": "running"
+      }
+    }
+  },
+  "diffs": [
+    {
+      "id": "Mau01",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        true,
+        true,
+        true
+      ],
+      "positionMm": [
+        199.1606,
+        169.9727,
+        141.7973
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": -57.363
+    },
+    {
+      "id": "Mau02",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        true,
+        true,
+        true
+      ],
+      "positionMm": [
+        276.9679,
+        247.7456,
+        224.2526
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": -52.715
+    },
+    {
+      "id": "Mau03",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        true,
+        true,
+        true
+      ],
+      "positionMm": [
+        361.9543,
+        332.801,
+        300.7254
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": -61.229
+    },
+    {
+      "id": "Mau04",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        true,
+        true,
+        true
+      ],
+      "positionMm": [
+        285.3549,
+        253.0378,
+        232.7202
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": -52.635
+    },
+    {
+      "id": "Mau05",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        true,
+        true,
+        true
+      ],
+      "positionMm": [
+        347.7688,
+        326.3122,
+        293.857
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": -53.912
+    },
+    {
+      "id": "Mau06",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        false,
+        false,
+        false
+      ],
+      "positionMm": [
+        369.9846,
+        369.9846,
+        369.9846
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": 0
+    },
+    {
+      "id": "Mau07",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        true,
+        true,
+        true
+      ],
+      "positionMm": [
+        362.2764,
+        328.4176,
+        304.8787
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": -57.398
+    },
+    {
+      "id": "Mau08",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        false,
+        false,
+        false
+      ],
+      "positionMm": [
+        369.9846,
+        369.9846,
+        369.9846
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": 0
+    },
+    {
+      "id": "Mau09",
+      "state": [
+        null,
+        null,
+        null
+      ],
+      "moving": [
+        true,
+        true,
+        true
+      ],
+      "positionMm": [
+        335.7232,
+        354.3841,
+        360.217
+      ],
+      "targetMm": [
+        null,
+        null,
+        null
+      ],
+      "plannedMm": [
+        null,
+        null,
+        null
+      ],
+      "steps": [
+        null,
+        null,
+        null
+      ],
+      "positionSteps": [
+        null,
+        null,
+        null
+      ],
+      "targetReached": [
+        null,
+        null,
+        null
+      ],
+      "stall": [
+        null,
+        null,
+        null
+      ],
+      "plannerBusy": [
+        null,
+        null,
+        null
+      ],
+      "completedPasses": [
+        null,
+        null,
+        null
+      ],
+      "loopIndex": [
+        null,
+        null,
+        null
+      ],
+      "loopBoundary": [
+        null,
+        null,
+        null
+      ],
+      "faultCode": [
+        null,
+        null,
+        null
+      ],
+      "posDeltaT0T2": 24.494
+    }
+  ],
+  "movingCount": {
+    "t0": 7,
+    "t1": 7,
+    "t2": 7
+  }
+}

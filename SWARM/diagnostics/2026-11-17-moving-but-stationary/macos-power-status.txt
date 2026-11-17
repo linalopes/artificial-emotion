@@ -1,0 +1,44 @@
+captured_at_local=2026-11-17T17:54:00+0100
+caffeinate_process=none
+--- pmset -g ---
+System-wide power settings:
+Currently in use:
+ standby              1
+ Sleep On Power Button 1
+ hibernatefile        /var/vm/sleepimage
+ powernap             1
+ networkoversleep     0
+ disksleep            10
+ sleep                1 (sleep prevented by sharingd, Cursor, bluetoothd, powerd)
+ hibernatemode        3
+ ttyskeepawake        1
+ displaysleep         60
+ tcpkeepalive         1
+ lowpowermode         0
+ womp                 1
+--- assertions (head) ---
+2026-11-17 17:54:00 +0100 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 563(sharingd): [0x0003086a0001883e] 00:06:22 PreventUserIdleSystemSleep named: "Handoff"  
+   pid 2078(Cursor): [0x000309a40001889a] 00:01:08 NoIdleSleepAssertion named: "Electron"  
+   pid 156(bluetoothd): [0x000309db000188a7] 00:00:13 PreventUserIdleSystemSleep named: "com.apple.BTStack"  
+   pid 156(bluetoothd): [0x000308820009884d] 00:05:58 UserIsActive named: "Bluetooth Incoming Connection Request"  
+	Timeout will fire in 3242 secs Action=TimeoutActionRelease
+   pid 156(bluetoothd): [0x000308b200098856] 00:05:10 UserIsActive named: "Bluetooth LE HID Activity"  
+	Timeout will fire in 3289 secs Action=TimeoutActionRelease
+   pid 107(powerd): [0x0003082f000187d5] 00:07:20 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 107(powerd): [0x0003082f000987d1] 00:07:20 UserIsActive named: "com.apple.powermanagement.kernel.useractive AppleHIDKeyboardEventDriverV2:sleepDisplayTickle kIOMessageSyste"  
+	Timeout will fire in 3159 secs Action=TimeoutActionRelease
+   pid 163(WindowServer): [0x0003082f000987d2] 00:00:00 UserIsActive named: "com.apple.iohideventsystem.queue.tickle serviceID:1004f8a90 service:AppleUserHIDEventService product:Bluetooth Keyboard eventType:3"  
+	Timeout will fire in 3600 secs Action=TimeoutActionRelease
+Kernel Assertions: 0x100=MAGICWAKE
+   id=540  level=255 0x100=MAGICWAKE creat=15/11/26, 02:39  mod=17/11/26, 10:26 description=en0 owner=IOSkywalkNetworkBSDClient

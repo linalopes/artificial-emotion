@@ -1,0 +1,2 @@
+COMMAND   PID      USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    15934 linalopes   22u  IPv4 0xb60bb9cd4cf81973      0t0  TCP *:8787 (LISTEN)
