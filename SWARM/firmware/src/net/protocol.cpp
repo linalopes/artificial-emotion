@@ -350,6 +350,25 @@ void ProtocolClient::fillStatus(JsonObject obj) const {
     obj["loop_index"] = c_.track->passIndex();
     obj["completed_passes"] = c_.track->completedPasses();
     obj["track_loop_compatible"] = c_.track->loopCompatible();
+    // Bounded loop-boundary / segment-completion diagnostic (last event only).
+    const auto& bd = c_.track->boundaryDiag();
+    if (bd.valid) {
+      JsonObject lb = obj["loop_boundary"].to<JsonObject>();
+      lb["seq"] = bd.seq;
+      lb["loop_index"] = bd.passIndex;
+      if (c_.run) {
+        lb["run_id"] = c_.run->runId();
+      }
+      lb["expected_steps"] = bd.expectedSteps;
+      lb["actual_steps"] = bd.actualSteps;
+      lb["delta_steps"] = bd.deltaSteps;
+      lb["delta_mm"] = bd.deltaMm;
+      lb["tol_steps"] = bd.tolSteps;
+      lb["action"] = loopBoundaryActionLabel(bd.action);
+      if (bd.segmentResult[0] != '\0') {
+        lb["segment_result"] = bd.segmentResult;
+      }
+    }
   }
 }
 

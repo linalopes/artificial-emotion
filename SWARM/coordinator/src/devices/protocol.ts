@@ -54,6 +54,19 @@ export interface Telemetry {
   completedPasses?: number | null;
   positionValid?: boolean | null;
   autonomous?: boolean | null;
+  /** Last loop-boundary / segment-completion diagnostic from firmware status (optional). */
+  loopBoundary?: {
+    seq: number | null;
+    loopIndex: number | null;
+    runId: string | null;
+    expectedSteps: number | null;
+    actualSteps: number | null;
+    deltaSteps: number | null;
+    deltaMm: number | null;
+    tolSteps: number | null;
+    action: string | null;
+    segmentResult: string | null;
+  } | null;
 }
 
 export type DeviceEvent =

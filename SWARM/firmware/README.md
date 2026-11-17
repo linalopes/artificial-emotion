@@ -2,7 +2,7 @@
 
 Firmware for the nine MauMau kinetic modules (`Mau01`–`Mau09`) in the Artificial Emotion **SWARM** installation.
 
-**Version:** **0.3.5** (set by PlatformIO `-D SWARM_FW_VERSION=\"0.3.5\"`) — clock_sync_fin parses `t*_us` as `uint64_t` (0.3.4’s `| 0` truncated past ~35.7 min uptime and broke fleet sync); motion ceiling remains `SWARM_ABS_MAX_RPM` **15** with the 0.3.4 NVS migration; homing on `SWARM_ABS_MAX_HOME_RPM` **15**; remote `hard_*` writes stay blocked.  
+**Version:** **0.3.7** (set by PlatformIO `-D SWARM_FW_VERSION=\"0.3.7\"`) — segment idle requires `targetReached` before next segment/loop (0.3.6 overnight faulted @ loop 103 after IncompleteStop was treated as complete); loop-boundary status telemetry; 0.3.6 `SWARM_LOOP_CLOSURE_MM` corrective prelude retained; motion ceiling `SWARM_ABS_MAX_RPM` **15**.  
  
  
 **Protocol:** version **1** (additive fields for autonomous playback)  

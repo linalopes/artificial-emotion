@@ -1,0 +1,242 @@
+[
+  {
+    "at": "2026-11-16T08:19:51.295Z",
+    "kind": "info",
+    "nodeId": null,
+    "runId": null,
+    "message": "goToStart Wave",
+    "detail": {
+      "score": "Wave",
+      "fingerprint": "4eef727e"
+    }
+  },
+  {
+    "at": "2026-11-16T08:20:16.987Z",
+    "kind": "run_start",
+    "nodeId": null,
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Wave armed",
+    "detail": {
+      "score": "Wave",
+      "durationMs": 240000,
+      "startAtMs": 410318.965875,
+      "expectedEndAtMs": 43610318.965875,
+      "autonomous": true,
+      "autonomousLoop": true,
+      "continuous": true,
+      "maxLoops": null,
+      "maxRuntimeMs": null,
+      "pass": 1
+    }
+  },
+  {
+    "at": "2026-11-16T08:20:16.987Z",
+    "kind": "run_expected_end",
+    "nodeId": null,
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Expected completion window ends at +43204000ms from start (incl. grace)",
+    "detail": {
+      "expectedMs": 43200000,
+      "graceMs": 4000,
+      "expectedEndAtMs": 43610318.965875
+    }
+  },
+  {
+    "at": "2026-11-16T08:20:19.377Z",
+    "kind": "run_phase",
+    "nodeId": null,
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Wave phase \u2192 running",
+    "detail": {
+      "startAtMs": 410318.965875
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:20.685Z",
+    "kind": "fault",
+    "nodeId": "Mau03",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau03 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:21.323Z",
+    "kind": "fault",
+    "nodeId": "Mau01",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau01 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:21.351Z",
+    "kind": "fault",
+    "nodeId": "Mau04",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau04 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:21.448Z",
+    "kind": "fault",
+    "nodeId": "Mau02",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau02 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:21.511Z",
+    "kind": "fault",
+    "nodeId": "Mau09",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau09 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:21.584Z",
+    "kind": "fault",
+    "nodeId": "Mau07",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau07 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:21.852Z",
+    "kind": "fault",
+    "nodeId": "Mau05",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau05 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:22:21.873Z",
+    "kind": "fault",
+    "nodeId": "Mau08",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau08 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:26:26.189Z",
+    "kind": "disconnect",
+    "nodeId": "Mau06",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau06 disconnected",
+    "detail": {
+      "phase": "running",
+      "autonomous": true,
+      "autonomousStarted": true
+    }
+  },
+  {
+    "at": "2026-11-16T13:26:26.307Z",
+    "kind": "reconnect_reconcile",
+    "nodeId": "Mau06",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau06 connected (fw 0.3.5)",
+    "detail": {
+      "simulated": false,
+      "wasInRun": true,
+      "phase": "running"
+    }
+  },
+  {
+    "at": "2026-11-16T13:26:26.307Z",
+    "kind": "reconnect_reconcile",
+    "nodeId": "Mau06",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau06 status after reconnect",
+    "detail": {
+      "runId": "62e07807a5cb43c5a7b87092a6eda92",
+      "loopIndex": 74,
+      "completedPasses": 74,
+      "positionValid": false,
+      "autonomous": false,
+      "fault": "track_infeasible",
+      "moving": false,
+      "homed": false
+    }
+  },
+  {
+    "at": "2026-11-16T13:26:26.307Z",
+    "kind": "fault",
+    "nodeId": "Mau06",
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Mau06 firmware FAULT track_infeasible",
+    "detail": {
+      "fault": "track_infeasible",
+      "phase": "running",
+      "positionValid": false,
+      "loopIndex": 74,
+      "completedPasses": 74
+    }
+  },
+  {
+    "at": "2026-11-16T13:26:26.351Z",
+    "kind": "run_complete",
+    "nodeId": null,
+    "runId": "62e07807a5cb43c5a7b87092a6eda92",
+    "message": "Wave finished",
+    "detail": {
+      "perNode": {
+        "Mau06": "faulted",
+        "Mau01": "faulted",
+        "Mau07": "faulted",
+        "Mau04": "faulted",
+        "Mau09": "faulted",
+        "Mau08": "faulted",
+        "Mau02": "faulted",
+        "Mau03": "faulted",
+        "Mau05": "faulted"
+      },
+      "anyFault": true
+    }
+  }
+]

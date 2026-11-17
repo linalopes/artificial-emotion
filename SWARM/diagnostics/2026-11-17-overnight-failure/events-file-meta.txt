@@ -1,0 +1,2 @@
+size=209226 mtime=2026-11-17T03:35:44Z
+     986 /Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/coordinator/data/coordinator-events.jsonl

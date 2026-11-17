@@ -65,6 +65,22 @@ class TrackPlayer {
     return count_ >= 2 && trackLoopCompatible(frames_[0].zMm, frames_[count_ - 1].zMm);
   }
 
+  /** Last loop-boundary / segment-completion diagnostic (bounded; for status telemetry). */
+  struct BoundaryDiag {
+    bool valid = false;
+    uint32_t seq = 0;
+    uint32_t passIndex = 0;
+    int32_t expectedSteps = 0;
+    int32_t actualSteps = 0;
+    int32_t deltaSteps = 0;
+    float deltaMm = 0;
+    int32_t tolSteps = 0;
+    LoopBoundaryAction action = LoopBoundaryAction::AtStart;
+    /** "reached" | "incomplete_resumed" | "incomplete_fault" | "" */
+    char segmentResult[24] = "";
+  };
+  const BoundaryDiag& boundaryDiag() const { return boundaryDiag_; }
+
  private:
   MotionPlanner* planner_ = nullptr;
   PositionModel* position_ = nullptr;
@@ -83,12 +99,17 @@ class TrackPlayer {
   bool started_ = false;
   uint32_t passIndex_ = 0;
   uint32_t completedPasses_ = 0;
+  int32_t activeTargetSteps_ = 0;
+  BoundaryDiag boundaryDiag_{};
 
   bool validateFeasibility(String* error) const;
   bool beginSegment(size_t fromIndex, String* error);
   uint32_t elapsedEpochMs(uint32_t nowMs) const;
   bool runtimeExpired(uint32_t nowMs) const;
   void finishPass(uint32_t nowMs);
+  void recordBoundary(LoopBoundaryAction action, int32_t expected, int32_t actual, int32_t tol);
+  void recordSegmentResult(const char* result);
+  bool resumeActiveTarget(String* error);
 };
 
 }  // namespace swarm

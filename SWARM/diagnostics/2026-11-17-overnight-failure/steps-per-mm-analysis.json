@@ -1,0 +1,13 @@
+{
+  "firmwareDefaultSpoolDiameterMm": 15.0,
+  "firmwareDefaultStepsPerOutputRev": 4096,
+  "firmwareDefaultCalibrationFactor": 1.0,
+  "derivedStepsPerMm": 86.91981958725378,
+  "SWARM_v1_docEstimate": 86.92,
+  "FIX_0_3_6_reportUsed": 43.46,
+  "FIX_0_3_6_reportImpliesSpoolMm": 29.99993773144976,
+  "loopClosureMm": 1.0,
+  "toleranceStepsAtDefaultSpm": 87,
+  "physicalToleranceMm": 1.0,
+  "note": "Runtime uses config_->stepsPerMm() from NVS geometry; mm gate is 1mm regardless. 43.46 was an incorrect illustrative half-geometry in the 0.3.6 report/tests, not a looser/tighter mm policy."
+}

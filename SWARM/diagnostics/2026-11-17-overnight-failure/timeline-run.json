@@ -1,0 +1,68 @@
+{
+  "runId": "799d3539875246879e711fc190257aa",
+  "score": {
+    "name": "Wave",
+    "fingerprint": "4eef727e",
+    "durationMs": 240000
+  },
+  "firmware": "0.3.6",
+  "armedUtc": "2026-11-16T15:01:19.107Z",
+  "runningUtc": "2026-11-16T15:01:21.594Z",
+  "firstFaultUtc": "2026-11-16T22:08:00.463Z",
+  "firstFaultZurich": "2026-11-16 23:08:00 CET",
+  "firstModule": "Mau06",
+  "firstFault": "track_infeasible",
+  "loopIndex": 103,
+  "completedPasses": 103,
+  "cascade": [
+    [
+      "Mau06",
+      "2026-11-16T22:08:00.463Z"
+    ],
+    [
+      "Mau09",
+      "2026-11-16T22:08:00.990Z"
+    ],
+    [
+      "Mau05",
+      "2026-11-16T22:08:01.043Z"
+    ],
+    [
+      "Mau07",
+      "2026-11-16T22:08:01.048Z"
+    ],
+    [
+      "Mau04",
+      "2026-11-16T22:08:01.091Z"
+    ],
+    [
+      "Mau03",
+      "2026-11-16T22:08:01.193Z"
+    ],
+    [
+      "Mau08",
+      "2026-11-16T22:08:01.390Z"
+    ],
+    [
+      "Mau02",
+      "2026-11-16T22:08:01.474Z"
+    ],
+    [
+      "Mau01",
+      "2026-11-16T22:17:36.049Z"
+    ]
+  ],
+  "runCompleteUtc": "2026-11-16T22:17:36.074Z",
+  "wallRuntimeToFirstFault": "7h 06m 38s",
+  "wallRuntimeSeconds": 25598.869,
+  "scoreTimeAtBoundarySeconds": 24720,
+  "scoreTimeHms": "6h 52m 00s",
+  "uiObservationLikelyUtc": "2026-11-17T02:35:39.764Z",
+  "uiObservationZurich": "2026-11-17 03:35:39 CET",
+  "defaultStepsPerMm": 86.91981958725378,
+  "loopClosureTolStepsAtDefault": 87,
+  "coordinatorPid": 88036,
+  "coordinatorStartedLocal": "2026-11-16 09:13:29",
+  "cancelStop": false,
+  "fleetFailRun": false
+}

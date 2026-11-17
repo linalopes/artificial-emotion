@@ -1,0 +1,85 @@
+126:[coord] [2026-11-16T08:20:16.986Z] INFO Wave armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.
+168:[coord] [2026-11-16T13:22:20.685Z] ERROR Mau03 reports fault track_infeasible.
+169:[coord] [2026-11-16T13:22:20.685Z] ERROR Mau03 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+170:[coord] [2026-11-16T13:22:21.323Z] ERROR Mau01 reports fault track_infeasible.
+171:[coord] [2026-11-16T13:22:21.323Z] ERROR Mau01 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+172:[coord] [2026-11-16T13:22:21.351Z] ERROR Mau04 reports fault track_infeasible.
+173:[coord] [2026-11-16T13:22:21.351Z] ERROR Mau04 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+174:[coord] [2026-11-16T13:22:21.448Z] ERROR Mau02 reports fault track_infeasible.
+175:[coord] [2026-11-16T13:22:21.448Z] ERROR Mau02 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+176:[coord] [2026-11-16T13:22:21.511Z] ERROR Mau09 reports fault track_infeasible.
+177:[coord] [2026-11-16T13:22:21.512Z] ERROR Mau09 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+178:[coord] [2026-11-16T13:22:21.584Z] ERROR Mau07 reports fault track_infeasible.
+179:[coord] [2026-11-16T13:22:21.584Z] ERROR Mau07 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+180:[coord] [2026-11-16T13:22:21.852Z] ERROR Mau05 reports fault track_infeasible.
+181:[coord] [2026-11-16T13:22:21.852Z] ERROR Mau05 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+182:[coord] [2026-11-16T13:22:21.873Z] ERROR Mau08 reports fault track_infeasible.
+183:[coord] [2026-11-16T13:22:21.873Z] ERROR Mau08 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+192:[coord] [2026-11-16T13:26:26.307Z] ERROR Mau06 reports fault track_infeasible.
+193:[coord] [2026-11-16T13:26:26.307Z] ERROR Mau06 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+233:[coord] [2026-11-16T14:40:51.709Z] INFO Mau01 connected, firmware 0.3.6.
+244:[coord] [2026-11-16T14:41:02.499Z] INFO Mau02 connected, firmware 0.3.6.
+251:[coord] [2026-11-16T14:41:14.562Z] INFO Mau03 connected, firmware 0.3.6.
+281:[coord] [2026-11-16T14:41:29.428Z] INFO Mau04 connected, firmware 0.3.6.
+333:[coord] [2026-11-16T14:41:41.054Z] INFO Mau05 connected, firmware 0.3.6.
+341:[coord] [2026-11-16T14:41:50.738Z] INFO Mau06 connected, firmware 0.3.6.
+356:[coord] [2026-11-16T14:42:01.665Z] INFO Mau07 connected, firmware 0.3.6.
+364:[coord] [2026-11-16T14:42:12.425Z] INFO Mau08 connected, firmware 0.3.6.
+373:[coord] [2026-11-16T14:42:23.946Z] INFO Mau09 connected, firmware 0.3.6.
+388:[coord] [2026-11-16T15:01:19.107Z] INFO Wave armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.
+511:[coord] [2026-11-16T22:08:00.463Z] ERROR Mau06 reports fault track_infeasible.
+512:[coord] [2026-11-16T22:08:00.463Z] ERROR Mau06 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+513:[coord] [2026-11-16T22:08:00.990Z] ERROR Mau09 reports fault track_infeasible.
+514:[coord] [2026-11-16T22:08:00.990Z] ERROR Mau09 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+515:[coord] [2026-11-16T22:08:01.043Z] ERROR Mau05 reports fault track_infeasible.
+516:[coord] [2026-11-16T22:08:01.043Z] ERROR Mau05 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+517:[coord] [2026-11-16T22:08:01.048Z] ERROR Mau07 reports fault track_infeasible.
+518:[coord] [2026-11-16T22:08:01.048Z] ERROR Mau07 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+519:[coord] [2026-11-16T22:08:01.091Z] ERROR Mau04 reports fault track_infeasible.
+520:[coord] [2026-11-16T22:08:01.091Z] ERROR Mau04 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+521:[coord] [2026-11-16T22:08:01.193Z] ERROR Mau03 reports fault track_infeasible.
+522:[coord] [2026-11-16T22:08:01.193Z] ERROR Mau03 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+523:[coord] [2026-11-16T22:08:01.390Z] ERROR Mau08 reports fault track_infeasible.
+524:[coord] [2026-11-16T22:08:01.390Z] ERROR Mau08 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+525:[coord] [2026-11-16T22:08:01.474Z] ERROR Mau02 reports fault track_infeasible.
+526:[coord] [2026-11-16T22:08:01.474Z] ERROR Mau02 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+528:[coord] [2026-11-16T22:17:00.260Z] WARN Mau09 clock sync timed out (seq 7160).
+529:[coord] [2026-11-16T22:17:36.049Z] ERROR Mau01 reports fault track_infeasible.
+530:[coord] [2026-11-16T22:17:36.049Z] ERROR Mau01 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+531:[coord] [2026-11-16T22:17:36.073Z] INFO Wave finished on Mac (some modules faulted/aborted locally; fleet was not cancelled).
+547:[coord] [2026-11-16T22:34:21.347Z] INFO Mau05 connected, firmware 0.3.6.
+598:[coord] [2026-11-17T01:13:22.634Z] INFO Mau03 connected, firmware 0.3.6.
+600:[coord] [2026-11-17T01:13:23.037Z] INFO Mau01 connected, firmware 0.3.6.
+601:[coord] [2026-11-17T01:13:23.049Z] INFO Mau07 connected, firmware 0.3.6.
+602:[coord] [2026-11-17T01:13:23.060Z] INFO Mau04 connected, firmware 0.3.6.
+609:[coord] [2026-11-17T01:13:23.322Z] INFO Mau08 connected, firmware 0.3.6.
+628:[coord] [2026-11-17T01:13:23.916Z] INFO Mau05 connected, firmware 0.3.6.
+631:[coord] [2026-11-17T01:13:24.586Z] INFO Mau06 connected, firmware 0.3.6.
+634:[coord] [2026-11-17T01:13:26.016Z] INFO Mau09 connected, firmware 0.3.6.
+662:[coord] [2026-11-17T02:35:39.764Z] INFO Mau07 connected, firmware 0.3.6.
+679:[coord] [2026-11-17T02:35:40.274Z] INFO Mau06 connected, firmware 0.3.6.
+688:[coord] [2026-11-17T02:35:40.429Z] INFO Mau01 connected, firmware 0.3.6.
+707:[coord] [2026-11-17T02:35:40.718Z] INFO Mau09 connected, firmware 0.3.6.
+735:[coord] [2026-11-17T02:35:41.237Z] INFO Mau02 connected, firmware 0.3.6.
+786:[coord] [2026-11-17T02:35:41.961Z] INFO Mau03 connected, firmware 0.3.6.
+816:[coord] [2026-11-17T02:35:42.392Z] INFO Mau04 connected, firmware 0.3.6.
+853:[coord] [2026-11-17T02:35:43.195Z] INFO Mau05 connected, firmware 0.3.6.
+897:[coord] [2026-11-17T02:35:44.793Z] INFO Mau08 connected, firmware 0.3.6.
+927:[coord] [2026-11-17T04:15:33.973Z] INFO Mau09 connected, firmware 0.3.6.
+930:[coord] [2026-11-17T04:15:34.018Z] INFO Mau04 connected, firmware 0.3.6.
+962:[coord] [2026-11-17T04:15:34.536Z] INFO Mau07 connected, firmware 0.3.6.
+971:[coord] [2026-11-17T04:15:34.621Z] INFO Mau05 connected, firmware 0.3.6.
+1028:[coord] [2026-11-17T04:15:35.272Z] INFO Mau08 connected, firmware 0.3.6.
+1045:[coord] [2026-11-17T04:15:35.501Z] INFO Mau06 connected, firmware 0.3.6.
+1075:[coord] [2026-11-17T04:15:36.037Z] INFO Mau01 connected, firmware 0.3.6.
+1088:[coord] [2026-11-17T04:15:36.446Z] INFO Mau02 connected, firmware 0.3.6.
+1097:[coord] [2026-11-17T04:29:08.862Z] INFO Mau04 connected, firmware 0.3.6.
+1160:[coord] [2026-11-17T08:18:58.003Z] INFO Mau01 connected, firmware 0.3.6.
+1173:[coord] [2026-11-17T08:18:58.450Z] INFO Mau02 connected, firmware 0.3.6.
+1197:[coord] [2026-11-17T08:18:59.075Z] INFO Mau03 connected, firmware 0.3.6.
+1198:[coord] [2026-11-17T08:18:59.075Z] INFO Mau09 connected, firmware 0.3.6.
+1201:[coord] [2026-11-17T08:18:59.085Z] INFO Mau05 connected, firmware 0.3.6.
+1281:[coord] [2026-11-17T08:19:00.248Z] INFO Mau06 connected, firmware 0.3.6.
+1326:[coord] [2026-11-17T08:19:01.021Z] INFO Mau07 connected, firmware 0.3.6.
+1354:[coord] [2026-11-17T08:19:01.841Z] INFO Mau08 connected, firmware 0.3.6.
+1411:[coord] [2026-11-17T08:19:04.246Z] INFO Mau04 connected, firmware 0.3.6.

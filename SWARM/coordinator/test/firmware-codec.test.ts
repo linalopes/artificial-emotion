@@ -243,6 +243,42 @@ describe('firmware codec', () => {
     expect(real.positionMm).toBeNull();
   });
 
+  it('maps loop_boundary diagnostic from status without inventing fields', () => {
+    const t = telemetryFromStatus({
+      state: 'READY',
+      fault: 'none',
+      position_valid: true,
+      z_mm_est: 250,
+      loop_index: 103,
+      completed_passes: 103,
+      loop_boundary: {
+        seq: 7,
+        loop_index: 103,
+        run_id: '799d3539875246879e711fc190257aa',
+        expected_steps: 21730,
+        actual_steps: 21733,
+        delta_steps: 3,
+        delta_mm: 0.0345,
+        tol_steps: 87,
+        action: 'CORRECT',
+        segment_result: 'incomplete_resumed'
+      }
+    });
+    expect(t.loopBoundary).toEqual({
+      seq: 7,
+      loopIndex: 103,
+      runId: '799d3539875246879e711fc190257aa',
+      expectedSteps: 21730,
+      actualSteps: 21733,
+      deltaSteps: 3,
+      deltaMm: 0.0345,
+      tolSteps: 87,
+      action: 'CORRECT',
+      segmentResult: 'incomplete_resumed'
+    });
+    expect(telemetryFromStatus({ state: 'READY', fault: 'none', position_valid: true }).loopBoundary).toBeNull();
+  });
+
   it('keeps default generator tracks within firmware keyframe and message limits', () => {
     const score = generateWave(DEFAULT_PARAMS.wave);
     const runId = newFirmwareRunId();

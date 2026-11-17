@@ -1,0 +1,41 @@
+126:[coord] [2026-11-16T08:20:16.986Z] INFO Wave armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.
+168:[coord] [2026-11-16T13:22:20.685Z] ERROR Mau03 reports fault track_infeasible.
+169:[coord] [2026-11-16T13:22:20.685Z] ERROR Mau03 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+170:[coord] [2026-11-16T13:22:21.323Z] ERROR Mau01 reports fault track_infeasible.
+171:[coord] [2026-11-16T13:22:21.323Z] ERROR Mau01 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+172:[coord] [2026-11-16T13:22:21.351Z] ERROR Mau04 reports fault track_infeasible.
+173:[coord] [2026-11-16T13:22:21.351Z] ERROR Mau04 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+174:[coord] [2026-11-16T13:22:21.448Z] ERROR Mau02 reports fault track_infeasible.
+175:[coord] [2026-11-16T13:22:21.448Z] ERROR Mau02 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+176:[coord] [2026-11-16T13:22:21.511Z] ERROR Mau09 reports fault track_infeasible.
+177:[coord] [2026-11-16T13:22:21.512Z] ERROR Mau09 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+178:[coord] [2026-11-16T13:22:21.584Z] ERROR Mau07 reports fault track_infeasible.
+179:[coord] [2026-11-16T13:22:21.584Z] ERROR Mau07 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+180:[coord] [2026-11-16T13:22:21.852Z] ERROR Mau05 reports fault track_infeasible.
+181:[coord] [2026-11-16T13:22:21.852Z] ERROR Mau05 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+182:[coord] [2026-11-16T13:22:21.873Z] ERROR Mau08 reports fault track_infeasible.
+183:[coord] [2026-11-16T13:22:21.873Z] ERROR Mau08 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+192:[coord] [2026-11-16T13:26:26.307Z] ERROR Mau06 reports fault track_infeasible.
+193:[coord] [2026-11-16T13:26:26.307Z] ERROR Mau06 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+194:[coord] [2026-11-16T13:26:26.351Z] INFO Wave finished on Mac (some modules faulted/aborted locally; fleet was not cancelled).
+388:[coord] [2026-11-16T15:01:19.107Z] INFO Wave armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.
+511:[coord] [2026-11-16T22:08:00.463Z] ERROR Mau06 reports fault track_infeasible.
+512:[coord] [2026-11-16T22:08:00.463Z] ERROR Mau06 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+513:[coord] [2026-11-16T22:08:00.990Z] ERROR Mau09 reports fault track_infeasible.
+514:[coord] [2026-11-16T22:08:00.990Z] ERROR Mau09 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+515:[coord] [2026-11-16T22:08:01.043Z] ERROR Mau05 reports fault track_infeasible.
+516:[coord] [2026-11-16T22:08:01.043Z] ERROR Mau05 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+517:[coord] [2026-11-16T22:08:01.048Z] ERROR Mau07 reports fault track_infeasible.
+518:[coord] [2026-11-16T22:08:01.048Z] ERROR Mau07 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+519:[coord] [2026-11-16T22:08:01.091Z] ERROR Mau04 reports fault track_infeasible.
+520:[coord] [2026-11-16T22:08:01.091Z] ERROR Mau04 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+521:[coord] [2026-11-16T22:08:01.193Z] ERROR Mau03 reports fault track_infeasible.
+522:[coord] [2026-11-16T22:08:01.193Z] ERROR Mau03 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+523:[coord] [2026-11-16T22:08:01.390Z] ERROR Mau08 reports fault track_infeasible.
+524:[coord] [2026-11-16T22:08:01.390Z] ERROR Mau08 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+525:[coord] [2026-11-16T22:08:01.474Z] ERROR Mau02 reports fault track_infeasible.
+526:[coord] [2026-11-16T22:08:01.474Z] ERROR Mau02 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+528:[coord] [2026-11-16T22:17:00.260Z] WARN Mau09 clock sync timed out (seq 7160).
+529:[coord] [2026-11-16T22:17:36.049Z] ERROR Mau01 reports fault track_infeasible.
+530:[coord] [2026-11-16T22:17:36.049Z] ERROR Mau01 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+531:[coord] [2026-11-16T22:17:36.073Z] INFO Wave finished on Mac (some modules faulted/aborted locally; fleet was not cancelled).

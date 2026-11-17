@@ -64,7 +64,24 @@ export function telemetryFromStatus(payload: Record<string, unknown>): Telemetry
     loopIndex: num(payload.loop_index),
     completedPasses: num(payload.completed_passes),
     positionValid,
-    autonomous: typeof payload.autonomous === 'boolean' ? payload.autonomous : null
+    autonomous: typeof payload.autonomous === 'boolean' ? payload.autonomous : null,
+    loopBoundary: (() => {
+      const raw = payload.loop_boundary;
+      if (!raw || typeof raw !== 'object') return null;
+      const lb = raw as Record<string, unknown>;
+      return {
+        seq: num(lb.seq),
+        loopIndex: num(lb.loop_index),
+        runId: str(lb.run_id),
+        expectedSteps: num(lb.expected_steps),
+        actualSteps: num(lb.actual_steps),
+        deltaSteps: num(lb.delta_steps),
+        deltaMm: num(lb.delta_mm),
+        tolSteps: num(lb.tol_steps),
+        action: str(lb.action),
+        segmentResult: str(lb.segment_result)
+      };
+    })()
   };
 }
 

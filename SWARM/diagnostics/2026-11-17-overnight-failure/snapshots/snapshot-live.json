@@ -1,0 +1,507 @@
+{
+  "type": "snapshot",
+  "snapshot": {
+    "fleet": "hardware",
+    "serverTimeMs": 86759777.709375,
+    "wallTimeMs": 1794903568485,
+    "nodes": [
+      {
+        "id": "Mau01",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -73,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841224925,
+        "travelSinceHomeMm": 98161.41009999895,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23243396.480166662,
+          "rttMs": 64.88799999654293,
+          "uncertaintyMs": 32.443999998271465,
+          "ageMs": 3323.682667002082
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903568183
+      },
+      {
+        "id": "Mau02",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -66,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841224642,
+        "travelSinceHomeMm": 98132.11269999885,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23254395.072166666,
+          "rttMs": 54.599999994039536,
+          "uncertaintyMs": 27.299999997019768,
+          "ageMs": 2980.6499169915915
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903567515
+      },
+      {
+        "id": "Mau03",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -64,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841225054,
+        "travelSinceHomeMm": 97910.50679999952,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23266436.849666666,
+          "rttMs": 27.344999998807907,
+          "uncertaintyMs": 13.672499999403954,
+          "ageMs": 2504.6770830005407
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903567993
+      },
+      {
+        "id": "Mau04",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -55,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841221901,
+        "travelSinceHomeMm": 98129.4205999989,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23280364.615,
+          "rttMs": 43.5730000063777,
+          "uncertaintyMs": 21.78650000318885,
+          "ageMs": 2142.223291993141
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903568363
+      },
+      {
+        "id": "Mau05",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -55,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841222895,
+        "travelSinceHomeMm": 97891.12099999892,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23291103.067833334,
+          "rttMs": 50.85700000822544,
+          "uncertaintyMs": 25.42850000411272,
+          "ageMs": 1734.164958000183
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903567766
+      },
+      {
+        "id": "Mau06",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -55,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841229889,
+        "travelSinceHomeMm": 98011.56259999954,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23302485.355499998,
+          "rttMs": 31.596000008285046,
+          "uncertaintyMs": 15.798000004142523,
+          "ageMs": 1374.8928750008345
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903568123
+      },
+      {
+        "id": "Mau07",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -62,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841223124,
+        "travelSinceHomeMm": 97905.66279999942,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23313488.781666666,
+          "rttMs": 62.89799998700619,
+          "uncertaintyMs": 31.448999993503094,
+          "ageMs": 866.3819579929113
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903567631
+      },
+      {
+        "id": "Mau08",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -68,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841230688,
+        "travelSinceHomeMm": 98016.19909999993,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23324054.931833338,
+          "rttMs": 70.23100001364946,
+          "uncertaintyMs": 35.11550000682473,
+          "ageMs": 554.272666990757
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903567942
+      },
+      {
+        "id": "Mau09",
+        "connected": true,
+        "simulated": false,
+        "fwVersion": "0.3.6",
+        "homed": false,
+        "homing": false,
+        "moving": false,
+        "faultCode": "track_infeasible",
+        "positionMm": null,
+        "targetMm": null,
+        "endstop": true,
+        "rssiDbm": -54,
+        "rpm": 15,
+        "accelMmS2": null,
+        "limitMinMm": 0,
+        "limitMaxMm": 500,
+        "lastHomedAtMs": 1794841230117,
+        "travelSinceHomeMm": 98012.25299999873,
+        "clock": {
+          "synced": true,
+          "offsetMs": -23335836.2095,
+          "rttMs": 54.37200000137091,
+          "uncertaintyMs": 27.186000000685453,
+          "ageMs": 94.90845800936222
+        },
+        "clockSyncedFromNode": true,
+        "lastTelemetryAtMs": 1794903568406
+      }
+    ],
+    "stop": {
+      "engaged": false,
+      "atMs": null
+    },
+    "run": {
+      "phase": "finished",
+      "runId": "799d3539875246879e711fc190257aa",
+      "scoreName": "Wave",
+      "scoreFingerprint": "4eef727e",
+      "durationMs": 240000,
+      "startAtMs": 24472604.919708,
+      "repeat": false,
+      "autonomous": true,
+      "autonomousLoop": true,
+      "pass": 1,
+      "error": null,
+      "perNode": {
+        "Mau07": "faulted",
+        "Mau05": "faulted",
+        "Mau03": "faulted",
+        "Mau08": "faulted",
+        "Mau02": "faulted",
+        "Mau01": "faulted",
+        "Mau04": "faulted",
+        "Mau06": "faulted",
+        "Mau09": "faulted"
+      }
+    },
+    "operatorClientId": "069f8fb6-aa6f-4dcc-a757-8203afc44141",
+    "clients": 2,
+    "you": {
+      "clientId": "7ba61896-69e0-425a-a8fc-38b5b5e31fd3",
+      "isOperator": false
+    },
+    "log": [
+      {
+        "atMs": 1794903542603,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542648,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542693,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542745,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542807,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542857,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542905,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542949,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903542997,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543042,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543079,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543124,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543166,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543215,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543258,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543298,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543346,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543386,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543432,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543482,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543523,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543568,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543611,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543649,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543690,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543729,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543774,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543820,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543868,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543906,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543945,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903543984,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903544027,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903544071,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903544111,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903544153,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903544197,
+        "level": "error",
+        "message": "Duplicate identity: a second device claimed Mau04 and was rejected. Check commissioning."
+      },
+      {
+        "atMs": 1794903544206,
+        "level": "warn",
+        "message": "Mau04 disconnected."
+      },
+      {
+        "atMs": 1794903544246,
+        "level": "info",
+        "message": "Mau04 connected, firmware 0.3.6."
+      },
+      {
+        "atMs": 1794903544635,
+        "level": "info",
+        "message": "Mau04 clock gate set to \u00b150 ms."
+      }
+    ]
+  }
+}

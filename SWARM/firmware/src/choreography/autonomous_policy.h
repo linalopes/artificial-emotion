@@ -85,6 +85,82 @@ inline bool trackLoopCompatible(float firstZMm, float lastZMm, float toleranceMm
   return fabsf(firstZMm - lastZMm) <= toleranceMm;
 }
 
+/**
+ * Steps allowed at a loop boundary before FAULT, derived from SWARM_LOOP_CLOSURE_MM
+ * (same mechanical closure used for track_not_loop_compatible). Never invents a looser gate.
+ */
+inline int32_t loopClosureToleranceSteps(float stepsPerMm,
+                                         float closureMm = SWARM_LOOP_CLOSURE_MM) {
+  if (!(stepsPerMm > 0.0f) || !(closureMm > 0.0f)) {
+    return 1;
+  }
+  const float raw = closureMm * stepsPerMm;
+  int32_t steps = static_cast<int32_t>(raw + 0.999999f);  // ceil without <cmath> dependency here
+  if (steps < 1) {
+    steps = 1;
+  }
+  return steps;
+}
+
+enum class LoopBoundaryAction : uint8_t {
+  AtStart = 0,
+  /** Residual within LOOP_CLOSURE_MM — physical prelude to first keyframe (no model snap). */
+  CorrectivePrelude = 1,
+  Fault = 2,
+};
+
+/** Wire / telemetry labels for loop-boundary decisions (status payload). */
+inline const char* loopBoundaryActionLabel(LoopBoundaryAction a) {
+  switch (a) {
+    case LoopBoundaryAction::AtStart:
+      return "CONTINUE";
+    case LoopBoundaryAction::CorrectivePrelude:
+      return "CORRECT";
+    case LoopBoundaryAction::Fault:
+    default:
+      return "FAULT";
+  }
+}
+
+/**
+ * Decide loop-restart behaviour when passIndex > 0.
+ * actualSteps is the planner position model; firstSteps is mmToSteps(frames[0].zMm).
+ */
+inline LoopBoundaryAction decideLoopBoundary(int32_t actualSteps, int32_t firstSteps,
+                                             int32_t toleranceSteps) {
+  int32_t d = actualSteps - firstSteps;
+  if (d < 0) {
+    d = -d;
+  }
+  if (d == 0) {
+    return LoopBoundaryAction::AtStart;
+  }
+  if (toleranceSteps > 0 && d <= toleranceSteps) {
+    return LoopBoundaryAction::CorrectivePrelude;
+  }
+  return LoopBoundaryAction::Fault;
+}
+
+/**
+ * When a segment planner becomes idle: only Advance if the move actually reached its target.
+ * IncompleteStop / controlled-stop-without-arrival must ResumeTarget — never treat as complete.
+ */
+enum class SegmentIdleAction : uint8_t {
+  Advance = 0,
+  ResumeTarget = 1,
+};
+
+inline SegmentIdleAction decideSegmentIdleAction(bool targetReached) {
+  return targetReached ? SegmentIdleAction::Advance : SegmentIdleAction::ResumeTarget;
+}
+
+inline const char* segmentCompletionLabel(SegmentIdleAction a, bool resumeFailed) {
+  if (a == SegmentIdleAction::Advance) {
+    return "reached";
+  }
+  return resumeFailed ? "incomplete_fault" : "incomplete_resumed";
+}
+
 /** Elapsed time on the shared epoch for pass `passIndex` (0-based) at keyframe local time. */
 inline uint32_t epochOffsetMs(uint32_t passIndex, uint32_t trackDurationMs, uint32_t keyframeTimeMs) {
   return passIndex * trackDurationMs + keyframeTimeMs;

@@ -19,6 +19,38 @@ void TrackPlayer::begin(MotionPlanner* planner, PositionModel* position, ConfigS
   passIndex_ = 0;
   completedPasses_ = 0;
   disconnectPendingStop_ = false;
+  activeTargetSteps_ = 0;
+  boundaryDiag_ = BoundaryDiag{};
+}
+
+void TrackPlayer::recordBoundary(LoopBoundaryAction action, int32_t expected, int32_t actual,
+                                 int32_t tol) {
+  boundaryDiag_.valid = true;
+  boundaryDiag_.seq++;
+  boundaryDiag_.passIndex = passIndex_;
+  boundaryDiag_.expectedSteps = expected;
+  boundaryDiag_.actualSteps = actual;
+  boundaryDiag_.deltaSteps = actual - expected;
+  const float spm = config_->stepsPerMm();
+  boundaryDiag_.deltaMm = (spm > 0.0f) ? (static_cast<float>(boundaryDiag_.deltaSteps) / spm) : 0.0f;
+  boundaryDiag_.tolSteps = tol;
+  boundaryDiag_.action = action;
+}
+
+void TrackPlayer::recordSegmentResult(const char* result) {
+  if (!result) {
+    boundaryDiag_.segmentResult[0] = '\0';
+    return;
+  }
+  strncpy(boundaryDiag_.segmentResult, result, sizeof(boundaryDiag_.segmentResult) - 1);
+  boundaryDiag_.segmentResult[sizeof(boundaryDiag_.segmentResult) - 1] = '\0';
+  boundaryDiag_.valid = true;
+  boundaryDiag_.seq++;
+}
+
+bool TrackPlayer::resumeActiveTarget(String* error) {
+  return planner_->moveToSteps(activeTargetSteps_, config_->get().speedRpm,
+                               config_->get().accelerationMmS2, error);
 }
 
 bool TrackPlayer::validateFeasibility(String* error) const {
@@ -94,6 +126,8 @@ bool TrackPlayer::load(const char* presetId, uint32_t revision, const TrackKeyfr
   passIndex_ = 0;
   completedPasses_ = 0;
   disconnectPendingStop_ = false;
+  activeTargetSteps_ = 0;
+  boundaryDiag_ = BoundaryDiag{};
   SWARM_LOG("Track loaded preset=%s rev=%lu frames=%u", presetId_,
             static_cast<unsigned long>(revision_), static_cast<unsigned>(count_));
   return true;
@@ -148,6 +182,8 @@ bool TrackPlayer::startAt(uint32_t startAtMillisLocal, const AutonomousPolicy& p
   completedPasses_ = 0;
   started_ = false;  // becomes true when local start time is reached
   disconnectPendingStop_ = false;
+  activeTargetSteps_ = 0;
+  boundaryDiag_ = BoundaryDiag{};
   SWARM_LOG("Track start_at local_ms=%lu autonomous=%d loop=%d",
             static_cast<unsigned long>(startAtMillisLocal), policy_.autonomous ? 1 : 0,
             policy_.loop ? 1 : 0);
@@ -203,6 +239,7 @@ bool TrackPlayer::beginSegment(size_t fromIndex, String* error) {
     return false;
   }
   index_ = fromIndex;
+  activeTargetSteps_ = targetSteps;
   phase_ = TrackPhase::SegmentActive;
   state_->setMoving();
   return true;
@@ -253,28 +290,56 @@ void TrackPlayer::service() {
 
     String err;
     const int32_t first = config_->mmToSteps(frames_[0].zMm);
-    // First pass (and only when not already at start): prelude move. Loop restarts skip jump.
-    if (position_->steps() != first) {
+    const int32_t actual = position_->steps();
+    const int32_t tol = loopClosureToleranceSteps(config_->stepsPerMm());
+    const int32_t delta = actual - first;
+    const LoopBoundaryAction boundary =
+        (passIndex_ == 0)
+            ? ((actual == first) ? LoopBoundaryAction::AtStart : LoopBoundaryAction::CorrectivePrelude)
+            : decideLoopBoundary(actual, first, tol);
+
+    recordBoundary(boundary, first, actual, tol);
+
+    if (boundary == LoopBoundaryAction::Fault) {
+      // Outside SWARM_LOOP_CLOSURE_MM — refuse silent jump / model snap.
+      recordSegmentResult("");
+      phase_ = TrackPhase::Stopped;
+      state_->enterFault(FaultCode::TrackInfeasible);
+      SWARM_LOG("LoopBoundary FAULT pass=%lu expected=%ld actual=%ld delta=%ld tol=%ld",
+                static_cast<unsigned long>(passIndex_), static_cast<long>(first),
+                static_cast<long>(actual), static_cast<long>(delta), static_cast<long>(tol));
+      return;
+    }
+
+    if (boundary == LoopBoundaryAction::CorrectivePrelude) {
+      // Pass 0: move to start. Later passes: only when residual ≤ loop-closure mm —
+      // physical prelude to first keyframe (planner move), never setSteps snap.
       if (passIndex_ > 0) {
-        // Loop boundary violated mechanically — refuse silent jump.
-        phase_ = TrackPhase::Stopped;
-        state_->enterFault(FaultCode::TrackInfeasible);
-        return;
+        SWARM_LOG("LoopBoundary CORRECT pass=%lu expected=%ld actual=%ld delta=%ld tol=%ld",
+                  static_cast<unsigned long>(passIndex_), static_cast<long>(first),
+                  static_cast<long>(actual), static_cast<long>(delta), static_cast<long>(tol));
       }
       if (!planner_->moveToSteps(first, config_->get().speedRpm, config_->get().accelerationMmS2,
                                  &err)) {
         phase_ = TrackPhase::Stopped;
         state_->enterFault(FaultCode::TrackInfeasible);
+        SWARM_LOG("LoopBoundary prelude failed pass=%lu err=%s",
+                  static_cast<unsigned long>(passIndex_), err.c_str());
         return;
       }
+      activeTargetSteps_ = first;
       state_->setMoving();
       phase_ = TrackPhase::SegmentActive;
       index_ = static_cast<size_t>(-2);
       return;
     }
+
+    // Exactly at first keyframe steps — begin score segment 0.
     if (!beginSegment(0, &err)) {
       phase_ = TrackPhase::Stopped;
       state_->enterFault(FaultCode::TrackInfeasible);
+      SWARM_LOG("LoopBoundary beginSegment0 failed pass=%lu err=%s",
+                static_cast<unsigned long>(passIndex_), err.c_str());
     }
     return;
   }
@@ -291,6 +356,31 @@ void TrackPlayer::service() {
   if (planner_->isBusy()) {
     return;
   }
+
+  // Confirmed defect (0.3.6 overnight @ loop 103): idle was treated as segment-complete
+  // even when IncompleteStop / controlled stop left targetReached_ false. Resume the
+  // absolute target instead of advancing or finishing the pass from the wrong steps.
+  const SegmentIdleAction idleAction = decideSegmentIdleAction(planner_->targetReached());
+  if (idleAction == SegmentIdleAction::ResumeTarget) {
+    String err;
+    planner_->clearStall();
+    if (!resumeActiveTarget(&err)) {
+      recordSegmentResult(segmentCompletionLabel(idleAction, true));
+      phase_ = TrackPhase::Stopped;
+      state_->enterFault(FaultCode::TrackInfeasible);
+      SWARM_LOG("Segment incomplete resume failed pass=%lu target=%ld actual=%ld err=%s",
+                static_cast<unsigned long>(passIndex_), static_cast<long>(activeTargetSteps_),
+                static_cast<long>(position_->steps()), err.c_str());
+      return;
+    }
+    recordSegmentResult(segmentCompletionLabel(idleAction, false));
+    state_->setMoving();
+    SWARM_LOG("Segment incomplete resumed pass=%lu target=%ld actual=%ld",
+              static_cast<unsigned long>(passIndex_), static_cast<long>(activeTargetSteps_),
+              static_cast<long>(position_->steps()));
+    return;
+  }
+  // Target reached — advance. Do not bump telemetry seq on the routine path (bounded traffic).
 
   if (state_->state() == ModuleState::Moving || state_->state() == ModuleState::Stopping) {
     state_->setReady();

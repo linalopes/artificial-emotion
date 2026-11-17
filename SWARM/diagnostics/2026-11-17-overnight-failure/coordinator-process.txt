@@ -1,0 +1,38 @@
+  PID STARTED                       ELAPSED COMMAND
+88036 Mon Nov 16 09:13:29 2026     18:23:47 /usr/local/bin/node --require /Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/node_modules/tsx/dist/preflight.cjs --import file:///Users/linalopes/Documents/Lina's%20PKM/03-INITIATIVES/2026%20Artificial%20Emotion/SWARM/node_modules/tsx/dist/loader.mjs src/main.ts
+COMMAND   PID      USER   FD     TYPE             DEVICE  SIZE/OFF                NODE NAME
+node    88036 linalopes  cwd      DIR               1,15       256           113439429 /Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/coordinator
+node    88036 linalopes  txt      REG               1,15 248392592              880861 /usr/local/bin/node
+node    88036 linalopes  txt      REG               1,15   2289328 1152921500312520966 /usr/lib/dyld
+node    88036 linalopes    0u    unix 0x2b81bb64fed8b486       0t0                     ->0xda53a3ced9136703
+node    88036 linalopes    1u    unix 0x20aa02bf6b00c6e3       0t0                     ->0x161cbeb6f37c583
+node    88036 linalopes    2u    unix 0xc95feef45ba96976       0t0                     ->0xdaeda0c3d0f3482e
+node    88036 linalopes    3u  KQUEUE                                                  count=0, state=0x8
+node    88036 linalopes    4     PIPE 0x79d585c914593a9a     16384                     ->0xe08eef83e7b6f68c
+node    88036 linalopes    5     PIPE 0xe08eef83e7b6f68c     16384                     ->0x79d585c914593a9a
+node    88036 linalopes    6r     CHR                3,2       0t0                 336 /dev/null
+node    88036 linalopes    7u  KQUEUE                                                  count=0, state=0xa
+node    88036 linalopes    8r     CHR                3,2       0t0                 336 /dev/null
+node    88036 linalopes    9u  KQUEUE                                                  count=0, state=0xa
+node    88036 linalopes   10r     CHR                3,2       0t0                 336 /dev/null
+node    88036 linalopes   11r     CHR                3,2       0t0                 336 /dev/null
+node    88036 linalopes   12u    unix 0x1090d0b04057f659       0t0                     ->0xbb38d942d3603f5f
+node    88036 linalopes   13u    unix 0x433a25bfb8024014       0t0                     ->0x3108349317aac259
+node    88036 linalopes   14     PIPE 0x23152ff3063aa6ec     16384                     ->0x357e8337fb160ac5
+node    88036 linalopes   15     PIPE 0x357e8337fb160ac5     16384                     ->0x23152ff3063aa6ec
+node    88036 linalopes   16u  KQUEUE                                                  count=0, state=0xa
+node    88036 linalopes   17r     CHR                3,2       0t0                 336 /dev/null
+node    88036 linalopes   18r     CHR                3,2       0t0                 336 /dev/null
+node    88036 linalopes   19u    unix 0x16da77b1799dd7b5       0t0                     ->0x3b204338d76c96e
+node    88036 linalopes   20u    unix 0x44d18315378f7f88       0t0                     ->0x34fc8b5ac21f6e0
+node    88036 linalopes   21u    IPv4 0x408120f8a966d788       0t0                 TCP *:8787 (LISTEN)
+node    88036 linalopes   22u    IPv4 0x3a919baf063b6eb2       0t0                 TCP 192.168.68.73:8787->192.168.68.82:62316 (ESTABLISHED)
+node    88036 linalopes   23u    IPv4 0x4526d2b387d10b4c       0t0                 TCP 192.168.68.73:8787->192.168.68.70:55848 (ESTABLISHED)
+node    88036 linalopes   24u    IPv4 0x6963ffec6d619327       0t0                 TCP 192.168.68.73:8787->192.168.68.83:58507 (ESTABLISHED)
+node    88036 linalopes   26u    IPv4 0x70b56d197a50e3f5       0t0                 TCP 192.168.68.73:8787->192.168.68.81:51812 (ESTABLISHED)
+node    88036 linalopes   27u    IPv4 0x70f8997af979946f       0t0                 TCP 192.168.68.73:8787->192.168.68.84:54221 (ESTABLISHED)
+node    88036 linalopes   28u    IPv4 0x2f0ed5d30a3c584b       0t0                 TCP 192.168.68.73:8787->192.168.68.87:50253 (ESTABLISHED)
+node    88036 linalopes   31u    IPv4 0x7fc1a39613bb6584       0t0                 TCP 127.0.0.1:8787->127.0.0.1:53151 (ESTABLISHED)
+node    88036 linalopes   33u    IPv4 0x6f5b034d16b8ac60       0t0                 TCP 192.168.68.73:8787->192.168.68.85:59848 (ESTABLISHED)
+node    88036 linalopes   34u    IPv4 0x1bed9af9c6d4ed8b       0t0                 TCP 192.168.68.73:8787->192.168.68.80:53527 (ESTABLISHED)
+node    88036 linalopes   35u    IPv4 0xd1780fd01e7682b9       0t0                 TCP 192.168.68.73:8787->192.168.68.65:54061 (ESTABLISHED)

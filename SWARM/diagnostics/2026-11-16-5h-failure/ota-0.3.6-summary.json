@@ -1,0 +1,240 @@
+{
+  "final": {
+    "Mau01": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau02": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau03": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau04": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau05": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau06": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau07": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau08": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    },
+    "Mau09": {
+      "connected": true,
+      "fw": "0.3.6",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    }
+  },
+  "results": [
+    {
+      "node": "Mau01",
+      "at": "2026-11-16T14:40:44Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau01",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau02",
+      "at": "2026-11-16T14:40:55Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau02",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau03",
+      "at": "2026-11-16T14:41:06Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau03",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau04",
+      "at": "2026-11-16T14:41:18Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau04",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau05",
+      "at": "2026-11-16T14:41:32Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau05",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau06",
+      "at": "2026-11-16T14:41:43Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau06",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau07",
+      "at": "2026-11-16T14:41:54Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau07",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau08",
+      "at": "2026-11-16T14:42:05Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau08",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    },
+    {
+      "node": "Mau09",
+      "at": "2026-11-16T14:42:16Z",
+      "ota_http": {
+        "ok": true,
+        "node": "Mau09",
+        "url": "http://192.168.68.73:8000/firmware.bin",
+        "detail": "ota started"
+      },
+      "status": "success",
+      "reconnected_0_3_6": true,
+      "after": {
+        "connected": true,
+        "fwVersion": "0.3.6",
+        "faultCode": null,
+        "homed": false,
+        "moving": false
+      }
+    }
+  ]
+}

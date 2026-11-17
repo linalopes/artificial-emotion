@@ -1,0 +1,55 @@
+[coord] [2026-11-16T10:55:44.459Z] WARN Mau01 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T10:58:07.001Z] WARN Mau05 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T11:02:36.830Z] WARN Mau02 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T11:24:16.003Z] WARN Mau07 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T11:43:55.332Z] WARN Mau02 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T11:47:20.841Z] WARN Mau01 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T11:58:20.133Z] WARN Mau08 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T12:01:55.459Z] WARN Mau05 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T12:12:23.482Z] WARN Mau03 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T12:17:15.528Z] WARN Mau02 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T12:27:17.961Z] WARN Mau09 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T12:40:17.857Z] WARN Mau07 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T12:53:16.825Z] WARN Mau03 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T12:55:39.778Z] WARN Mau08 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:03:13.519Z] WARN Mau04 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:15:03.790Z] INFO The controlling browser disconnected. Control is free. Motion in progress is not affected.
+[coord] [2026-11-16T13:15:12.316Z] WARN Mau09 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:21:34.563Z] WARN Mau09 clock sync reset (wedged exchange recovery).
+[coord] [2026-11-16T13:22:20.685Z] ERROR Mau03 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:20.685Z] ERROR Mau03 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:21.323Z] ERROR Mau01 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:21.323Z] ERROR Mau01 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:21.351Z] ERROR Mau04 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:21.351Z] ERROR Mau04 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:21.448Z] ERROR Mau02 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:21.448Z] ERROR Mau02 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:21.511Z] ERROR Mau09 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:21.512Z] ERROR Mau09 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:21.584Z] ERROR Mau07 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:21.584Z] ERROR Mau07 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:21.852Z] ERROR Mau05 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:21.852Z] ERROR Mau05 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:21.873Z] ERROR Mau08 reports fault track_infeasible.
+[coord] [2026-11-16T13:22:21.873Z] ERROR Mau08 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:22:36.892Z] WARN Mau06 clock sync timed out (seq 4986).
+[coord] [2026-11-16T13:23:38.221Z] WARN Mau06 clock sync timed out (seq 4995).
+[coord] [2026-11-16T13:24:39.552Z] WARN Mau06 clock sync timed out (seq 5004).
+[coord] [2026-11-16T13:25:40.887Z] WARN Mau06 clock sync timed out (seq 5013).
+[coord] [2026-11-16T13:26:26.189Z] WARN Mau06 disconnected.
+[coord] [2026-11-16T13:26:26.190Z] WARN Mau06 link lost during autonomous run — fleet continues; module keeps its authorized trajectory if already started.
+[coord] [2026-11-16T13:26:26.307Z] INFO Mau06 connected, firmware 0.3.5.
+[coord] [2026-11-16T13:26:26.307Z] INFO Mau06 reconnected during autonomous run 62e07807a5cb43c5a7b87092a6eda92; reconciling from module reports (no trajectory replay).
+[coord] [2026-11-16T13:26:26.307Z] ERROR Mau06 reports fault track_infeasible.
+[coord] [2026-11-16T13:26:26.307Z] ERROR Mau06 faulted (track_infeasible) during autonomous run — other modules are not cancelled.
+[coord] [2026-11-16T13:26:26.351Z] INFO Wave finished on Mac (some modules faulted/aborted locally; fleet was not cancelled).
+[coord] [2026-11-16T13:26:26.685Z] INFO Mau06 clock gate set to ±50 ms.
+[coord] [2026-11-16T13:32:22.030Z] WARN Mau08 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:34:57.472Z] WARN Mau08 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:36:20.618Z] WARN Mau08 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:46:54.077Z] WARN Mau01 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:52:23.911Z] WARN Mau03 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:53:28.936Z] WARN Mau03 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:57:18.319Z] WARN Mau07 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T13:58:19.754Z] WARN Mau07 clock_sync_fin refused: rtt out of range
+[coord] [2026-11-16T14:01:15.772Z] WARN Mau04 clock_sync_fin refused: rtt out of range

@@ -167,6 +167,7 @@ Autonomous looping (if authorized): subsequent passes are scheduled from the **s
 | `loop_index` | 0-based current pass |
 | `completed_passes` | Finished passes |
 | `track_loop_compatible` | First/last z within 1 mm |
+| `loop_boundary` | Optional last diagnostic object (bounded; seq bumps on boundary CORRECT/FAULT and incomplete-segment resume/fault only): `seq`, `loop_index`, `run_id`, `expected_steps`, `actual_steps`, `delta_steps`, `delta_mm`, `tol_steps`, `action` (`CONTINUE`/`CORRECT`/`FAULT`), `segment_result` (`reached`/`incomplete_resumed`/`incomplete_fault`) |
 
 ### Clock drift (autonomous)
 

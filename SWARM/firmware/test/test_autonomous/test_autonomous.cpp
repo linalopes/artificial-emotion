@@ -8,9 +8,16 @@
 
 using swarm::AutonomousPolicy;
 using swarm::DisconnectPlayAction;
+using swarm::LoopBoundaryAction;
+using swarm::SegmentIdleAction;
 using swarm::decideDisconnectAction;
+using swarm::decideLoopBoundary;
+using swarm::decideSegmentIdleAction;
 using swarm::epochOffsetMs;
+using swarm::loopBoundaryActionLabel;
+using swarm::loopClosureToleranceSteps;
 using swarm::mayStartNextLoop;
+using swarm::segmentCompletionLabel;
 using swarm::trackLoopCompatible;
 using swarm::validateAutonomousPolicy;
 
@@ -109,6 +116,187 @@ void test_max_caps() {
   TEST_ASSERT_FALSE(validateAutonomousPolicy(p, &reason));
 }
 
+void test_loop_closure_tolerance_steps_matches_mm_gate() {
+  // Firmware default spool 15 mm → ≈ 86.92 steps/mm → 1 mm closure ≈ 87 steps (ceil).
+  const float spmDefault = 86.91981958725378f;
+  const int32_t tolDefault = loopClosureToleranceSteps(spmDefault, SWARM_LOOP_CLOSURE_MM);
+  TEST_ASSERT_TRUE(tolDefault >= 86);
+  TEST_ASSERT_TRUE(tolDefault <= 88);
+  // Alternate geometry still maps 1 mm → ceil(spm).
+  const float spmAlt = 43.45990979362689f;
+  const int32_t tolAlt = loopClosureToleranceSteps(spmAlt, SWARM_LOOP_CLOSURE_MM);
+  TEST_ASSERT_TRUE(tolAlt >= 43);
+  TEST_ASSERT_TRUE(tolAlt <= 45);
+  TEST_ASSERT_EQUAL_INT32(1, loopClosureToleranceSteps(0.0f));
+  TEST_ASSERT_EQUAL_INT32(1, loopClosureToleranceSteps(-1.0f));
+}
+
+void test_loop_boundary_actions() {
+  const int32_t first = 5729;  // Mau03 Wave start steps at default geometry
+  const int32_t tol = 44;
+  TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::AtStart),
+                    static_cast<int>(decideLoopBoundary(first, first, tol)));
+  TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::CorrectivePrelude),
+                    static_cast<int>(decideLoopBoundary(first + 1, first, tol)));
+  TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::CorrectivePrelude),
+                    static_cast<int>(decideLoopBoundary(first - 1, first, tol)));
+  TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::CorrectivePrelude),
+                    static_cast<int>(decideLoopBoundary(first + tol, first, tol)));
+  TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::Fault),
+                    static_cast<int>(decideLoopBoundary(first + tol + 1, first, tol)));
+  TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::Fault),
+                    static_cast<int>(decideLoopBoundary(first - (tol + 1), first, tol)));
+}
+
+/** Regression: 0.3.5 exact-step gate faulted fleets ~loop 74; residual ≤ closure must correct. */
+void test_loop_boundary_1000_transitions_wave_like() {
+  const int32_t first = 5729;
+  const int32_t tol = loopClosureToleranceSteps(43.45990979362689f);
+  int corrections = 0;
+  int faults = 0;
+  int atStart = 0;
+  // Closed-loop: mostly exact; inject small ± residuals and rounding-edge cases.
+  for (int i = 0; i < 1000; i++) {
+    int32_t actual = first;
+    if (i % 17 == 0) {
+      actual = first + 1;  // +1 step residual
+    } else if (i % 19 == 0) {
+      actual = first - 1;
+    } else if (i % 53 == 0) {
+      actual = first + tol;  // edge of closure
+    } else if (i % 59 == 0) {
+      actual = first - tol;
+    } else if (i % 97 == 0) {
+      actual = first + tol + 1;  // genuine out-of-tolerance
+    } else if (i % 101 == 0) {
+      actual = first + 500;  // travel-scale error (would also fail soft-limit prelude)
+    }
+    const LoopBoundaryAction a = decideLoopBoundary(actual, first, tol);
+    if (a == LoopBoundaryAction::AtStart) {
+      atStart++;
+    } else if (a == LoopBoundaryAction::CorrectivePrelude) {
+      corrections++;
+      // Correction returns to exact first — no model snap; next loop clean.
+      actual = first;
+      TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::AtStart),
+                        static_cast<int>(decideLoopBoundary(actual, first, tol)));
+    } else {
+      faults++;
+      TEST_ASSERT_TRUE(actual - first > tol || first - actual > tol);
+    }
+  }
+  TEST_ASSERT_TRUE(atStart > 800);
+  TEST_ASSERT_TRUE(corrections > 0);
+  TEST_ASSERT_TRUE(faults > 0);
+  // Exact-equality gate would have faulted every nonzero residual (corrections+faults).
+  TEST_ASSERT_TRUE(corrections + faults > faults);
+}
+
+void test_loop_boundary_interrupted_equals_fault_when_far() {
+  // Cancelled / incomplete trajectory left far from first keyframe → still FAULT.
+  TEST_ASSERT_EQUAL(static_cast<int>(LoopBoundaryAction::Fault),
+                    static_cast<int>(decideLoopBoundary(100, 5729, 44)));
+}
+
+void test_segment_idle_requires_target_reached() {
+  TEST_ASSERT_EQUAL(static_cast<int>(SegmentIdleAction::Advance),
+                    static_cast<int>(decideSegmentIdleAction(true)));
+  TEST_ASSERT_EQUAL(static_cast<int>(SegmentIdleAction::ResumeTarget),
+                    static_cast<int>(decideSegmentIdleAction(false)));
+  TEST_ASSERT_EQUAL_STRING("CONTINUE", loopBoundaryActionLabel(LoopBoundaryAction::AtStart));
+  TEST_ASSERT_EQUAL_STRING("CORRECT",
+                           loopBoundaryActionLabel(LoopBoundaryAction::CorrectivePrelude));
+  TEST_ASSERT_EQUAL_STRING("FAULT", loopBoundaryActionLabel(LoopBoundaryAction::Fault));
+  TEST_ASSERT_EQUAL_STRING("reached",
+                           segmentCompletionLabel(SegmentIdleAction::Advance, false));
+  TEST_ASSERT_EQUAL_STRING("incomplete_resumed",
+                           segmentCompletionLabel(SegmentIdleAction::ResumeTarget, false));
+  TEST_ASSERT_EQUAL_STRING("incomplete_fault",
+                           segmentCompletionLabel(SegmentIdleAction::ResumeTarget, true));
+}
+
+/**
+ * Overnight 0.3.6 failure class: IncompleteStop treated as complete → wrong loop start.
+ * Model: each loop ends with optional incomplete last-segment residual; must Resume then
+ * Correct/Continue at boundary — never Advance while !targetReached.
+ */
+void test_incomplete_segment_then_1000_loop_transitions() {
+  const float spm = 86.91981958725378f;
+  const int32_t first = static_cast<int32_t>(250.0f * spm + 0.5f);  // centerMm Wave
+  const int32_t tol = loopClosureToleranceSteps(spm);
+  int resumes = 0;
+  int advances = 0;
+  int corrections = 0;
+  int faults = 0;
+  int32_t pos = first;
+
+  for (int loop = 0; loop < 1000; loop++) {
+    // Simulate last-segment planner idle.
+    bool reached = true;
+    if (loop % 23 == 0) {
+      // IncompleteStop short of last/first keyframe by a few steps (≤1 mm).
+      reached = false;
+      pos = first + 3;
+    } else if (loop % 29 == 0) {
+      reached = false;
+      pos = first - (tol - 1);  // still within closure after resume-to-target fails? resume first
+    } else if (loop % 31 == 0) {
+      reached = false;
+      pos = first + tol + 20;  // far incomplete — resume would re-target; boundary FAULT if skipped
+    } else {
+      pos = first;
+    }
+
+    const SegmentIdleAction seg = decideSegmentIdleAction(reached);
+    if (seg == SegmentIdleAction::ResumeTarget) {
+      resumes++;
+      // Firmware re-issues moveToSteps(activeTarget); physical completion → exact first.
+      pos = first;
+      reached = true;
+      TEST_ASSERT_EQUAL(static_cast<int>(SegmentIdleAction::Advance),
+                        static_cast<int>(decideSegmentIdleAction(reached)));
+      advances++;
+    } else {
+      advances++;
+    }
+
+    // Only after targetReached may the loop boundary run.
+    const LoopBoundaryAction boundary = decideLoopBoundary(pos, first, tol);
+    if (boundary == LoopBoundaryAction::AtStart) {
+      // continue
+    } else if (boundary == LoopBoundaryAction::CorrectivePrelude) {
+      corrections++;
+      pos = first;
+    } else {
+      faults++;
+      TEST_ASSERT_TRUE(pos - first > tol || first - pos > tol);
+    }
+  }
+
+  TEST_ASSERT_TRUE(resumes > 0);
+  TEST_ASSERT_TRUE(advances >= 1000);
+  TEST_ASSERT_EQUAL_INT(0, faults);  // all incompletes resumed to target before boundary
+  TEST_ASSERT_TRUE(corrections == 0);  // resume restored exact first
+}
+
+void test_wifi_disconnect_keeps_autonomous_policy() {
+  // Temporary Wi-Fi loss must not cancel an already-started autonomous run.
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectPlayAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectAction(false, true, true, true)));
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectPlayAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectAction(false, true, true, false)));
+}
+
+void test_long_running_continuous_may_start_next_loop() {
+  AutonomousPolicy p{};
+  p.autonomous = true;
+  p.loop = true;
+  p.continuous = true;
+  for (uint32_t passes = 1; passes <= 2000; passes++) {
+    TEST_ASSERT_TRUE(mayStartNextLoop(p, passes, passes * 240000u));
+  }
+}
+
 int main(int, char**) {
   UNITY_BEGIN();
   RUN_TEST(test_policy_defaults_ok);
@@ -120,5 +308,13 @@ int main(int, char**) {
   RUN_TEST(test_may_start_next_loop_bounds);
   RUN_TEST(test_disconnect_actions);
   RUN_TEST(test_max_caps);
+  RUN_TEST(test_loop_closure_tolerance_steps_matches_mm_gate);
+  RUN_TEST(test_loop_boundary_actions);
+  RUN_TEST(test_loop_boundary_1000_transitions_wave_like);
+  RUN_TEST(test_loop_boundary_interrupted_equals_fault_when_far);
+  RUN_TEST(test_segment_idle_requires_target_reached);
+  RUN_TEST(test_incomplete_segment_then_1000_loop_transitions);
+  RUN_TEST(test_wifi_disconnect_keeps_autonomous_policy);
+  RUN_TEST(test_long_running_continuous_may_start_next_loop);
   return UNITY_END();
 }

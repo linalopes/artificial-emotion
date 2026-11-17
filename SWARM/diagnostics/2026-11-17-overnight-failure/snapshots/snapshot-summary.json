@@ -1,0 +1,128 @@
+{
+  "capturedAtUtc": "2026-11-17T02:37:16Z",
+  "run": {
+    "phase": "finished",
+    "runId": "799d3539875246879e711fc190257aa",
+    "scoreName": "Wave",
+    "scoreFingerprint": "4eef727e",
+    "durationMs": 240000,
+    "startAtMs": 24472604.919708,
+    "repeat": false,
+    "autonomous": true,
+    "autonomousLoop": true,
+    "pass": 1,
+    "error": null,
+    "perNode": {
+      "Mau07": "faulted",
+      "Mau05": "faulted",
+      "Mau03": "faulted",
+      "Mau08": "faulted",
+      "Mau02": "faulted",
+      "Mau01": "faulted",
+      "Mau04": "faulted",
+      "Mau06": "faulted",
+      "Mau09": "faulted"
+    }
+  },
+  "nodes": [
+    {
+      "id": "Mau01",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 98161.41009999895,
+      "lastHomedAtMs": 1794841224925
+    },
+    {
+      "id": "Mau02",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 98132.11269999885,
+      "lastHomedAtMs": 1794841224642
+    },
+    {
+      "id": "Mau03",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 97910.50679999952,
+      "lastHomedAtMs": 1794841225054
+    },
+    {
+      "id": "Mau04",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 98129.4205999989,
+      "lastHomedAtMs": 1794841221901
+    },
+    {
+      "id": "Mau05",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 97891.12099999892,
+      "lastHomedAtMs": 1794841222895
+    },
+    {
+      "id": "Mau06",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 98011.56259999954,
+      "lastHomedAtMs": 1794841229889
+    },
+    {
+      "id": "Mau07",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 97905.66279999942,
+      "lastHomedAtMs": 1794841223124
+    },
+    {
+      "id": "Mau08",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 98016.19909999993,
+      "lastHomedAtMs": 1794841230688
+    },
+    {
+      "id": "Mau09",
+      "connected": true,
+      "fwVersion": "0.3.6",
+      "faultCode": "track_infeasible",
+      "homed": false,
+      "positionMm": null,
+      "moving": false,
+      "travelSinceHomeMm": 98012.25299999873,
+      "lastHomedAtMs": 1794841230117
+    }
+  ]
+}
