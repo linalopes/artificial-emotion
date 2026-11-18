@@ -10,6 +10,7 @@
 #include "homing/home_controller.h"
 #include "motor/motion_planner.h"
 #include "motor/motor_driver.h"
+#include "net/net_task.h"
 #include "net/protocol.h"
 #include "net/wifi_manager.h"
 #include "ota/ota_service.h"
@@ -84,6 +85,7 @@ void setup() {
   ctrls.clock = &gClock;
   ctrls.run = &gRun;
   gProtocol.begin(ctrls);
+  swarm::startNetworkTask(&gProtocol);
 
   printBootBanner();
 

@@ -401,6 +401,135 @@ describe('collective run', () => {
   );
 
   it(
+    'finishes autonomous Mac run from status completion without run_completed or motor commands',
+    async () => {
+      await homeAll();
+      const score = shortScore(2000);
+      await positioned(score);
+      expect(
+        (
+          await send({
+            type: 'execute',
+            score,
+            confirmed: true,
+            repeat: false,
+            autonomous: true,
+            autonomousLoop: true,
+            maxLoops: 3
+          })
+        ).ok
+      ).toBe(true);
+      await until(() => run().phase === 'running', 3000, 'autonomous running');
+      const runId = run().runId!;
+      expect(runId).toBeTruthy();
+
+      const sent: string[] = [];
+      const originalSend = app.coordinator.device.send.bind(app.coordinator.device);
+      app.coordinator.device.send = async (nodeId, cmd, timeoutMs) => {
+        sent.push(`${nodeId}:${(cmd as { name: string }).name}`);
+        return originalSend(nodeId, cmd, timeoutMs);
+      };
+
+      // Simulate 0.3.10: modules finished locally; status resumes without run_completed.
+      const now = Date.now();
+      for (const id of NODE_IDS) {
+        const n = node(id);
+        app.coordinator.fleet.telemetry(
+          id,
+          {
+            positionMm: n.positionMm,
+            targetMm: n.targetMm,
+            homed: true,
+            homing: false,
+            moving: false,
+            endstop: false,
+            faultCode: null,
+            rssiDbm: -50,
+            rpm: n.rpm,
+            accelMmS2: n.accelMmS2,
+            limitMinMm: n.limitMinMm,
+            limitMaxMm: n.limitMaxMm,
+            runId: null,
+            loopIndex: 2,
+            completedPasses: 3,
+            autonomous: false,
+            positionValid: true,
+            completionReason: 'max_loops'
+          },
+          now
+        );
+      }
+
+      const partial = app.coordinator.reconcileAutonomousCompletionFromFleet(now);
+      // First call marks nodes; if all nine updated, should finish.
+      expect(partial.finishedNodes.length).toBe(9);
+      expect(run().phase).toBe('finished');
+      expect(sent).toEqual([]); // no stop/cancel/move
+
+      // Duplicate reconcile is safe and issues no commands.
+      const again = app.coordinator.reconcileAutonomousCompletionFromFleet(now);
+      expect(again.ok).toBe(false); // no longer running
+      expect(sent).toEqual([]);
+
+      app.coordinator.device.send = originalSend;
+    },
+    25_000
+  );
+
+  it(
+    'does not unlock Perform when only some modules have completion status',
+    async () => {
+      await homeAll();
+      const score = shortScore(2000);
+      await positioned(score);
+      await send({
+        type: 'execute',
+        score,
+        confirmed: true,
+        repeat: false,
+        autonomous: true,
+        autonomousLoop: true,
+        maxLoops: 3
+      });
+      await until(() => run().phase === 'running', 3000, 'running');
+      const now = Date.now();
+      // Only three modules look finished.
+      for (const id of ['Mau01', 'Mau02', 'Mau03'] as NodeId[]) {
+        const n = node(id);
+        app.coordinator.fleet.telemetry(
+          id,
+          {
+            positionMm: n.positionMm,
+            targetMm: n.targetMm,
+            homed: true,
+            homing: false,
+            moving: false,
+            endstop: false,
+            faultCode: null,
+            rssiDbm: -50,
+            rpm: n.rpm,
+            accelMmS2: n.accelMmS2,
+            limitMinMm: n.limitMinMm,
+            limitMaxMm: n.limitMaxMm,
+            runId: null,
+            completedPasses: 3,
+            autonomous: false,
+            positionValid: true,
+            completionReason: 'max_loops'
+          },
+          now
+        );
+      }
+      const res = app.coordinator.reconcileAutonomousCompletionFromFleet(now);
+      expect(res.ok).toBe(false);
+      expect(run().phase).toBe('running');
+      expect(res.finishedNodes.length).toBe(3);
+      expect(res.pendingNodes.length).toBe(6);
+    },
+    25_000
+  );
+
+  it(
     'serializes operator cancel then immediate goToStart so move acks are not starved',
     async () => {
       // Regression: cancel+stop and goToStart overlapping caused 9/9 "no acknowledgment within 1500 ms".

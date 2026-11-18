@@ -1,0 +1,191 @@
+{
+  "node": "Mau05",
+  "result": "success",
+  "log": [
+    {
+      "t": "2026-11-18T16:53:52.581Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:52.681Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:52.782Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:52.882Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:52.983Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.084Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.184Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.284Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.386Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.488Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.588Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.688Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.789Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.891Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:53.992Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.091Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.192Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.292Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.394Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.494Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.595Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.696Z",
+      "connected": false,
+      "fw": "0.3.10",
+      "fault": null,
+      "homed": true,
+      "moving": false
+    },
+    {
+      "t": "2026-11-18T16:53:54.797Z",
+      "connected": true,
+      "fw": "0.3.11",
+      "fault": null,
+      "homed": false,
+      "moving": false
+    }
+  ],
+  "at": "2026-11-18T16:53:54.797Z"
+}

@@ -11,6 +11,11 @@ import { DeviceServer } from './devices/server';
 import { DurableLog } from './durable-log';
 import { Fleet } from './fleet';
 import {
+  evidenceFromTelemetry,
+  expectationFromWatch,
+  statusIndicatesAutonomousCompletion
+} from './autonomous-completion';
+import {
   COMPLETION_GRACE_MS,
   expectedRunDurationMs,
   resolveAutonomousMaxRuntimeMs,
@@ -229,16 +234,12 @@ export class Coordinator {
           this.run.perNode[node] = 'armed';
           return;
         }
-        this.run.perNode[node] = ev.state;
         if (ev.state === 'finished') {
-          this.durable.write({
-            kind: 'completion',
-            nodeId: node,
-            runId: ev.runId,
-            message: `${node} reported run_completed`,
-            detail: { state: ev.state, reason: ev.reason ?? null }
-          });
+          this.recordNodeFinished(node, ev.runId, ev.reason ?? null, 'run_completed');
+          this.maybeFinishAutonomousRun('event');
+          return;
         }
+        this.run.perNode[node] = ev.state;
         if (ev.state === 'aborted' && ACTIVE.has(this.run.phase)) {
           if (this.autonomousStarted()) {
             this.run.perNode[node] = 'aborted';
@@ -266,7 +267,7 @@ export class Coordinator {
     return this.run.autonomous === true && this.run.phase === 'running';
   }
 
-  /** After reconnect, adopt module-reported run progress without replaying a trajectory. */
+  /** After reconnect / status resume, adopt progress; finish from explicit completion evidence (no STOP). */
   private reconcileAutonomousTelemetry(node: NodeId, t: Telemetry): void {
     if (!this.run.autonomous || !this.run.runId || !ACTIVE.has(this.run.phase)) return;
     if (t.runId && t.runId !== this.run.runId) return;
@@ -285,7 +286,8 @@ export class Coordinator {
           autonomous: t.autonomous ?? null,
           fault: t.faultCode,
           moving: t.moving,
-          homed: t.homed
+          homed: t.homed,
+          completionReason: t.completionReason ?? null
         }
       });
       // One reconcile log per reconnect — do not re-log every subsequent status frame.
@@ -297,12 +299,152 @@ export class Coordinator {
       this.run.perNode[node] = 'faulted';
       return;
     }
-    if (t.completedPasses != null && t.completedPasses > 0 && !t.moving && t.positionValid) {
-      // Heuristic for firmware status without a fresh run_completed event after offline finish.
-      if (prev === 'reconnected' || prev === 'disconnected' || prev === 'running') {
-        /* keep running until explicit finished unless we already have finished */
+
+    // 0.3.10 may mute run_completed; promote finished from fresh status with explicit reason.
+    if (this.run.phase === 'running') {
+      const atMs = this.fleet.get(node).lastTelemetryAtMs ?? Date.now();
+      const expect = expectationFromWatch(this.run.runId, this.runAuto);
+      if (
+        statusIndicatesAutonomousCompletion(evidenceFromTelemetry(t, atMs), expect, Date.now())
+      ) {
+        this.recordNodeFinished(node, this.run.runId, t.completionReason ?? null, 'status');
+        this.maybeFinishAutonomousRun('status');
       }
     }
+  }
+
+  /**
+   * Idempotent per-node finished bookkeeping. Does not send device commands.
+   * Duplicate completion reports are ignored after the first.
+   */
+  private recordNodeFinished(
+    node: NodeId,
+    runId: string,
+    reason: string | null,
+    source: 'run_completed' | 'status'
+  ): void {
+    const prev = this.run.perNode[node];
+    if (prev === 'finished') return;
+    this.run.perNode[node] = 'finished';
+    this.durable.write({
+      kind: 'completion',
+      nodeId: node,
+      runId,
+      message:
+        source === 'status'
+          ? `${node} completion reconciled from status (${reason ?? 'unknown'})`
+          : `${node} reported run_completed`,
+      detail: { state: 'finished', reason, source }
+    });
+    if (source === 'status') {
+      this.note('info', `${node} autonomous completion reconciled from status (${reason ?? 'unknown'}).`);
+    }
+  }
+
+  /**
+   * When every participant has confirmed completion (status path) or settled (event path),
+   * mark Mac run finished and clear the watch. Never issues cancel/stop/motor commands.
+   */
+  private maybeFinishAutonomousRun(source: 'event' | 'status'): void {
+    if (!this.run.autonomous || this.run.phase !== 'running' || !this.run.runId) return;
+    const participants = this.runNodes;
+    if (participants.length === 0) return;
+
+    if (source === 'status') {
+      // Require explicit finished from every participant — partial completion must not unlock.
+      if (!participants.every((id) => this.run.perNode[id] === 'finished')) return;
+    } else if (!participants.every((id) => this.nodeSettled(id))) {
+      return;
+    }
+
+    if (this.monitor) {
+      clearInterval(this.monitor);
+      this.monitor = null;
+    }
+    const anyFault = participants.some(
+      (id) => this.run.perNode[id] === 'faulted' || this.run.perNode[id] === 'aborted'
+    );
+    this.run.phase = 'finished';
+    this.note(
+      'info',
+      anyFault
+        ? `${this.run.scoreName ?? 'Run'} finished on Mac via ${source} reconcile (some modules faulted/aborted locally; fleet was not cancelled).`
+        : `${this.run.scoreName ?? 'Run'} finished on Mac via ${source} reconcile. ${participants.length === NODE_IDS.length ? 'All nine modules' : participants.join(', ')} confirmed completion.`
+    );
+    this.durable.write({
+      kind: 'run_complete',
+      runId: this.run.runId,
+      message: `${this.run.scoreName ?? 'Run'} finished`,
+      detail: {
+        perNode: { ...this.run.perNode },
+        anyFault,
+        nodes: participants,
+        reconcileSource: source
+      }
+    });
+  }
+
+  /**
+   * Re-scan current fleet telemetry for autonomous completion (no device commands).
+   * Used after status resumes and for recovering a Mac RUNNING lock when modules already finished.
+   */
+  reconcileAutonomousCompletionFromFleet(nowMs: number = Date.now()): {
+    ok: boolean;
+    phase: string;
+    finishedNodes: NodeId[];
+    pendingNodes: NodeId[];
+    detail: string;
+  } {
+    if (!this.run.autonomous || this.run.phase !== 'running' || !this.run.runId) {
+      return {
+        ok: false,
+        phase: this.run.phase,
+        finishedNodes: [],
+        pendingNodes: [...this.runNodes],
+        detail: 'No autonomous running Mac run to reconcile.'
+      };
+    }
+    const expect = expectationFromWatch(this.run.runId, this.runAuto);
+    const finishedNodes: NodeId[] = [];
+    const pendingNodes: NodeId[] = [];
+    for (const id of this.runNodes) {
+      const n = this.fleet.get(id);
+      if (!n.connected || n.lastTelemetryAtMs == null) {
+        pendingNodes.push(id);
+        continue;
+      }
+      const evidence = evidenceFromTelemetry(
+        {
+          moving: n.moving,
+          homing: n.homing,
+          faultCode: n.faultCode,
+          autonomous: n.autonomousReported,
+          completionReason: n.completionReason,
+          completedPasses: n.completedPasses,
+          runId: n.reportedRunId
+        },
+        n.lastTelemetryAtMs
+      );
+      if (statusIndicatesAutonomousCompletion(evidence, expect, nowMs)) {
+        this.recordNodeFinished(id, this.run.runId, n.completionReason ?? null, 'status');
+        finishedNodes.push(id);
+      } else if (this.run.perNode[id] === 'finished') {
+        finishedNodes.push(id);
+      } else {
+        pendingNodes.push(id);
+      }
+    }
+    this.maybeFinishAutonomousRun('status');
+    return {
+      ok: this.run.phase === 'finished',
+      phase: this.run.phase,
+      finishedNodes,
+      pendingNodes,
+      detail:
+        this.run.phase === 'finished'
+          ? 'Mac run marked finished from fleet status.'
+          : `Waiting for completion evidence from: ${pendingNodes.join(', ') || 'none'}`
+    };
   }
 
   /**

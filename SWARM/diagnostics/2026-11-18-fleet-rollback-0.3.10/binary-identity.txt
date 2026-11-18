@@ -1,0 +1,4 @@
+source_commit=39c4214
+note=Exact prior artifact sha 8513d571 not on disk; rebuilt unmodified from 0.3.10 ship commit
+b0db5277568de873a38d1e0b243af6c1ffdff792a811869141837cbc8b1fb1e9  /Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/firmware/.pio/build/swarm_s3_4mb_ota/firmware.bin
+0.3.10

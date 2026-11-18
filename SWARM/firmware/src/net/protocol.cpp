@@ -1,5 +1,6 @@
 #include "protocol.h"
 
+#include <string.h>
 #include <WiFi.h>
 
 #include <swarm_limits.h>
@@ -9,6 +10,7 @@
 #include "../util/safe_string.h"
 #include "../util/timing.h"
 #include "../choreography/autonomous_policy.h"
+#include "net_isolation.h"
 #include "ws_reconnect_policy.h"
 
 namespace swarm {
@@ -80,7 +82,13 @@ void ProtocolClient::begin(const SwarmControllers& ctrls) {
   linked_ = false;
   socketStarted_ = false;
   mirrorSerialJson_ = false;
+  forceStatus_ = false;
+  stopFramePending_ = false;
+  stopFrameLen_ = 0;
   idem_.clear();
+  if (!bridge_.begin()) {
+    SWARM_LOG("WS bridge queues unavailable");
+  }
 }
 
 bool ProtocolClient::commandRequiresIdempotency(const char* type) const {
@@ -116,6 +124,8 @@ bool ProtocolClient::autonomyActive() const {
   return c_.run && c_.run->shouldSurviveDisconnect();
 }
 
+bool ProtocolClient::networkIsolated() const { return networkIsolatedBuild(); }
+
 void ProtocolClient::ensureSocket() {
   if (!c_.wifi->isConnected() || !c_.config->isProvisioned()) {
     return;
@@ -124,9 +134,9 @@ void ProtocolClient::ensureSocket() {
   if (linked_) {
     return;
   }
-  // 0.3.8: while autonomous playback is running, never attempt TCP connect —
-  // remote STOP is unavailable until the run ends (physical cutoff remains).
-  if (shouldDeferWsReconnect(autonomyActive(), linked_)) {
+  // 0.3.10 cooperative: defer reconnect during autonomy.
+  // 0.3.11 isolated: allow paced reconnect on the net task (motors unaffected).
+  if (shouldDeferWsReconnect(autonomyActive(), linked_, networkIsolated())) {
     if (!wsReconnectDeferredLogged_) {
       SWARM_LOG("WS reconnect deferred: autonomous run active (remote STOP unavailable)");
       wsReconnectDeferredLogged_ = true;
@@ -138,7 +148,7 @@ void ProtocolClient::ensureSocket() {
   // Pace attempts even when socketStarted_ was cleared on disconnect (0.3.7 bug).
   if (!shouldAttemptWsReconnect(c_.wifi->isConnected(), c_.config->isProvisioned(), linked_,
                                 autonomyActive(), now, lastConnectAttemptMs_,
-                                SWARM_WS_RECONNECT_MIN_MS)) {
+                                SWARM_WS_RECONNECT_MIN_MS, networkIsolated())) {
     return;
   }
 
@@ -155,25 +165,37 @@ void ProtocolClient::ensureSocket() {
             static_cast<unsigned long>(wsConnectAttempts_));
 }
 
+void ProtocolClient::handleConnectSession() {
+  // M1: new coordinator session — drop prior message_id cache.
+  idem_.beginSession();
+  if (c_.clock) {
+    c_.clock->beginSession();
+  }
+  if (c_.run) {
+    // Fresh session: cancel armed/prepared runs. Do not interrupt an autonomous run
+    // that is already executing (Case E — reconnect reports state, no auto restart).
+    if (!c_.run->shouldSurviveDisconnect()) {
+      c_.run->onDisconnectBeforeStart();
+    }
+  }
+  SWARM_LOG("WS connected (idempotency session %lu)", static_cast<unsigned long>(idem_.session()));
+  forceStatus_ = true;
+}
+
 void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
   switch (type) {
     case WStype_CONNECTED:
       linked_ = true;
-      // M1: new coordinator session — drop prior message_id cache.
-      idem_.beginSession();
-      if (c_.clock) {
-        c_.clock->beginSession();
-      }
-      if (c_.run) {
-        // Fresh session: cancel armed/prepared runs. Do not interrupt an autonomous run
-        // that is already executing (Case E — reconnect reports state, no auto restart).
-        if (!c_.run->shouldSurviveDisconnect()) {
-          c_.run->onDisconnectBeforeStart();
+      if (networkIsolated()) {
+        WsInboundMsg msg{};
+        msg.kind = WsInboundKind::Connected;
+        if (!bridge_.pushInbound(msg)) {
+          SWARM_LOG("WS inbound Connected dropped (queue full)");
         }
+      } else {
+        handleConnectSession();
+        sendStatus(true);
       }
-      SWARM_LOG("WS connected (idempotency session %lu)",
-                static_cast<unsigned long>(idem_.session()));
-      sendStatus(true);
       break;
     case WStype_DISCONNECTED:
       if (linked_) {
@@ -181,7 +203,15 @@ void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
         wsDisconnects_++;
         SWARM_LOG("WS disconnected count=%lu autonomy=%d",
                   static_cast<unsigned long>(wsDisconnects_), autonomyActive() ? 1 : 0);
-        handleDisconnectPolicy();
+        if (networkIsolated()) {
+          WsInboundMsg msg{};
+          msg.kind = WsInboundKind::Disconnected;
+          if (!bridge_.pushInbound(msg)) {
+            SWARM_LOG("WS inbound Disconnected dropped (queue full)");
+          }
+        } else {
+          handleDisconnectPolicy();
+        }
       } else {
         wsConnectFailures_++;
       }
@@ -190,8 +220,33 @@ void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
     case WStype_TEXT: {
       if (isMessageTooLarge(length)) {
         SWARM_LOG("WS reject: message too large (%u)", static_cast<unsigned>(length));
-        sendAck("oversized", false, "message too large");
+        if (networkIsolated()) {
+          // Ack from net task would race planner — drop oversized silently on wire;
+          // motor path never sees it.
+        } else {
+          sendAck("oversized", false, "message too large");
+        }
         return;
+      }
+      if (networkIsolated()) {
+        const char* text = reinterpret_cast<const char*>(payload);
+        if (bridge_.tryMarkStopHint(text, length) && !stopFramePending_) {
+          // Priority slot: motor loop parses with full target/idempotency checks first.
+          stopFrameLen_ = static_cast<uint16_t>(length);
+          memcpy(stopFrame_, payload, length);
+          stopFrame_[length] = '\0';
+          stopFramePending_ = true;
+          break;
+        }
+        WsInboundMsg msg{};
+        msg.kind = WsInboundKind::Text;
+        msg.length = static_cast<uint16_t>(length);
+        memcpy(msg.data, payload, length);
+        msg.data[length] = '\0';
+        if (!bridge_.pushInbound(msg)) {
+          SWARM_LOG("WS inbound Text dropped (queue full)");
+        }
+        break;
       }
       JsonDocument doc;
       if (!parseBoundedJson(reinterpret_cast<const char*>(payload), length, doc)) {
@@ -203,6 +258,41 @@ void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
     }
     default:
       break;
+  }
+}
+
+void ProtocolClient::drainInbound() {
+  // Priority: stop/stop_all frames before other inbound (still full parse + target match).
+  if (stopFramePending_) {
+    stopFramePending_ = false;
+    bridge_.consumeStopHint();
+    JsonDocument stopDoc;
+    if (parseBoundedJson(stopFrame_, stopFrameLen_, stopDoc)) {
+      handleMessage(stopDoc);
+    } else {
+      SWARM_LOG("WS JSON parse/reject (priority stop)");
+    }
+    stopFrameLen_ = 0;
+  }
+  WsInboundMsg msg;
+  while (bridge_.popInbound(&msg)) {
+    switch (msg.kind) {
+      case WsInboundKind::Connected:
+        handleConnectSession();
+        break;
+      case WsInboundKind::Disconnected:
+        handleDisconnectPolicy();
+        break;
+      case WsInboundKind::Text: {
+        JsonDocument doc;
+        if (!parseBoundedJson(msg.data, msg.length, doc)) {
+          SWARM_LOG("WS JSON parse/reject (motor drain)");
+          break;
+        }
+        handleMessage(doc);
+        break;
+      }
+    }
   }
 }
 
@@ -268,9 +358,14 @@ void ProtocolClient::sendJson(const JsonDocument& doc) {
     SWARM_LOG("status/json truncated or empty — not sent");
     return;
   }
-  // 0.3.10: never write while autonomy is active — ESP32 WiFiClient::write can
-  // block up to ~10 s on an unreachable coordinator while linked_ is still true.
-  if (shouldEmitWsTraffic(linked_, autonomyActive())) {
+  if (networkIsolated()) {
+    // Serialize on the motor/local path; net task owns the blocking sendTXT.
+    if (linked_ && !bridge_.pushOutbound(out, n)) {
+      SWARM_LOG("WS outbound dropped (queue full)");
+    }
+  } else if (shouldEmitWsTraffic(linked_, autonomyActive(), false)) {
+    // 0.3.10 cooperative: never write while autonomy is active — WiFiClient::write
+    // can block ~10 s on an unreachable coordinator while linked_ is still true.
     ws_.sendTXT(out, n);
   }
   if (mirrorSerialJson_ && !motionCritical()) {
@@ -343,8 +438,10 @@ void ProtocolClient::fillStatus(JsonObject obj) const {
   obj["coordinator_host"] = c_.config->get().coordinatorHost;
   obj["coordinator_port"] = c_.config->get().coordinatorPort;
   obj["ws_linked"] = linked_;
-  obj["ws_reconnect_deferred"] = shouldDeferWsReconnect(autonomyActive(), linked_);
-  obj["ws_io_deferred"] = shouldDeferWsIo(autonomyActive());
+  obj["ws_reconnect_deferred"] =
+      shouldDeferWsReconnect(autonomyActive(), linked_, networkIsolated());
+  obj["ws_io_deferred"] = shouldDeferWsIo(autonomyActive(), networkIsolated());
+  obj["ws_net_isolated"] = networkIsolated();
   obj["ws_connect_attempts"] = wsConnectAttempts_;
   obj["ws_connect_failures"] = wsConnectFailures_;
   obj["ws_disconnects"] = wsDisconnects_;
@@ -1015,14 +1112,27 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
   sendAck(messageId, false, "unknown type");
 }
 
-void ProtocolClient::service() {
+void ProtocolClient::serviceNetwork() {
   const bool autoRun = autonomyActive();
+  const bool isolated = networkIsolated();
   ensureSocket();
-  // Never call ws_.loop() during autonomous playback — covers (1) unlinked
-  // reconnect connect() and (2) still-linked write/read against a dead peer
-  // (WiFiClient::write up to ~10 s) before linked_ flips false.
-  if (shouldServiceWsClient(socketStarted_, linked_, autoRun)) {
+  // Isolated: always service when linked/socketStarted — blocking stays off motor core.
+  // Cooperative 0.3.10: defer during autonomy.
+  if (shouldServiceWsClient(socketStarted_, linked_, autoRun, isolated)) {
     ws_.loop();
+  }
+  WsOutboundMsg out;
+  while (bridge_.popOutbound(&out)) {
+    if (linked_ && out.length > 0) {
+      ws_.sendTXT(out.data, out.length);
+    }
+  }
+}
+
+void ProtocolClient::serviceLocal() {
+  const bool autoRun = autonomyActive();
+  if (networkIsolated()) {
+    drainInbound();
   }
 
   const uint64_t nowUs = monoTimeUs();
@@ -1105,7 +1215,20 @@ void ProtocolClient::service() {
     }
   }
 
-  sendStatus(false);
+  if (forceStatus_) {
+    forceStatus_ = false;
+    sendStatus(true);
+  } else {
+    sendStatus(false);
+  }
+}
+
+void ProtocolClient::service() {
+  serviceLocal();
+  if (!networkIsolated()) {
+    // 0.3.10 cooperative path: WS on the same loop, deferred during autonomy.
+    serviceNetwork();
+  }
 }
 
 void ProtocolClient::handleSerialLine(const String& line) {

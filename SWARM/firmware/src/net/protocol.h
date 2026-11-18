@@ -18,6 +18,7 @@
 #include "../system/module_state.h"
 #include "idempotency.h"
 #include "wifi_manager.h"
+#include "ws_queues.h"
 
 namespace swarm {
 
@@ -38,11 +39,20 @@ struct SwarmControllers {
 class ProtocolClient {
  public:
   void begin(const SwarmControllers& ctrls);
+  /** Motor-loop path: clock/run/state + inbound command handling + status enqueue. */
+  void serviceLocal();
+  /** Network-task path: ensureSocket + ws_.loop + outbound sendTXT. */
+  void serviceNetwork();
+  /**
+   * Cooperative entry: when net-isolated, only serviceLocal(); otherwise local+network
+   * on the Arduino loop (0.3.10-style).
+   */
   void service();
   bool isLinked() const { return linked_; }
   void sendStatus(bool force = false);
   void handleSerialLine(const String& line);
   void onWsEvent(WStype_t type, uint8_t* payload, size_t length);
+  WsBridge& bridge() { return bridge_; }
 
   static bool isMessageTooLarge(size_t nbytes) { return nbytes > SWARM_MAX_WS_MESSAGE_BYTES; }
   IdempotencyCache& idempotency() { return idem_; }
@@ -51,8 +61,9 @@ class ProtocolClient {
   SwarmControllers c_;
   WebSocketsClient ws_;
   IdempotencyCache idem_;
-  bool linked_ = false;
-  bool socketStarted_ = false;
+  WsBridge bridge_;
+  volatile bool linked_ = false;
+  volatile bool socketStarted_ = false;
   uint32_t lastStatusMs_ = 0;
   uint32_t lastConnectAttemptMs_ = 0;
   bool mirrorSerialJson_ = false;
@@ -63,9 +74,15 @@ class ProtocolClient {
   uint32_t incompleteStopCount_ = 0;
   uint32_t lastIncompleteStopLogMs_ = 0;
   bool wsReconnectDeferredLogged_ = false;
+  volatile bool forceStatus_ = false;
+  /** Priority inbound slot for stop/stop_all (parsed on motor loop with full target checks). */
+  volatile bool stopFramePending_ = false;
+  uint16_t stopFrameLen_ = 0;
+  char stopFrame_[SWARM_MAX_WS_MESSAGE_BYTES];
 
   void ensureSocket();
   bool autonomyActive() const;
+  bool networkIsolated() const;
   void handleMessage(JsonDocument& doc);
   void sendJson(const JsonDocument& doc);
   void sendAck(const char* messageId, bool ok, const char* detail, bool remember = true);
@@ -73,6 +90,8 @@ class ProtocolClient {
   void fillStatus(JsonObject obj) const;
   bool applyConfigObject(JsonObjectConst obj, bool persist, String* error);
   void handleDisconnectPolicy();
+  void handleConnectSession();
+  void drainInbound();
   bool targetMatches(const char* target) const;
   bool parseBoundedJson(const char* data, size_t len, JsonDocument& doc);
   void operatorStop();

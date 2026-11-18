@@ -25,11 +25,16 @@ using swarm::segmentCompletionLabel;
 using swarm::AbruptUnreachableSimResult;
 using swarm::esp32WifiClientWriteWorstCaseMs;
 using swarm::shouldAttemptWsReconnect;
+using swarm::autonomyAllowsRemoteStop;
+using swarm::autonomyAllowsTelemetry;
+using swarm::autonomyContinuesWhileDisconnected;
 using swarm::shouldDeferWsIo;
+using swarm::shouldDeferWsIoV0310;
 using swarm::shouldDeferWsReconnect;
 using swarm::shouldEmitWsTraffic;
 using swarm::shouldServiceWsClient;
 using swarm::shouldServiceWsClientV038;
+using swarm::shouldServiceWsClientV0310;
 using swarm::simulateAbruptUnreachableCoordinator;
 using swarm::trackLoopCompatible;
 using swarm::validateAutonomousPolicy;
@@ -455,6 +460,81 @@ void test_ws_reconnect_paced_after_autonomy() {
   TEST_ASSERT_TRUE(wsTcpTimeoutMs() < (SWARM_STALL_ABORT_US / 1000u));
 }
 
+/** 0.3.10 baseline preserved: cooperative defer still mute WS during autonomy. */
+void test_v0310_baseline_defers_ws_during_autonomy() {
+  TEST_ASSERT_TRUE(shouldDeferWsIoV0310(true));
+  TEST_ASSERT_FALSE(shouldDeferWsIoV0310(false));
+  TEST_ASSERT_FALSE(shouldServiceWsClientV0310(true, true, true));
+  TEST_ASSERT_FALSE(shouldEmitWsTraffic(true, true, /*networkIsolated=*/false));
+}
+
+/** 1. Normal autonomous playback with telemetry (isolated). */
+void test_v0311_autonomy_with_telemetry() {
+  const bool isolated = true;
+  TEST_ASSERT_FALSE(shouldDeferWsIo(true, isolated));
+  TEST_ASSERT_TRUE(shouldEmitWsTraffic(true, true, isolated));
+  TEST_ASSERT_TRUE(shouldServiceWsClient(true, true, true, isolated));
+  TEST_ASSERT_TRUE(autonomyAllowsTelemetry(isolated));
+}
+
+/** 2+3. Abrupt Mac loss: motors keep stepping while disconnected. */
+void test_v0311_abrupt_loss_motors_continue() {
+  const uint32_t blockMs = esp32WifiClientWriteWorstCaseMs();
+  const AbruptUnreachableSimResult isolated =
+      simulateAbruptUnreachableCoordinator(/*useV038WsGating=*/false, blockMs, 40,
+                                           /*networkIsolated=*/true);
+  TEST_ASSERT_TRUE(isolated.runStillActive);
+  TEST_ASSERT_FALSE(isolated.faulted);
+  TEST_ASSERT_EQUAL_UINT32(0, isolated.incompleteStops);
+  TEST_ASSERT_EQUAL_UINT32(0, isolated.loopsWithCoilsDark);
+  TEST_ASSERT_TRUE(isolated.stepsAfterFault > 30);
+  TEST_ASSERT_TRUE(autonomyContinuesWhileDisconnected(true));
+}
+
+/** 4. Reconnect during active playback — WS I/O allowed, motors not gated. */
+void test_v0311_reconnect_during_playback() {
+  const bool isolated = true;
+  TEST_ASSERT_TRUE(
+      shouldAttemptWsReconnect(true, true, false, true, 60'000, 0, 5000, isolated));
+  TEST_ASSERT_TRUE(shouldServiceWsClient(true, false, true, isolated));
+  TEST_ASSERT_FALSE(shouldDeferWsReconnect(true, false, isolated));
+}
+
+/** 5. STOP after reconnection when linked + isolated. */
+void test_v0311_stop_after_reconnect() {
+  TEST_ASSERT_TRUE(autonomyAllowsRemoteStop(/*networkIsolated=*/true, /*linked=*/true));
+  TEST_ASSERT_FALSE(autonomyAllowsRemoteStop(true, false));
+  TEST_ASSERT_FALSE(autonomyAllowsRemoteStop(false, true));  // 0.3.10 mute
+}
+
+/**
+ * 6. Confirmed completion without a WebSocket completion event — host policy:
+ * telemetry may resume with completion_reason; motors already idle. (Coordinator
+ * reconcile covered separately in Node tests.)
+ */
+void test_v0311_completion_telemetry_without_event() {
+  // After local completion, autonomy ends → telemetry path open even without isolation.
+  TEST_ASSERT_FALSE(shouldDeferWsIo(false, true));
+  TEST_ASSERT_TRUE(shouldEmitWsTraffic(true, false, true));
+  TEST_ASSERT_TRUE(autonomyAllowsTelemetry(true));
+}
+
+/** 7. Network ops blocking must not starve motor stepping when isolated. */
+void test_v0311_network_block_does_not_starve_steps() {
+  const uint32_t blockMs = esp32WifiClientWriteWorstCaseMs();
+  const AbruptUnreachableSimResult coop =
+      simulateAbruptUnreachableCoordinator(false, blockMs, 40, /*networkIsolated=*/false);
+  const AbruptUnreachableSimResult iso =
+      simulateAbruptUnreachableCoordinator(false, blockMs, 40, /*networkIsolated=*/true);
+  // Both avoid IncompleteStop (0.3.10 defer OR 0.3.11 isolate).
+  TEST_ASSERT_EQUAL_UINT32(0, coop.incompleteStops);
+  TEST_ASSERT_EQUAL_UINT32(0, iso.incompleteStops);
+  // Isolation keeps stepping even while WS would "service" (emit path open).
+  TEST_ASSERT_TRUE(shouldServiceWsClient(true, true, true, true));
+  TEST_ASSERT_TRUE(iso.stepsAfterFault >= coop.stepsAfterFault);
+  TEST_ASSERT_TRUE(iso.stepsAfterFault > 30);
+}
+
 int main(int, char**) {
   UNITY_BEGIN();
   RUN_TEST(test_policy_defaults_ok);
@@ -481,5 +561,12 @@ int main(int, char**) {
   RUN_TEST(test_ws_reconnect_paced_after_autonomy);
   RUN_TEST(test_esp32_wificlient_write_exceeds_stall_abort);
   RUN_TEST(test_abrupt_unreachable_coordinator_keeps_stepping);
+  RUN_TEST(test_v0310_baseline_defers_ws_during_autonomy);
+  RUN_TEST(test_v0311_autonomy_with_telemetry);
+  RUN_TEST(test_v0311_abrupt_loss_motors_continue);
+  RUN_TEST(test_v0311_reconnect_during_playback);
+  RUN_TEST(test_v0311_stop_after_reconnect);
+  RUN_TEST(test_v0311_completion_telemetry_without_event);
+  RUN_TEST(test_v0311_network_block_does_not_starve_steps);
   return UNITY_END();
 }

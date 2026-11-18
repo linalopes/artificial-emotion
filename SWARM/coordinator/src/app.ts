@@ -184,6 +184,17 @@ async function http(req: IncomingMessage, res: ServerResponse, cfg: Config, coor
     }
     return json(405, { error: 'method not allowed' });
   }
+  // Bookkeeping-only: finish a stuck autonomous Mac RUNNING lock from fresh module status.
+  // Never sends STOP / cancel / motor commands.
+  if (path === '/api/run-reconcile') {
+    if (req.method !== 'POST') return json(405, { error: 'method not allowed' });
+    try {
+      const result = coordinator.reconcileAutonomousCompletionFromFleet();
+      return json(result.ok ? 200 : 409, { ok: result.ok, ...result });
+    } catch (e) {
+      return json(500, { error: e instanceof Error ? e.message : String(e) });
+    }
+  }
   // Hardware OTA helper (no UI): POST { node, url } → authenticated ota_update to one module.
   if (path === '/api/fw-ota') {
     if (cfg.fleet !== 'hardware') return json(400, { error: 'fw-ota is only available in hardware fleet mode' });

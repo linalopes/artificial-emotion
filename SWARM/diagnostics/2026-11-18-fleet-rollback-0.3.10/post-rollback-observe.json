@@ -1,0 +1,228 @@
+{
+  "summary": {
+    "at": "2026-11-18T17:09:53.164Z",
+    "observeMs": 75073,
+    "disconnectEvents": 0,
+    "allConnectedOn0310Idle": true,
+    "final": {
+      "Mau01": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau02": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau03": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau04": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau05": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau06": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau07": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau08": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      },
+      "Mau09": {
+        "conn": true,
+        "fw": "0.3.10",
+        "homed": false,
+        "moving": false,
+        "homing": false,
+        "fault": null,
+        "wsAtt": 1,
+        "wsFail": 0,
+        "wsDisc": 0
+      }
+    }
+  },
+  "events": [
+    {
+      "t": "2026-11-18T17:08:38.095Z",
+      "id": "Mau01",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau02",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau03",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau04",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau05",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau06",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau07",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau08",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    },
+    {
+      "t": "2026-11-18T17:08:38.096Z",
+      "id": "Mau09",
+      "conn": true,
+      "fw": "0.3.10",
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "fault": null,
+      "wsAtt": 1,
+      "wsFail": 0,
+      "wsDisc": 0
+    }
+  ]
+}
