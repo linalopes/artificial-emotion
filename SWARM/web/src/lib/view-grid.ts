@@ -87,3 +87,41 @@ export function formatPlanView(): string {
     r.nodes.map((id) => id.slice(3)).join('   ')
   ).join('\n');
 }
+
+/**
+ * Visualization-only ceiling-anchor spacing (mm). Not a measured installation dimension.
+ * Shared by 2D/3D so both views stay aligned with `viewPoseOf`.
+ */
+export const VIZ_ANCHOR_SPACING_MM = 600;
+
+/** Visualization-only sphere radius (mm). */
+export const VIZ_SPHERE_RADIUS_MM = 45;
+
+/**
+ * World coordinates for 3D (and shared spacing math):
+ * - X: left → right (visual col)
+ * - Y: up; ceiling anchors at y = 0; travel mm increases downward (−Y)
+ * - Z: front → back (visual depth); front row at z = 0
+ */
+export function worldAnchorOf(id: NodeId): { x: number; y: number; z: number } {
+  const { col, depth } = viewPoseOf(id);
+  return {
+    x: (col - 1) * VIZ_ANCHOR_SPACING_MM,
+    y: 0,
+    z: depth * VIZ_ANCHOR_SPACING_MM
+  };
+}
+
+/** Sphere centre from firmware travel mm (0 = home near ceiling). null → unknown. */
+export function worldSphereOf(
+  id: NodeId,
+  travelMm: number | null
+): { x: number; y: number; z: number; known: boolean } {
+  const a = worldAnchorOf(id);
+  if (travelMm === null || !Number.isFinite(travelMm)) {
+    return { ...a, y: -VIZ_SPHERE_RADIUS_MM, known: false };
+  }
+  // Avoid -0 so equality checks and debug dumps stay clean at home.
+  const y = -Math.max(0, travelMm) || 0;
+  return { x: a.x, y, z: a.z, known: true };
+}

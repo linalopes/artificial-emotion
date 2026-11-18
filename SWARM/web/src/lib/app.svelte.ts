@@ -5,6 +5,9 @@ import {
 
 export type Area = 'control' | 'perform' | 'system';
 export type Mode = 'preview' | 'live';
+/** Main stage representation. System area ignores this and keeps tables. */
+export type VizMode = '2d' | '3d';
+
 export interface Result {
   ok: boolean;
   error?: string;
@@ -38,6 +41,8 @@ class AppState {
   // Interface state
   area = $state<Area>('control');
   mode = $state<Mode>('preview');
+  /** 2D SVG stage vs Three.js scene. Does not affect telemetry or commands. */
+  vizMode = $state<VizMode>('2d');
   sel = $state<NodeId[]>(['Mau05']);
   multi = $state(false);
   moveMm = $state(400);

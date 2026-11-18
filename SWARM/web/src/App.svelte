@@ -4,11 +4,16 @@
   import Overview from './components/Overview.svelte';
   import PerformPanel from './components/PerformPanel.svelte';
   import Stage from './components/Stage.svelte';
+  import Stage3D from './components/Stage3D.svelte';
   import SystemPanel from './components/SystemPanel.svelte';
   import SystemTable from './components/SystemTable.svelte';
   import Timeline from './components/Timeline.svelte';
   import TopView from './components/TopView.svelte';
   import { app, type Area } from './lib/app.svelte';
+
+  /** 3D is offered in Control/Perform only; System keeps the classic 2D layout. */
+  const use3d = $derived(app.vizMode === '3d' && app.area !== 'system');
+  const showVizToggle = $derived(app.area === 'control' || app.area === 'perform');
 
   const AREAS: { id: Area; label: string }[] = [
     { id: 'control', label: 'Control' },
@@ -104,23 +109,36 @@
 
   <main class="main">
     <section class="work">
-      <div class="views">
+      {#if showVizToggle}
+        <div class="vizbar" role="group" aria-label="Visualization mode">
+          <button class="b s" class:on={app.vizMode === '2d'} aria-pressed={app.vizMode === '2d'} onclick={() => (app.vizMode = '2d')}>2D</button>
+          <button class="b s" class:on={app.vizMode === '3d'} aria-pressed={app.vizMode === '3d'} onclick={() => (app.vizMode = '3d')}>3D</button>
+          <span class="l" style="margin-left: 8px">{use3d ? 'Interactive Three.js stage' : 'Oblique · front · top'}</span>
+        </div>
+      {/if}
+      <div class="views" class:solo={use3d}>
         <div class="stagebox">
-          <Stage variant="oblique" />
-          <span class="l over" class:live={app.mode === 'live'} style="left: 16px; top: 12px">Oblique view</span>
-          <div class="legend m" class:live={app.mode === 'live'}>
-            <span><i class="dot solid"></i>Reported by firmware (estimate)</span>
-            <span><i class="dot dashed"></i>Planned position</span>
-            <span><i class="tick"></i>Travel limit</span>
-          </div>
+          {#if use3d}
+            <Stage3D />
+          {:else}
+            <Stage variant="oblique" />
+            <span class="l over" class:live={app.mode === 'live'} style="left: 16px; top: 12px">Oblique view</span>
+            <div class="legend m" class:live={app.mode === 'live'}>
+              <span><i class="dot solid"></i>Reported by firmware (estimate)</span>
+              <span><i class="dot dashed"></i>Planned position</span>
+              <span><i class="tick"></i>Travel limit</span>
+            </div>
+          {/if}
         </div>
-        <div class="side">
-          <div class="stagebox">
-            <Stage variant="front" />
-            <span class="l over" class:live={app.mode === 'live'} style="left: 12px; top: 10px">Front view</span>
+        {#if !use3d}
+          <div class="side">
+            <div class="stagebox">
+              <Stage variant="front" />
+              <span class="l over" class:live={app.mode === 'live'} style="left: 12px; top: 10px">Front view</span>
+            </div>
+            <div style="padding: 10px 12px; border-top: 1px solid var(--line)"><TopView /></div>
           </div>
-          <div style="padding: 10px 12px; border-top: 1px solid var(--line)"><TopView /></div>
-        </div>
+        {/if}
       </div>
       <nav class="mnav" aria-label="Areas">
         {#each AREAS as a}
@@ -187,7 +205,15 @@
   .notice.bad { background: #fbe9e9; color: var(--danger-dark); font-weight: 700; }
   .main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
   .work { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .vizbar {
+    display: flex; align-items: center; gap: 4px; flex: none;
+    padding: 6px 16px; border-bottom: 1px solid var(--line);
+  }
+  .vizbar .b.s { min-height: 28px; padding: 2px 10px; border-radius: 0; }
+  .vizbar .b.s:first-of-type { border-radius: 4px 0 0 4px; }
+  .vizbar .b.s:nth-of-type(2) { border-radius: 0 4px 4px 0; border-left: 0; }
   .views { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 250px; }
+  .views.solo { grid-template-columns: minmax(0, 1fr); }
   .stagebox { position: relative; min-height: 0; min-width: 0; }
   .side { display: grid; grid-template-rows: minmax(0, 1fr) auto; border-left: 1px solid var(--line); min-height: 0; }
   .over { position: absolute; }
