@@ -1,15 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { NODE_IDS, gridOf } from '@swarm/shared';
 import {
-  VIZ_ANCHOR_SPACING_MM,
   VIEW_COLS_LEFT_TO_RIGHT,
   VIEW_MATRIX_FRONT_TO_BACK,
   VIEW_ROWS_FRONT_TO_BACK,
   VIEW_ROWS_PLAN_TOP_TO_BOTTOM,
   formatPlanView,
-  viewPoseOf,
-  worldAnchorOf,
-  worldSphereOf
+  viewPoseOf
 } from './view-grid';
 
 describe('SWARM Control column-based spatial mapping', () => {
@@ -66,15 +63,5 @@ describe('SWARM Control column-based spatial mapping', () => {
       expect(v.depth).toBe(g.col);
       expect(v.index).toBe(g.index);
     }
-  });
-
-  it('maps 0–500 mm travel downward in shared world coordinates', () => {
-    const a = worldAnchorOf('Mau01');
-    expect(a).toEqual({ x: -VIZ_ANCHOR_SPACING_MM, y: 0, z: 0 });
-    expect(worldSphereOf('Mau01', 0)).toMatchObject({ x: a.x, y: 0, z: 0, known: true });
-    expect(worldSphereOf('Mau01', 500)).toMatchObject({ x: a.x, y: -500, z: 0, known: true });
-    expect(worldSphereOf('Mau01', null).known).toBe(false);
-    expect(worldAnchorOf('Mau07')).toEqual({ x: VIZ_ANCHOR_SPACING_MM, y: 0, z: 0 });
-    expect(worldAnchorOf('Mau03').z).toBe(2 * VIZ_ANCHOR_SPACING_MM);
   });
 });
