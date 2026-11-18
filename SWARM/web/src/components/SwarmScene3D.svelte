@@ -56,7 +56,7 @@
     <button class="b s" onclick={() => { preset = 'oblique'; scene?.resetCamera(); }}>Reset</button>
   </div>
   <div class="legend m">
-    <span><i class="dot solid"></i>Reported by firmware (estimate)</span>
+    <span><i class="dot wire"></i>Reported by firmware (estimate)</span>
     <span><i class="dot dashed"></i>Planned position</span>
   </div>
   {#if hoverId}
@@ -78,9 +78,9 @@
   .wrap.live .cams .b.on { background: var(--turquoise); color: var(--purple); border-color: var(--turquoise); }
   .legend { position: absolute; right: 16px; bottom: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; z-index: 2; pointer-events: none; }
   .legend span { display: flex; align-items: center; gap: 8px; }
-  .dot { width: 14px; height: 14px; border-radius: 999px; border: 1.5px solid currentColor; display: inline-block; }
-  .dot.solid { background: rgba(255, 255, 255, 0.6); }
-  .dot.dashed { border-style: dashed; background: rgba(234, 125, 255, 0.3); }
+  .dot { width: 14px; height: 14px; border-radius: 999px; border: 1.5px solid currentColor; display: inline-block; background: transparent; }
+  .dot.wire { border-style: solid; }
+  .dot.dashed { border-style: dashed; background: rgba(234, 125, 255, 0.15); }
   .tip { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 2; padding: 4px 10px; border-radius: var(--radius); background: rgba(255, 255, 255, 0.82); border: 1px solid var(--line-strong); pointer-events: none; white-space: nowrap; }
   .wrap.live .tip { background: rgba(34, 17, 62, 0.75); border-color: rgba(255, 255, 255, 0.35); }
 </style>

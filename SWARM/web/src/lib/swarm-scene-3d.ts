@@ -331,24 +331,19 @@ export class SwarmScene3D {
   }
 
   private buildModules(): void {
-    const glassMat = new THREE.MeshPhysicalMaterial({
+    // Schematic wireframe language (aligned with 2D stroke aesthetic). No physical glass / IBL.
+    const sphereMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
-      metalness: 0,
-      roughness: 0.12,
-      transmission: 0.82,
-      thickness: 0.35,
+      wireframe: true,
       transparent: true,
-      opacity: 0.85,
-      ior: 1.45,
-      specularIntensity: 0.4
+      opacity: 0.95,
+      depthWrite: false
     });
-    const ghostMat = new THREE.MeshPhysicalMaterial({
+    const ghostMat = new THREE.MeshBasicMaterial({
       color: 0xea7dff,
-      metalness: 0,
-      roughness: 0.25,
-      transmission: 0.5,
+      wireframe: true,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.4,
       depthWrite: false
     });
     const ringMat = new THREE.MeshBasicMaterial({
@@ -360,13 +355,14 @@ export class SwarmScene3D {
     const phMat = new THREE.MeshBasicMaterial({
       color: 0x22113e,
       transparent: true,
-      opacity: 0.55,
-      wireframe: true
+      opacity: 0.45,
+      wireframe: true,
+      depthWrite: false
     });
     const lineMat = new THREE.LineBasicMaterial({ color: 0x22113e, transparent: true, opacity: 0.45 });
-    const sphereGeo = new THREE.SphereGeometry(SPHERE_RADIUS_M, 28, 20);
+    // Same radius for reported spheres and unknown placeholders — state must not change volume.
+    const sphereGeo = new THREE.SphereGeometry(SPHERE_RADIUS_M, 24, 16);
     const ringGeo = new THREE.RingGeometry(SPHERE_RADIUS_M + 0.012, SPHERE_RADIUS_M + 0.02, 32);
-    const phGeo = new THREE.SphereGeometry(SPHERE_RADIUS_M * 0.7, 12, 8);
 
     for (const id of NODE_IDS) {
       const group = new THREE.Group();
@@ -374,14 +370,14 @@ export class SwarmScene3D {
       const lineGeo = new THREE.BufferGeometry();
       lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(6), 3));
       const string = new THREE.Line(lineGeo, lineMat.clone());
-      const sphere = new THREE.Mesh(sphereGeo, glassMat.clone());
+      const sphere = new THREE.Mesh(sphereGeo, sphereMat.clone());
       sphere.userData.nodeId = id;
       const ghost = new THREE.Mesh(sphereGeo, ghostMat.clone());
       ghost.visible = false;
       const ring = new THREE.Mesh(ringGeo, ringMat.clone());
       ring.rotation.x = -Math.PI / 2;
       ring.visible = false;
-      const placeholder = new THREE.Mesh(phGeo, phMat.clone());
+      const placeholder = new THREE.Mesh(sphereGeo, phMat.clone());
       placeholder.userData.nodeId = id;
       placeholder.visible = false;
       const label = makeLabelSprite(id.slice(3), 0x22113e);
@@ -421,24 +417,24 @@ export class SwarmScene3D {
   }
 
   private tintSphere(mesh: THREE.Mesh, st: Status): void {
-    const mat = mesh.material as THREE.MeshPhysicalMaterial;
+    const mat = mesh.material as THREE.MeshBasicMaterial;
     const p = PALETTE[this.palette];
+    // Wireframe stroke colors mirror 2D body fills / strokes; selection stays on the ring.
     if (st === 'fault') {
       mat.color.setHex(p.fault);
-      mat.transmission = 0.15;
-      mat.opacity = 0.92;
+      mat.opacity = 0.95;
     } else if (st === 'moving') {
       mat.color.setHex(p.moving);
-      mat.transmission = 0.55;
-      mat.opacity = 0.9;
+      mat.opacity = 0.95;
     } else if (st === 'homing') {
       mat.color.setHex(p.homing);
-      mat.transmission = 0.45;
-      mat.opacity = 0.9;
+      mat.opacity = 0.95;
+    } else if (st === 'offline') {
+      mat.color.setHex(p.ink);
+      mat.opacity = 0.28;
     } else {
       mat.color.setHex(p.glass);
-      mat.transmission = 0.82;
-      mat.opacity = st === 'offline' ? 0.35 : 0.85;
+      mat.opacity = 0.95;
     }
   }
 
@@ -446,7 +442,8 @@ export class SwarmScene3D {
     const mat = mesh.material as THREE.MeshBasicMaterial;
     const p = PALETTE[this.palette];
     mat.color.setHex(st === 'fault' ? p.fault : p.ink);
-    mat.opacity = st === 'unhomed' ? 0.45 : 0.6;
+    // Lighter / schematic for unknown position (2D uses dashed transparent stroke).
+    mat.opacity = st === 'unhomed' ? 0.4 : st === 'offline' ? 0.28 : 0.5;
   }
 
   private hit(ev: PointerEvent): NodeId | null {
