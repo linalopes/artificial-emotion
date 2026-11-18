@@ -8,7 +8,9 @@ function blank(id: NodeId): NodeState {
     limitMinMm: null, limitMaxMm: null, lastHomedAtMs: null, travelSinceHomeMm: 0, clock: null,
     clockSyncedFromNode: null, lastTelemetryAtMs: null,
     reportedRunId: null, loopIndex: null, completedPasses: null, autonomousReported: null,
-    positionValid: null, lastLoopBoundaryAction: null, lastProgressAtMs: null
+    positionValid: null, lastLoopBoundaryAction: null, lastProgressAtMs: null,
+    completionReason: null, wsReconnectDeferred: null, wsConnectAttempts: null,
+    wsConnectFailures: null, wsDisconnects: null, incompleteStopCount: null
   };
 }
 
@@ -72,6 +74,18 @@ export class Fleet {
     if (t.autonomous !== undefined) s.autonomousReported = t.autonomous ?? null;
     if (t.positionValid !== undefined) s.positionValid = t.positionValid ?? null;
     if (t.loopBoundary?.action != null) s.lastLoopBoundaryAction = t.loopBoundary.action;
+    if (t.completionReason !== undefined) s.completionReason = t.completionReason ?? null;
+    if (t.wsReconnectDeferred !== undefined) s.wsReconnectDeferred = t.wsReconnectDeferred ?? null;
+    if (t.wsConnectAttempts !== undefined && t.wsConnectAttempts !== null) {
+      s.wsConnectAttempts = t.wsConnectAttempts;
+    }
+    if (t.wsConnectFailures !== undefined && t.wsConnectFailures !== null) {
+      s.wsConnectFailures = t.wsConnectFailures;
+    }
+    if (t.wsDisconnects !== undefined && t.wsDisconnects !== null) s.wsDisconnects = t.wsDisconnects;
+    if (t.incompleteStopCount !== undefined && t.incompleteStopCount !== null) {
+      s.incompleteStopCount = t.incompleteStopCount;
+    }
     if (
       (t.completedPasses !== undefined && t.completedPasses !== null) ||
       (t.loopIndex !== undefined && t.loopIndex !== null) ||

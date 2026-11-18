@@ -1,0 +1,106 @@
+{
+  "at": "2026-11-18T09:01:14.021Z",
+  "fleet": "hardware",
+  "runPhase": "idle",
+  "nodes": {
+    "Mau01": {
+      "connected": true,
+      "fw": "0.3.8",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau02": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau03": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau04": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau05": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau06": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau07": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau08": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    },
+    "Mau09": {
+      "connected": true,
+      "fw": "0.3.7",
+      "fault": null,
+      "homed": false,
+      "moving": false,
+      "homing": false,
+      "positionValid": false,
+      "rpm": 15,
+      "positionMm": null
+    }
+  }
+}

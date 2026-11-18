@@ -84,6 +84,8 @@ export class Coordinator {
   private expectedEndAtMs: number | null = null;
   /** True after Mac watch deadline without module completion — modules left alone. */
   private watchExpired = false;
+  /** Modules participating in the current goToStart/execute (default: all nine). */
+  private runNodes: NodeId[] = [...NODE_IDS];
   /** Incremented to abandon whatever asynchronous run flow is in progress. */
   private token = 0;
   private operator: string | null = null;
@@ -425,7 +427,7 @@ export class Coordinator {
       case 'clearFault':
         return this.clearFaults(intent.nodes);
       case 'goToStart':
-        return this.goToStart(intent.score);
+        return this.goToStart(intent.score, intent.nodes);
       case 'execute':
         return this.execute(intent.score, {
           repeat: intent.repeat,
@@ -433,7 +435,8 @@ export class Coordinator {
           autonomousLoop: intent.autonomousLoop === true,
           continuous: intent.continuous === true,
           maxLoops: intent.maxLoops,
-          maxRuntimeMs: intent.maxRuntimeMs
+          maxRuntimeMs: intent.maxRuntimeMs,
+          nodes: intent.nodes
         });
       case 'cancelRun':
         if (!ACTIVE.has(this.run.phase) && this.run.phase !== 'positioned') return { ok: false, error: 'No run to cancel.' };
@@ -669,11 +672,11 @@ export class Coordinator {
     return out;
   }
 
-  /** Reasons the fleet cannot take part in a collective operation, or [] when it can. */
-  readiness(needSync: boolean): string[] {
+  /** Reasons selected modules cannot take part, or [] when they can. */
+  readiness(needSync: boolean, nodes: readonly NodeId[] = NODE_IDS): string[] {
     const out: string[] = [];
     if (this.stop.engaged) out.push('Software stop is engaged.');
-    for (const id of NODE_IDS) {
+    for (const id of nodes) {
       const n = this.fleet.get(id);
       if (!n.connected) out.push(`${id} is not connected.`);
       else if (n.faultCode) out.push(`${id} has fault ${n.faultCode}.`);
@@ -691,18 +694,20 @@ export class Coordinator {
     return v.ok ? null : v.issues[0].message;
   }
 
-  private async goToStart(score: Score): Promise<IntentResult> {
+  private async goToStart(score: Score, nodes?: NodeId[]): Promise<IntentResult> {
     return this.enqueueFleetIo(async () => {
       // After any in-flight cancel/stop (serialized), re-check readiness.
       // Stop / connectivity / faults must win over score-speed messaging (engageStop
       // may also clamp RPM, which would otherwise surface as a misleading speed error).
       if (ACTIVE.has(this.run.phase)) return { ok: false, error: 'A run is already in progress.' };
-      const again = this.readiness(false);
+      const targets = nodes && nodes.length ? nodes : [...NODE_IDS];
+      const again = this.readiness(false, targets);
       if (again.length) return { ok: false, error: again.join(' ') };
       const bad = this.checkScore(score);
       if (bad) return { ok: false, error: bad };
 
       const token = ++this.token;
+      this.runNodes = targets;
       this.run = {
         ...idleRun(),
         phase: 'positioning',
@@ -710,14 +715,19 @@ export class Coordinator {
         scoreFingerprint: scoreFingerprint(score),
         durationMs: score.durationMs
       };
-      this.note('info', `Moving all modules to the start of ${score.name}.`);
+      this.note(
+        'info',
+        targets.length === NODE_IDS.length
+          ? `Moving all modules to the start of ${score.name}.`
+          : `Moving ${targets.join(', ')} to the start of ${score.name} (subset run).`
+      );
       this.durable.write({
         kind: 'info',
         message: `goToStart ${score.name}`,
-        detail: { score: score.name, fingerprint: scoreFingerprint(score) }
+        detail: { score: score.name, fingerprint: scoreFingerprint(score), nodes: targets }
       });
       const results = await Promise.all(
-        NODE_IDS.map(async (id) => {
+        targets.map(async (id) => {
           try {
             await this.device.send(id, { name: 'move', targetMm: positionAt(score, id, 0) });
             this.run.perNode[id] = 'moving to start';
@@ -735,7 +745,7 @@ export class Coordinator {
         });
         return { ok: false, error: this.run.error ?? 'Go to start failed.' };
       }
-      void this.awaitPositioned(score, token);
+      void this.awaitPositioned(score, token, targets);
       return { ok: true };
     });
   }
@@ -745,21 +755,26 @@ export class Coordinator {
     return n.positionMm !== null && !n.moving && Math.abs(n.positionMm - positionAt(score, id, 0)) <= this.cfg.positionToleranceMm;
   }
 
-  private async awaitPositioned(score: Score, token: number): Promise<void> {
+  private async awaitPositioned(score: Score, token: number, nodes: readonly NodeId[]): Promise<void> {
     const lim = this.limits();
     let worst = 0;
-    for (const id of NODE_IDS) {
+    for (const id of nodes) {
       const n = this.fleet.get(id);
       worst = Math.max(worst, Math.abs((n.positionMm ?? 0) - positionAt(score, id, 0)) / lim[id].maxSpeedMmS);
     }
     const deadline = monoNow() + worst * 1500 + 8000;
     while (token === this.token) {
-      for (const id of NODE_IDS) if (this.atStart(score, id)) this.run.perNode[id] = 'at start';
-      if (NODE_IDS.every((id) => this.atStart(score, id))) {
+      for (const id of nodes) if (this.atStart(score, id)) this.run.perNode[id] = 'at start';
+      if (nodes.every((id) => this.atStart(score, id))) {
         this.run.phase = 'positioned';
-        this.note('info', `All modules report their start positions for ${score.name}.`);
+        this.note(
+          'info',
+          nodes.length === NODE_IDS.length
+            ? `All modules report their start positions for ${score.name}.`
+            : `${nodes.join(', ')} report start positions for ${score.name}.`
+        );
         // Motion bursts can stall clock exchanges; drive the sync protocol while idle at start.
-        void this.awaitClocksReady(8_000).then((blockers) => {
+        void this.awaitClocksReady(8_000, nodes).then((blockers) => {
           if (token !== this.token) return;
           if (blockers.length === 0) this.note('info', 'Clocks re-synchronised after go-to-start.');
           else this.note('warn', `Clocks still catching up after go-to-start: ${blockers.join(' ')}`);
@@ -767,7 +782,7 @@ export class Coordinator {
         return;
       }
       if (monoNow() > deadline) {
-        const late = NODE_IDS.filter((id) => !this.atStart(score, id));
+        const late = nodes.filter((id) => !this.atStart(score, id));
         await this.failRun(`Start positions were not reached in time by ${late.join(', ')}.`);
         return;
       }
@@ -775,24 +790,25 @@ export class Coordinator {
     }
   }
 
-  /** Drive the existing clock_sync protocol until every module is ready for prepare_run. */
-  private async awaitClocksReady(timeoutMs = 12_000): Promise<string[]> {
+  /** Drive the existing clock_sync protocol until selected modules are ready for prepare_run. */
+  private async awaitClocksReady(timeoutMs = 12_000, nodes: readonly NodeId[] = this.runNodes): Promise<string[]> {
     const deadline = Date.now() + timeoutMs;
-    let last = this.readiness(true);
+    let last = this.readiness(true, nodes);
     while (Date.now() < deadline) {
-      last = this.readiness(true);
+      last = this.readiness(true, nodes);
       const clockOnly = last.filter((b) => b.includes('clock is not synchronised'));
       const other = last.filter((b) => !b.includes('clock is not synchronised'));
       if (other.length) return last;
       if (clockOnly.length === 0) return [];
       this.device.nudgeClocks((id) => {
+        if (!nodes.includes(id)) return false;
         const n = this.fleet.get(id);
         const view = { ...n, clock: this.device.clockStatus(id) };
         return !clockReadyForCollective(view, this.cfg.fleet);
       });
       await sleep(200);
     }
-    return last.length ? last : this.readiness(true);
+    return last.length ? last : this.readiness(true, nodes);
   }
 
   private async execute(
@@ -804,15 +820,26 @@ export class Coordinator {
       continuous: boolean;
       maxLoops?: number;
       maxRuntimeMs?: number;
+      nodes?: NodeId[];
     }
   ): Promise<IntentResult> {
     if (this.run.phase !== 'positioned' || this.run.scoreFingerprint !== scoreFingerprint(score)) {
       return { ok: false, error: 'Move the modules to the start of this score first (Go to start). The score has changed or was never positioned.' };
     }
+    if (opts.nodes && opts.nodes.length) {
+      const same =
+        opts.nodes.length === this.runNodes.length && opts.nodes.every((id) => this.runNodes.includes(id));
+      if (!same) {
+        return {
+          ok: false,
+          error: `Execute nodes must match goToStart subset (${this.runNodes.join(', ')}).`
+        };
+      }
+    }
     this.note('info', 'Driving clock synchronisation before arming…');
-    const blockers = await this.awaitClocksReady();
+    const blockers = await this.awaitClocksReady(12_000, this.runNodes);
     if (blockers.length) return { ok: false, error: blockers.join(' ') };
-    const away = NODE_IDS.filter((id) => !this.atStart(score, id));
+    const away = this.runNodes.filter((id) => !this.atStart(score, id));
     if (away.length) return { ok: false, error: `${away.join(', ')} moved away from the start position. Go to start again.` };
     const bad = this.checkScore(score);
     if (bad) return { ok: false, error: bad };
@@ -849,11 +876,12 @@ export class Coordinator {
     const runId = newFirmwareRunId();
     this.lastLoggedPasses.clear();
     this.run = { ...this.run, runId, phase: 'loading', pass: this.run.pass + 1, startAtMs: null, error: null, perNode: {} };
+    const participants = this.runNodes;
     const stage = async (phase: RunState['phase'], done: string, make: (id: NodeId) => DeviceCommand | null): Promise<string | null> => {
       if (token !== this.token) return 'Cancelled.';
       this.run.phase = phase;
       const res = await Promise.all(
-        NODE_IDS.map(async (id) => {
+        participants.map(async (id) => {
           const cmd = make(id);
           if (!cmd) return `${id} has no clock estimate`;
           try {
@@ -916,13 +944,15 @@ export class Coordinator {
     this.runAuto = preparedAuto;
     const expectedMs = expectedRunDurationMs(score.durationMs, preparedAuto);
     this.expectedEndAtMs = startAt + expectedMs;
+    const who =
+      participants.length === NODE_IDS.length ? 'nine modules' : participants.join(', ');
     this.note(
       'info',
       auto.autonomous
-        ? `${score.name} armed AUTONOMOUS on nine modules. Mac may disconnect after start; modules continue locally.`
+        ? `${score.name} armed AUTONOMOUS on ${who}. Mac may disconnect after start; modules continue locally.`
         : this.codec.speaksFirmware
-          ? `${score.name} armed on nine modules, pass ${this.run.pass}. Shared start_at_us=${Math.round(startAt * 1000)}.`
-          : `${score.name} armed on nine modules, pass ${this.run.pass}. Each module starts from its own clock.`
+          ? `${score.name} armed on ${who}, pass ${this.run.pass}. Shared start_at_us=${Math.round(startAt * 1000)}.`
+          : `${score.name} armed on ${who}, pass ${this.run.pass}. Each module starts from its own clock.`
     );
     this.durable.write({
       kind: 'run_start',
@@ -933,6 +963,7 @@ export class Coordinator {
         durationMs: score.durationMs,
         startAtMs: startAt,
         expectedEndAtMs: this.expectedEndAtMs,
+        nodes: participants,
         autonomous: preparedAuto.autonomous,
         autonomousLoop: preparedAuto.autonomousLoop,
         continuous: preparedAuto.continuous,
@@ -961,6 +992,7 @@ export class Coordinator {
     if (this.monitor) clearInterval(this.monitor);
     // Autonomous multi-loop runs last score.durationMs × maxLoops (or maxRuntimeMs / continuous ceiling).
     const expectedMs = expectedRunDurationMs(score.durationMs, auto);
+    const participants = this.runNodes;
     this.monitor = setInterval(() => {
       if (token !== this.token) {
         clearInterval(this.monitor!);
@@ -979,8 +1011,8 @@ export class Coordinator {
 
       if (auto.autonomous && this.run.phase === 'running') {
         // Disconnected modules may still be playing locally; do not require them for Mac-side success.
-        const away = NODE_IDS.filter((id) => this.run.perNode[id] === 'disconnected');
-        const tracked = NODE_IDS.filter((id) => this.run.perNode[id] !== 'disconnected');
+        const away = participants.filter((id) => this.run.perNode[id] === 'disconnected');
+        const tracked = participants.filter((id) => this.run.perNode[id] !== 'disconnected');
         const trackedSettled = tracked.length > 0 && tracked.every((id) => this.nodeSettled(id));
         if (trackedSettled && away.length === 0) {
           clearInterval(this.monitor!);
@@ -990,18 +1022,18 @@ export class Coordinator {
             'info',
             anyFault
               ? `${score.name} finished on Mac (some modules faulted/aborted locally; fleet was not cancelled).`
-              : `${score.name} finished. All nine modules confirmed completion.`
+              : `${score.name} finished. ${participants.length === NODE_IDS.length ? 'All nine modules' : participants.join(', ')} confirmed completion.`
           );
           this.durable.write({
             kind: 'run_complete',
             runId: this.run.runId,
             message: `${score.name} finished`,
-            detail: { perNode: { ...this.run.perNode }, anyFault }
+            detail: { perNode: { ...this.run.perNode }, anyFault, nodes: participants }
           });
           return;
         }
         if (now > startAt + expectedMs + COMPLETION_GRACE_MS) {
-          const missingConnected = NODE_IDS.filter(
+          const missingConnected = participants.filter(
             (id) => this.fleet.get(id).connected && this.run.perNode[id] !== 'disconnected' && !this.nodeSettled(id)
           );
           if (missingConnected.length === 0) {
@@ -1044,24 +1076,27 @@ export class Coordinator {
         return;
       }
 
-      const finished = NODE_IDS.every((id) => this.run.perNode[id] === 'finished');
+      const finished = participants.every((id) => this.run.perNode[id] === 'finished');
       if (finished) {
         clearInterval(this.monitor!);
         if (this.run.repeat && !this.run.autonomous) {
           void this.startPass(score, token, { autonomous: false, autonomousLoop: false, continuous: false });
         } else {
           this.run.phase = 'finished';
-          this.note('info', `${score.name} finished. All nine modules confirmed completion.`);
+          this.note(
+            'info',
+            `${score.name} finished. ${participants.length === NODE_IDS.length ? 'All nine modules' : participants.join(', ')} confirmed completion.`
+          );
           this.durable.write({
             kind: 'run_complete',
             runId: this.run.runId,
             message: `${score.name} finished`,
-            detail: { perNode: { ...this.run.perNode } }
+            detail: { perNode: { ...this.run.perNode }, nodes: participants }
           });
         }
       } else if (now > startAt + expectedMs + COMPLETION_GRACE_MS) {
         clearInterval(this.monitor!);
-        const missing = NODE_IDS.filter((id) => this.run.perNode[id] !== 'finished');
+        const missing = participants.filter((id) => this.run.perNode[id] !== 'finished');
         void this.failRun(`Completion was not confirmed by ${missing.join(', ')}.`, {
           initiator: 'coordinator:completion_watch'
         });

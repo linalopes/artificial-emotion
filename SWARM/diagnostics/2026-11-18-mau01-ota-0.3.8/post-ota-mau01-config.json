@@ -1,0 +1,33 @@
+{
+    "ok": true,
+    "node": "Mau01",
+    "config": {
+        "module_id": "Mau01",
+        "spool_diameter_mm": 15,
+        "steps_per_output_rev": 4096,
+        "calibration_factor": 1,
+        "steps_per_mm": 86.91982,
+        "retract_direction": -1,
+        "max_travel_mm": 500,
+        "speed_rpm": 15,
+        "acceleration_mm_s2": 20,
+        "home_seek_rpm": 15,
+        "home_backoff_rpm": 6,
+        "home_search_max_steps": 149937,
+        "home_timeout_ms": 420000,
+        "home_offset_mm": 2,
+        "home_open_recovery_enabled": false,
+        "home_recovery_max_steps": 2000,
+        "coil_hold_mode": 0,
+        "disconnect_policy": 0,
+        "wifi_ssid": "School of AI",
+        "coordinator_host": "192.168.68.73",
+        "coordinator_port": 8787,
+        "config_revision": 10,
+        "hard_max_rpm": 15,
+        "hard_max_travel_mm": 1500,
+        "abs_max_rpm": 15,
+        "abs_max_home_rpm": 15,
+        "abs_max_travel_mm": 1500
+    }
+}

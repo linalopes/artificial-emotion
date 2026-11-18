@@ -1,0 +1,74 @@
+[
+  {
+    "t": 1794992462.8348181,
+    "connected": true,
+    "fw": "0.3.7",
+    "fault": null,
+    "homed": false,
+    "moving": false,
+    "homing": false,
+    "positionValid": false,
+    "rpm": 15,
+    "positionMm": null
+  },
+  {
+    "t": 1794992465.104465,
+    "connected": true,
+    "fw": "0.3.7",
+    "fault": null,
+    "homed": false,
+    "moving": false,
+    "homing": false,
+    "positionValid": false,
+    "rpm": 15,
+    "positionMm": null
+  },
+  {
+    "t": 1794992467.350903,
+    "connected": true,
+    "fw": "0.3.7",
+    "fault": null,
+    "homed": false,
+    "moving": false,
+    "homing": false,
+    "positionValid": false,
+    "rpm": 15,
+    "positionMm": null
+  },
+  {
+    "t": 1794992469.591501,
+    "connected": false,
+    "fw": "0.3.7",
+    "fault": null,
+    "homed": false,
+    "moving": false,
+    "homing": false,
+    "positionValid": false,
+    "rpm": 15,
+    "positionMm": null
+  },
+  {
+    "t": 1794992471.818362,
+    "connected": false,
+    "fw": "0.3.7",
+    "fault": null,
+    "homed": false,
+    "moving": false,
+    "homing": false,
+    "positionValid": false,
+    "rpm": 15,
+    "positionMm": null
+  },
+  {
+    "t": 1794992474.029121,
+    "connected": true,
+    "fw": "0.3.8",
+    "fault": null,
+    "homed": false,
+    "moving": false,
+    "homing": false,
+    "positionValid": false,
+    "rpm": 15,
+    "positionMm": null
+  }
+]

@@ -60,6 +60,13 @@ export interface NodeState {
   lastLoopBoundaryAction: string | null;
   /** Wall time of the last telemetry that advanced run-progress fields. */
   lastProgressAtMs: number | null;
+  /** Firmware 0.3.8+ diagnostics (null until reported). */
+  completionReason: string | null;
+  wsReconnectDeferred: boolean | null;
+  wsConnectAttempts: number | null;
+  wsConnectFailures: number | null;
+  wsDisconnects: number | null;
+  incompleteStopCount: number | null;
 }
 
 /**

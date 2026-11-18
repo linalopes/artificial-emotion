@@ -16,7 +16,9 @@ const blank = (id: NodeId): NodeState => ({
   targetMm: null, endstop: null, rssiDbm: null, rpm: null, accelMmS2: null, limitMinMm: null, limitMaxMm: null, lastHomedAtMs: null,
   travelSinceHomeMm: 0, clock: null, clockSyncedFromNode: null, lastTelemetryAtMs: null,
   reportedRunId: null, loopIndex: null, completedPasses: null, autonomousReported: null,
-  positionValid: null, lastLoopBoundaryAction: null, lastProgressAtMs: null
+  positionValid: null, lastLoopBoundaryAction: null, lastProgressAtMs: null,
+  completionReason: null, wsReconnectDeferred: null, wsConnectAttempts: null,
+  wsConnectFailures: null, wsDisconnects: null, incompleteStopCount: null
 });
 const ACTIVE = ['positioning', 'loading', 'preparing', 'committing', 'armed', 'running'];
 
@@ -236,7 +238,8 @@ class AppState {
 }
 
 function describe(i: Intent): string {
-  const who = 'nodes' in i ? (i.nodes.length === 9 ? 'all modules' : i.nodes.join(', ')) : '';
+  const nodes = 'nodes' in i ? i.nodes : undefined;
+  const who = nodes ? (nodes.length === 9 ? 'all modules' : nodes.join(', ')) : '';
   switch (i.type) {
     case 'home': return `Home ${who}`;
     case 'move': return `Move ${who} to ${i.targetMm} mm`;
@@ -246,8 +249,8 @@ function describe(i: Intent): string {
     case 'releaseStop': return 'Release software stop';
     case 'setParams': return `Parameters for ${who}`;
     case 'clearFault': return `Clear fault on ${who}`;
-    case 'goToStart': return `Go to start of ${i.score.name}`;
-    case 'execute': return `Arm ${i.score.name} on all modules`;
+    case 'goToStart': return `Go to start of ${i.score.name}${who ? ` (${who})` : ''}`;
+    case 'execute': return `Arm ${i.score.name} on ${who || 'all modules'}`;
     case 'cancelRun': return 'Stop run';
     case 'claimOperator': return 'Take control';
     case 'releaseOperator': return 'Release control';

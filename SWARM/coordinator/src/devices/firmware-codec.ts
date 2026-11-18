@@ -81,7 +81,14 @@ export function telemetryFromStatus(payload: Record<string, unknown>): Telemetry
         action: str(lb.action),
         segmentResult: str(lb.segment_result)
       };
-    })()
+    })(),
+    completionReason: str(payload.completion_reason),
+    wsReconnectDeferred:
+      typeof payload.ws_reconnect_deferred === 'boolean' ? payload.ws_reconnect_deferred : null,
+    wsConnectAttempts: num(payload.ws_connect_attempts),
+    wsConnectFailures: num(payload.ws_connect_failures),
+    wsDisconnects: num(payload.ws_disconnects),
+    incompleteStopCount: num(payload.incomplete_stop_count)
   };
 }
 

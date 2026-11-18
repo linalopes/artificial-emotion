@@ -67,6 +67,13 @@ export interface Telemetry {
     action: string | null;
     segmentResult: string | null;
   } | null;
+  /** Firmware 0.3.8+ bounded autonomy / link diagnostics. */
+  completionReason?: string | null;
+  wsReconnectDeferred?: boolean | null;
+  wsConnectAttempts?: number | null;
+  wsConnectFailures?: number | null;
+  wsDisconnects?: number | null;
+  incompleteStopCount?: number | null;
 }
 
 export type DeviceEvent =

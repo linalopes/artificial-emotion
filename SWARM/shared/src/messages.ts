@@ -15,7 +15,7 @@ export type Intent =
   | { type: 'releaseStop' }
   | { type: 'setParams'; nodes: NodeId[]; rpm?: number; accelMmS2?: number }
   | { type: 'clearFault'; nodes: NodeId[] }
-  | { type: 'goToStart'; score: Score }
+  | { type: 'goToStart'; score: Score; /** Subset run; default all nine. */ nodes?: NodeId[] }
   | {
       type: 'execute';
       score: Score;
@@ -29,6 +29,8 @@ export type Intent =
       continuous?: boolean;
       maxLoops?: number;
       maxRuntimeMs?: number;
+      /** Must match the subset used for goToStart when set. Default all nine. */
+      nodes?: NodeId[];
     }
   | { type: 'cancelRun' }
   | { type: 'simScenario'; scenario: SimScenario; node?: NodeId };
@@ -105,7 +107,10 @@ export function parseEnvelope(raw: unknown): IntentEnvelope | { error: string } 
     }
     case 'goToStart': {
       const r = checkScoreShape(i.score);
-      return 'error' in r ? r : ok({ type: 'goToStart', score: r.score });
+      if ('error' in r) return r;
+      const nodes = i.nodes === undefined ? undefined : nodeList(i.nodes);
+      if (i.nodes !== undefined && !nodes) return { error: 'Node list is invalid.' };
+      return ok({ type: 'goToStart', score: r.score, ...(nodes ? { nodes } : {}) });
     }
     case 'execute': {
       if (i.confirmed !== true) return { error: 'Execute needs explicit confirmation.' };
@@ -121,6 +126,8 @@ export function parseEnvelope(raw: unknown): IntentEnvelope | { error: string } 
       if (autonomous && autonomousLoop && !continuous && (maxLoops ?? 0) === 0 && (maxRuntimeMs ?? 0) === 0) {
         return { error: 'Autonomous looping needs maxLoops, maxRuntimeMs, or continuous.' };
       }
+      const nodes = i.nodes === undefined ? undefined : nodeList(i.nodes);
+      if (i.nodes !== undefined && !nodes) return { error: 'Node list is invalid.' };
       return ok({
         type: 'execute',
         score: r.score,
@@ -130,7 +137,8 @@ export function parseEnvelope(raw: unknown): IntentEnvelope | { error: string } 
         ...(autonomousLoop ? { autonomousLoop: true } : {}),
         ...(continuous ? { continuous: true } : {}),
         ...(maxLoops !== undefined ? { maxLoops } : {}),
-        ...(maxRuntimeMs !== undefined ? { maxRuntimeMs } : {})
+        ...(maxRuntimeMs !== undefined ? { maxRuntimeMs } : {}),
+        ...(nodes ? { nodes } : {})
       });
     }
     case 'simScenario': {
