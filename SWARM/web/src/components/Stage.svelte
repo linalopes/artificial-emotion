@@ -1,15 +1,17 @@
 <script lang="ts">
-  import { NODE_IDS, gridOf, type NodeId } from '@swarm/shared';
+  import { NODE_IDS, type NodeId } from '@swarm/shared';
   import { app } from '../lib/app.svelte';
   import { STATUS_LABEL, positionText, statusOf } from '../lib/status';
+  import { viewPoseOf } from '../lib/view-grid';
 
   let { variant = 'oblique' }: { variant?: 'oblique' | 'front' } = $props();
 
   // Geometry carried over from the approved wireframe.
+  // rad/opacity indexed by visual depth: 0 = front (closest), 2 = back (farthest).
   const cfg = $derived(
     variant === 'oblique'
-      ? { w: 850, h: 572, ox: 140, dx: 200, ex: 85, ey: 50, cy: 150, sc: 0.36, rad: [13, 16, 19], off: 0 }
-      : { w: 250, h: 286, ox: 65, dx: 60, ex: 0, ey: 0, cy: 56, sc: 0.2, rad: [6, 8, 10], off: 9 }
+      ? { w: 850, h: 572, ox: 140, dx: 200, ex: 85, ey: 50, cy: 150, sc: 0.36, rad: [19, 16, 13], off: 0 }
+      : { w: 250, h: 286, ox: 65, dx: 60, ex: 0, ey: 0, cy: 56, sc: 0.2, rad: [10, 8, 6], off: 9 }
   );
   const front = $derived(variant === 'front');
   const UNKNOWN_Z = 250;
@@ -18,23 +20,24 @@
     NODE_IDS.map((id: NodeId) => {
       const n = app.node(id);
       const s = statusOf(n);
-      const { col, row, index } = gridOf(id);
-      const depth = 2 - row;
-      const x = front ? cfg.ox + col * cfg.dx + (row - 1) * cfg.off : cfg.ox + col * cfg.dx + depth * cfg.ex;
+      // Column-based layout: front Mau01/04/07 (depth 0), back Mau03/06/09 (depth 2).
+      // Oblique frame: larger Y = front baseline; smaller Y = far/back edge.
+      const { col, depth, index } = viewPoseOf(id);
+      const x = front ? cfg.ox + col * cfg.dx + (1 - depth) * cfg.off : cfg.ox + col * cfg.dx + depth * cfg.ex;
       const top = front ? cfg.cy : cfg.cy - depth * cfg.ey;
-      const r = cfg.rad[row];
+      const r = cfg.rad[depth];
       const z = n.positionMm ?? UNKNOWN_Z;
       const g = app.ghosts[id];
       const showGhost = g !== undefined && (n.positionMm === null || Math.abs(g - n.positionMm) > 4);
       return {
-        id, n, s, x, top, r, row,
+        id, n, s, x, top, r, depth,
         y: top + z * cfg.sc,
         gy: top + Math.max(0, Math.min(1000, g ?? 0)) * cfg.sc,
         showGhost,
         limY: n.limitMaxMm === null ? null : top + n.limitMaxMm * cfg.sc,
         selected: app.sel.includes(id),
         glyph: r < 9 ? '' : s === 'fault' ? '!' : s === 'offline' ? '×' : s === 'unhomed' ? '?' : String(index + 1),
-        opacity: (s === 'offline' ? 0.55 : 1) * (front ? [0.6, 0.8, 1][row] : 1),
+        opacity: (s === 'offline' ? 0.55 : 1) * (front ? [1, 0.8, 0.6][depth] : 1),
         label: `${id}, ${STATUS_LABEL[s]}, ${positionText(n)}`
       };
     })

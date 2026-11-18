@@ -1,19 +1,29 @@
 <script lang="ts">
-  import { COLS, DIAGONALS, NODE_IDS, ROWS } from '@swarm/shared';
   import { app } from '../lib/app.svelte';
   import { STATUS_LABEL, statusOf } from '../lib/status';
+  import {
+    NODE_IDS,
+    VIEW_COLS_LEFT_TO_RIGHT,
+    VIEW_DIAGONALS,
+    VIEW_ROWS_PLAN_TOP_TO_BOTTOM
+  } from '../lib/view-grid';
 </script>
 
 <div class="col" style="gap: 6px">
-  <div class="k"><span class="l">Top view</span><span class="m small">back row first</span></div>
+  <div class="k"><span class="l">Top view</span><span class="m small">front = 01 04 07 (bottom)</span></div>
   <div class="tvgrid">
     <span></span>
-    {#each COLS as c, i}
-      <button class="b s" onclick={() => app.select(c)} aria-label="Select column {i + 1}">C{i + 1}</button>
+    {#each VIEW_COLS_LEFT_TO_RIGHT as c}
+      <button class="b s" onclick={() => app.select(c.nodes)} aria-label="Select {c.label.toLowerCase()} column ({c.id})" title="{c.label} column">{c.id}</button>
     {/each}
-    {#each ROWS as r, i}
-      <button class="b s tall" onclick={() => app.select(r)} aria-label="Select row {i + 1}">R{i + 1}</button>
-      {#each r as id}
+    {#each VIEW_ROWS_PLAN_TOP_TO_BOTTOM as row}
+      <button
+        class="b s tall"
+        onclick={() => app.select(row.nodes)}
+        aria-label="Select {row.label.toLowerCase()} row ({row.id})"
+        title="{row.label} row"
+      >{row.id}</button>
+      {#each row.nodes as id}
         {@const s = statusOf(app.node(id))}
         <button class="b tv tall" class:sel={app.sel.includes(id)} class:dim={s === 'offline'} aria-pressed={app.sel.includes(id)} onclick={() => app.pick(id)}>
           <span class="num">{id.slice(3)}</span>
@@ -25,8 +35,9 @@
   <div class="quick">
     <button class="b s" onclick={() => app.select([...NODE_IDS])}>All</button>
     <button class="b s" onclick={() => app.select([])}>None</button>
-    <button class="b s" aria-label="Diagonal from back left" onclick={() => app.select(DIAGONALS[0])}>Diag A</button>
-    <button class="b s" aria-label="Diagonal from back right" onclick={() => app.select(DIAGONALS[1])}>Diag B</button>
+    {#each VIEW_DIAGONALS as d}
+      <button class="b s" aria-label={d.aria} onclick={() => app.select([...d.nodes])}>{d.label}</button>
+    {/each}
   </div>
   <button class="b s" class:on={app.multi} aria-pressed={app.multi} onclick={() => (app.multi = !app.multi)}>Multi-select {app.multi ? 'on' : 'off'}</button>
 </div>

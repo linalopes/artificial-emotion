@@ -22,7 +22,12 @@ export function newFirmwareRunId(uuid: string = globalThis.crypto.randomUUID()):
   return uuid.replace(/-/g, '').slice(0, FW_RUN_ID_MAX_LEN);
 }
 
-/** Grid position. Row 0 is the back row (Mau01..Mau03), column 0 is the left column. */
+/**
+ * Logical grid for choreography / hardware grouping (not the Control UI camera).
+ * Row 0 = Mau01..Mau03, row 1 = Mau04..Mau06, row 2 = Mau07..Mau09;
+ * col 0 = Mau01/04/07, col 1 = Mau02/05/08, col 2 = Mau03/06/09.
+ * Operator-facing Control views transpose this (front = Mau01/04/07); see web `view-grid.ts`.
+ */
 export function gridOf(id: NodeId): { col: number; row: number; index: number } {
   const index = NODE_IDS.indexOf(id);
   return { index, col: index % 3, row: Math.floor(index / 3) };

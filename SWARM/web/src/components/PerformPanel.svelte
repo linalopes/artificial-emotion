@@ -53,7 +53,10 @@
       <label class="col"><span class="k"><span class="l">Period</span><span class="m">{p.periodS} s</span></span><input type="range" min="30" max="300" step="10" bind:value={p.periodS} disabled={locked} /></label>
       <label class="col"><span class="k"><span class="l">Phase offset per module</span><span class="m">{p.phaseDeg}°</span></span><input type="range" min="0" max="120" step="5" bind:value={p.phaseDeg} disabled={locked} /></label>
       <label class="k"><span class="l">Direction</span>
-        <select bind:value={p.direction} disabled={locked}><option value="diagonal">Diagonal</option><option value="rows">Back to front</option><option value="columns">Left to right</option></select></label>
+        <!-- Labels match operator space; values still feed shared generateWave(gridOf).
+             direction=rows phases logical rows (= visual columns L→R).
+             direction=columns phases logical cols (= visual front→back). -->
+        <select bind:value={p.direction} disabled={locked}><option value="diagonal">Diagonal</option><option value="rows">Left to right</option><option value="columns">Front to back</option></select></label>
     {:else if app.preset === 'breathing'}
       {@const p = app.params.breathing}
       <label class="col"><span class="k"><span class="l">Amplitude</span><span class="m">{p.amplitudeMm} mm</span></span><input type="range" min="20" max="450" step="10" bind:value={p.amplitudeMm} disabled={locked} /></label>
