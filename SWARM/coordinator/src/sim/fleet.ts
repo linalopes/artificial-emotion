@@ -22,9 +22,12 @@ export class SimFleet implements SimControl {
       else if (name === 'reconnect') n.setOffline(false);
       else if (name === 'homingFault') n.injectHomingFault();
       else if (name === 'clockFault') n.setClockMuted(true);
+      else if (name === 'holdAutonomous') n.setHoldAutonomous(true);
+      else if (name === 'releaseAutonomous') n.setHoldAutonomous(false);
       else {
         n.setClockMuted(false);
         n.setOffline(false);
+        n.setHoldAutonomous(false);
       }
     }
   }

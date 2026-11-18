@@ -54,6 +54,8 @@ export class SimNode {
   private traj: Trajectory | null = null;
   /** If the run finished while the WS was down, re-emit on reconnect (autonomous survives disconnect). */
   private pendingFinishedRunId: string | null = null;
+  /** Test hook: keep autonomous trajectory active past maxRuntime (Mac watch expiry). */
+  private holdAutonomous = false;
   private lastTick = performance.now();
 
   constructor(
@@ -97,6 +99,10 @@ export class SimNode {
     this.homing = false;
     this.vel = 0;
     this.abortRun('fault');
+  }
+  /** Keep playing past authorized runtime so Mac watch expiry can be tested without cancel/stop. */
+  setHoldAutonomous(v: boolean): void {
+    this.holdAutonomous = v;
   }
 
   // ---- connection -----------------------------------------------------------------------
@@ -245,6 +251,7 @@ export class SimNode {
 
   /** Mirrors firmware mayStartNextLoop: finish when the authorized autonomous bound is met. */
   private autonomousPassDone(tr: Trajectory, elapsedMs: number, durationMs: number): boolean {
+    if (this.holdAutonomous && tr.autonomous) return false;
     if (!tr.autonomous || !tr.loop) return elapsedMs >= durationMs;
     if (tr.maxRuntimeMs && tr.maxRuntimeMs > 0 && elapsedMs >= tr.maxRuntimeMs) return true;
     if (tr.continuous) return false;

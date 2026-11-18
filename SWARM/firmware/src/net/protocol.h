@@ -56,8 +56,16 @@ class ProtocolClient {
   uint32_t lastStatusMs_ = 0;
   uint32_t lastConnectAttemptMs_ = 0;
   bool mirrorSerialJson_ = false;
+  /** Bounded reconnect / stall diagnostics (0.3.8). */
+  uint32_t wsConnectAttempts_ = 0;
+  uint32_t wsConnectFailures_ = 0;
+  uint32_t wsDisconnects_ = 0;
+  uint32_t incompleteStopCount_ = 0;
+  uint32_t lastIncompleteStopLogMs_ = 0;
+  bool wsReconnectDeferredLogged_ = false;
 
   void ensureSocket();
+  bool autonomyActive() const;
   void handleMessage(JsonDocument& doc);
   void sendJson(const JsonDocument& doc);
   void sendAck(const char* messageId, bool ok, const char* detail, bool remember = true);

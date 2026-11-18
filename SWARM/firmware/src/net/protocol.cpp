@@ -2,11 +2,13 @@
 
 #include <WiFi.h>
 
+#include <swarm_limits.h>
 #include <swarm_version.h>
 #include "../util/log.h"
 #include "../util/mono_time.h"
 #include "../util/safe_string.h"
 #include "../util/timing.h"
+#include "ws_reconnect_policy.h"
 
 namespace swarm {
 namespace {
@@ -109,16 +111,33 @@ bool ProtocolClient::parseBoundedJson(const char* data, size_t len, JsonDocument
   return !err;
 }
 
+bool ProtocolClient::autonomyActive() const {
+  return c_.run && c_.run->shouldSurviveDisconnect();
+}
+
 void ProtocolClient::ensureSocket() {
   if (!c_.wifi->isConnected() || !c_.config->isProvisioned()) {
     return;
   }
   const uint32_t now = millis();
-  if (socketStarted_ && linked_) {
+  if (linked_) {
     return;
   }
-  // L1: single reconnect owner — disable library auto-reconnect; we pace attempts here.
-  if (socketStarted_ && elapsedMs(now, lastConnectAttemptMs_) < 5000) {
+  // 0.3.8: while autonomous playback is running, never attempt TCP connect —
+  // remote STOP is unavailable until the run ends (physical cutoff remains).
+  if (shouldDeferWsReconnect(autonomyActive(), linked_)) {
+    if (!wsReconnectDeferredLogged_) {
+      SWARM_LOG("WS reconnect deferred: autonomous run active (remote STOP unavailable)");
+      wsReconnectDeferredLogged_ = true;
+    }
+    return;
+  }
+  wsReconnectDeferredLogged_ = false;
+
+  // Pace attempts even when socketStarted_ was cleared on disconnect (0.3.7 bug).
+  if (!shouldAttemptWsReconnect(c_.wifi->isConnected(), c_.config->isProvisioned(), linked_,
+                                autonomyActive(), now, lastConnectAttemptMs_,
+                                SWARM_WS_RECONNECT_MIN_MS)) {
     return;
   }
 
@@ -126,10 +145,13 @@ void ProtocolClient::ensureSocket() {
   ws_.disconnect();
   ws_.begin(cfg.coordinatorHost, cfg.coordinatorPort, "/swarm");
   ws_.onEvent(wsThunk);
-  ws_.setReconnectInterval(0);
+  // Library spacing matches our backoff so loop() cannot tight-retry connect().
+  ws_.setReconnectInterval(SWARM_WS_RECONNECT_MIN_MS);
   socketStarted_ = true;
   lastConnectAttemptMs_ = now;
-  SWARM_LOG("WS connecting to %s:%u/swarm", cfg.coordinatorHost, cfg.coordinatorPort);
+  wsConnectAttempts_++;
+  SWARM_LOG("WS connecting to %s:%u/swarm attempt=%lu", cfg.coordinatorHost, cfg.coordinatorPort,
+            static_cast<unsigned long>(wsConnectAttempts_));
 }
 
 void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
@@ -155,8 +177,12 @@ void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
     case WStype_DISCONNECTED:
       if (linked_) {
         linked_ = false;
-        SWARM_LOG("WS disconnected");
+        wsDisconnects_++;
+        SWARM_LOG("WS disconnected count=%lu autonomy=%d",
+                  static_cast<unsigned long>(wsDisconnects_), autonomyActive() ? 1 : 0);
         handleDisconnectPolicy();
+      } else {
+        wsConnectFailures_++;
       }
       socketStarted_ = false;  // allow ensureSocket to retry with backoff
       break;
@@ -309,6 +335,11 @@ void ProtocolClient::fillStatus(JsonObject obj) const {
   obj["coordinator_host"] = c_.config->get().coordinatorHost;
   obj["coordinator_port"] = c_.config->get().coordinatorPort;
   obj["ws_linked"] = linked_;
+  obj["ws_reconnect_deferred"] = shouldDeferWsReconnect(autonomyActive(), linked_);
+  obj["ws_connect_attempts"] = wsConnectAttempts_;
+  obj["ws_connect_failures"] = wsConnectFailures_;
+  obj["ws_disconnects"] = wsDisconnects_;
+  obj["incomplete_stop_count"] = incompleteStopCount_;
   obj["rssi"] = c_.wifi->rssi();
   obj["config_revision"] = c_.config->get().configRevision;
   obj["steps_per_mm"] = c_.config->stepsPerMm();
@@ -349,6 +380,7 @@ void ProtocolClient::fillStatus(JsonObject obj) const {
   if (c_.track) {
     obj["loop_index"] = c_.track->passIndex();
     obj["completed_passes"] = c_.track->completedPasses();
+    obj["completion_reason"] = c_.track->completionReason();
     obj["track_loop_compatible"] = c_.track->loopCompatible();
     // Bounded loop-boundary / segment-completion diagnostic (last event only).
     const auto& bd = c_.track->boundaryDiag();
@@ -801,16 +833,17 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
       sendAck(messageId, false, error.c_str());
       return;
     }
-    sendAck(messageId, true, pol.autonomous ? "ready_for_commit_autonomous" : "ready_for_commit");
+    const auto& accepted = c_.run->policy();
+    sendAck(messageId, true, accepted.autonomous ? "ready_for_commit_autonomous" : "ready_for_commit");
     {
       JsonDocument ev;
       JsonObject p = ev["payload"].to<JsonObject>();
       p["run_id"] = runId;
-      p["autonomous"] = pol.autonomous;
-      p["loop"] = pol.loop;
-      p["continuous"] = pol.continuous;
-      p["max_loops"] = pol.maxLoops;
-      p["max_runtime_ms"] = pol.maxRuntimeMs;
+      p["autonomous"] = accepted.autonomous;
+      p["loop"] = accepted.loop;
+      p["continuous"] = accepted.continuous;
+      p["max_loops"] = accepted.maxLoops;
+      p["max_runtime_ms"] = accepted.maxRuntimeMs;
       sendEvent("run_prepared", ev["payload"].as<JsonObjectConst>());
     }
     return;
@@ -974,8 +1007,11 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
 }
 
 void ProtocolClient::service() {
+  const bool autoRun = autonomyActive();
   ensureSocket();
-  if (socketStarted_) {
+  // Never call ws_.loop() while unlinked + autonomous — library connect() can block
+  // up to WEBSOCKETS_TCP_TIMEOUT and starve MotionPlanner (stall abort 100 ms).
+  if (shouldServiceWsClient(socketStarted_, linked_, autoRun)) {
     ws_.loop();
   }
 
@@ -996,6 +1032,8 @@ void ProtocolClient::service() {
       JsonDocument ev;
       JsonObject p = ev["payload"].to<JsonObject>();
       p["run_id"] = c_.run->runId();
+      p["completion_reason"] = c_.track ? c_.track->completionReason() : "";
+      p["completed_passes"] = c_.track ? c_.track->completedPasses() : 0;
       sendEvent("run_completed", ev["payload"].as<JsonObjectConst>());
       c_.run->reset();
     } else if (c_.run->phase() == RunPhase::Failed) {
@@ -1013,6 +1051,14 @@ void ProtocolClient::service() {
 
   // Stall incomplete: report accurately — do not claim target reached.
   if (c_.planner->lastStall() == StallOutcome::IncompleteStop) {
+    incompleteStopCount_++;
+    const uint32_t nowMs = millis();
+    if (elapsedMs(nowMs, lastIncompleteStopLogMs_) >= 5000u) {
+      lastIncompleteStopLogMs_ = nowMs;
+      SWARM_LOG("Planner IncompleteStop count=%lu autonomy=%d linked=%d",
+                static_cast<unsigned long>(incompleteStopCount_), autoRun ? 1 : 0,
+                linked_ ? 1 : 0);
+    }
     if (c_.state->state() == ModuleState::Moving || c_.state->state() == ModuleState::Stopping) {
       if (c_.state->positionValid()) {
         c_.state->setReady();

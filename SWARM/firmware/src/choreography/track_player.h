@@ -57,6 +57,8 @@ class TrackPlayer {
   const AutonomousPolicy& policy() const { return policy_; }
   uint32_t passIndex() const { return passIndex_; }  // 0-based current pass
   uint32_t completedPasses() const { return completedPasses_; }
+  /** Last completion / stop reason for status telemetry (bounded string). */
+  const char* completionReason() const { return completionReason_; }
   uint32_t epochStartMs() const { return epochStartMs_; }
   uint32_t trackDurationMs() const { return count_ >= 2 ? frames_[count_ - 1].timeMs : 0; }
   float firstZMm() const { return count_ > 0 ? frames_[0].zMm : 0; }
@@ -101,12 +103,14 @@ class TrackPlayer {
   uint32_t completedPasses_ = 0;
   int32_t activeTargetSteps_ = 0;
   BoundaryDiag boundaryDiag_{};
+  char completionReason_[32] = "";
 
   bool validateFeasibility(String* error) const;
   bool beginSegment(size_t fromIndex, String* error);
   uint32_t elapsedEpochMs(uint32_t nowMs) const;
   bool runtimeExpired(uint32_t nowMs) const;
   void finishPass(uint32_t nowMs);
+  void setCompletionReason(const char* reason);
   void recordBoundary(LoopBoundaryAction action, int32_t expected, int32_t actual, int32_t tol);
   void recordSegmentResult(const char* result);
   bool resumeActiveTarget(String* error);

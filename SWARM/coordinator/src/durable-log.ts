@@ -7,6 +7,7 @@ export type DurableEventKind =
   | 'run_phase'
   | 'run_complete'
   | 'run_failed'
+  | 'run_watch_expired'
   | 'connect'
   | 'disconnect'
   | 'reconnect_reconcile'

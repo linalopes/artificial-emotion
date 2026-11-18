@@ -2,8 +2,40 @@ import { describe, expect, it } from 'vitest';
 import {
   AUTONOMOUS_RUNTIME_CEILING_MS,
   COMPLETION_GRACE_MS,
-  expectedRunDurationMs
+  expectedRunDurationMs,
+  resolveAutonomousMaxRuntimeMs
 } from '../src/run-duration';
+
+describe('resolveAutonomousMaxRuntimeMs', () => {
+  it('injects 12 h for continuous when unset, preserves explicit values', () => {
+    expect(
+      resolveAutonomousMaxRuntimeMs({ autonomous: true, autonomousLoop: true, continuous: true })
+    ).toBe(AUTONOMOUS_RUNTIME_CEILING_MS);
+    expect(
+      resolveAutonomousMaxRuntimeMs({
+        autonomous: true,
+        autonomousLoop: true,
+        continuous: true,
+        maxRuntimeMs: 600_000
+      })
+    ).toBe(600_000);
+  });
+
+  it('passes through finite maxRuntime and leaves non-autonomous unset', () => {
+    expect(
+      resolveAutonomousMaxRuntimeMs({
+        autonomous: true,
+        autonomousLoop: true,
+        continuous: false,
+        maxLoops: 3,
+        maxRuntimeMs: 90_000
+      })
+    ).toBe(90_000);
+    expect(
+      resolveAutonomousMaxRuntimeMs({ autonomous: false, autonomousLoop: false, continuous: false })
+    ).toBeUndefined();
+  });
+});
 
 describe('expectedRunDurationMs', () => {
   const single = { autonomous: false, autonomousLoop: false, continuous: false };

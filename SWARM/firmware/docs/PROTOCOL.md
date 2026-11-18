@@ -120,6 +120,7 @@ Optional autonomous fields (Phase B.2). Defaults preserve pre-B.2 behaviour.
 Node checks: READY + position valid, track loaded, **clock_synced**, no fault/OTA/busy/homing.  
 If `autonomous`+`loop`: track first/last `z_mm` must match within **1 mm** (`SWARM_LOOP_CLOSURE_MM`); otherwise nack `track_not_loop_compatible`.  
 Looping without `continuous` requires `max_loops ≥ 1` and/or `max_runtime_ms ≥ 1000`.  
+`continuous: true` with `max_runtime_ms` omitted/0 is normalized to the firmware 12 h ceiling (`SWARM_AUTONOMOUS_MAX_RUNTIME_MS`); `run_prepared` echoes the **accepted** policy.  
 Ack detail: `ready_for_commit` or `ready_for_commit_autonomous`. Event: `run_prepared` (echoes accepted policy).
 
 Legacy `prepare_start` remains (unsynchronized; no clock gate; not autonomous).
@@ -151,7 +152,7 @@ Autonomous looping (if authorized): subsequent passes are scheduled from the **s
 | Sync lost before start | arm cancelled / fail; no start |
 | Disconnect before start | cancel armed/prepared/loaded run; invalidate clock |
 | Disconnect during **non-autonomous** run | finish-segment-then-stop or controlled stop (config) |
-| Disconnect during **autonomous** run (already started) | **continue** full track / authorized loops; clock invalidated |
+| Disconnect during **autonomous** run (already started) | **continue** full track / authorized loops; clock invalidated; **WS reconnect deferred until the run ends** (0.3.8 — remote STOP unavailable while deferred; physical cut-off remains) |
 | Operator stop (while linked) | cancel run + stop motors |
 | FAULT during run | `run_failed`; stop; clear autonomous auth |
 | Reconnect during autonomous run | report status; **no** auto-restart / no duplicate arm |
@@ -166,6 +167,9 @@ Autonomous looping (if authorized): subsequent passes are scheduled from the **s
 | `max_loops` / `max_runtime_ms` | Policy bounds |
 | `loop_index` | 0-based current pass |
 | `completed_passes` | Finished passes |
+| `completion_reason` | Last local completion reason (`max_runtime`, `max_loops`, `track_complete`, `operator_stop`, …) |
+| `ws_reconnect_deferred` / `ws_connect_attempts` / `ws_connect_failures` / `ws_disconnects` | Bounded link diagnostics (0.3.8) |
+| `incomplete_stop_count` | Planner IncompleteStop events observed |
 | `track_loop_compatible` | First/last z within 1 mm |
 | `loop_boundary` | Optional last diagnostic object (bounded; seq bumps on boundary CORRECT/FAULT and incomplete-segment resume/fault only): `seq`, `loop_index`, `run_id`, `expected_steps`, `actual_steps`, `delta_steps`, `delta_mm`, `tol_steps`, `action` (`CONTINUE`/`CORRECT`/`FAULT`), `segment_result` (`reached`/`incomplete_resumed`/`incomplete_fault`) |
 

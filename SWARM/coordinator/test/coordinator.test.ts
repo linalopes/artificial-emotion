@@ -494,6 +494,153 @@ describe('collective run', () => {
   });
 
   it(
+    'injects 12 h maxRuntimeMs on continuous prepare and does not cancel/stop when Mac watch expires while modules still run',
+    async () => {
+      await app.close();
+      const dir = mkdtempSync(join(process.cwd(), 'tmp-watch-expire-'));
+      const eventLogPath = join(dir, 'events.jsonl');
+      try {
+        const cfg = {
+          ...loadConfig({}),
+          port: 0,
+          host: '127.0.0.1',
+          ackTimeoutMs: 300,
+          clockIntervalMs: 50,
+          clockMaxAgeMs: 2500,
+          startLeadMs: 500,
+          snapshotIntervalMs: 50,
+          eventLogPath
+        };
+        app = await createApp(cfg, { speedFactor: 150, telemetryMs: 40, tickMs: 10, reconnectMs: 100 });
+        app.coordinator.clientJoined(OP);
+        await send({ type: 'claimOperator' });
+        await until(
+          () =>
+            NODE_IDS.every(
+              (id) =>
+                node(id).connected &&
+                node(id).lastTelemetryAtMs !== null &&
+                app.coordinator.device.clockStatus(id)?.synced === true
+            ),
+          6000,
+          'nine synced'
+        );
+        await homeAll();
+        const score = shortScore(800);
+        await positioned(score);
+        // Modules refuse to finish so Mac watch (maxRuntime + grace) can expire first.
+        app.sim!.scenario('holdAutonomous');
+        expect(
+          await send({
+            type: 'execute',
+            score,
+            confirmed: true,
+            repeat: false,
+            autonomous: true,
+            autonomousLoop: true,
+            continuous: true,
+            maxRuntimeMs: 300
+          })
+        ).toEqual({ ok: true });
+        await until(() => run().phase === 'running', 3000, 'running');
+        await app.coordinator.durable.flush();
+        let events = readFileSync(eventLogPath, 'utf8')
+          .trim()
+          .split('\n')
+          .map((l) => JSON.parse(l) as { kind: string; detail?: Record<string, unknown> });
+        const startEv = events.find((e) => e.kind === 'run_start');
+        expect(startEv?.detail?.maxRuntimeMs).toBe(300);
+        expect(startEv?.detail?.continuous).toBe(true);
+
+        // maxRuntime 300 + grace 4000 → watch expires ~4.3 s after start.
+        await until(
+          () =>
+            readFileSync(eventLogPath, 'utf8').includes('run_watch_expired') && run().phase === 'running',
+          12_000,
+          'watch expired without failRun'
+        );
+        expect(run().error).toBeNull();
+        expect(run().phase).toBe('running');
+        await app.coordinator.durable.flush();
+        events = readFileSync(eventLogPath, 'utf8')
+          .trim()
+          .split('\n')
+          .map((l) => JSON.parse(l) as { kind: string; detail?: Record<string, unknown> });
+        expect(events.some((e) => e.kind === 'run_watch_expired')).toBe(true);
+        expect(events.some((e) => e.kind === 'run_failed')).toBe(false);
+        expect(events.some((e) => e.kind === 'cancel_stop')).toBe(false);
+
+        // Operator STOP after watch expiry must still reach connected modules.
+        app.sim!.scenario('releaseAutonomous');
+        expect((await send({ type: 'engageStop' })).ok).toBe(true);
+        await until(() => run().phase === 'cancelled', 8000, 'operator stop cancelled run');
+        expect(run().error).toMatch(/Software stop/i);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+    40_000
+  );
+
+  it('injects 12 h maxRuntimeMs when continuous execute omits maxRuntimeMs', async () => {
+    await app.close();
+    const dir = mkdtempSync(join(process.cwd(), 'tmp-cont-12h-'));
+    const eventLogPath = join(dir, 'events.jsonl');
+    try {
+      const cfg = {
+        ...loadConfig({}),
+        port: 0,
+        host: '127.0.0.1',
+        ackTimeoutMs: 300,
+        clockIntervalMs: 50,
+        clockMaxAgeMs: 2500,
+        startLeadMs: 500,
+        snapshotIntervalMs: 50,
+        eventLogPath
+      };
+      app = await createApp(cfg, { speedFactor: 150, telemetryMs: 40, tickMs: 10, reconnectMs: 100 });
+      app.coordinator.clientJoined(OP);
+      await send({ type: 'claimOperator' });
+      await until(
+        () =>
+          NODE_IDS.every(
+            (id) =>
+              node(id).connected &&
+              node(id).lastTelemetryAtMs !== null &&
+              app.coordinator.device.clockStatus(id)?.synced === true
+          ),
+        6000,
+        'nine synced'
+      );
+      await homeAll();
+      const score = shortScore(600);
+      await positioned(score);
+      expect(
+        await send({
+          type: 'execute',
+          score,
+          confirmed: true,
+          repeat: false,
+          autonomous: true,
+          autonomousLoop: true,
+          continuous: true
+        })
+      ).toEqual({ ok: true });
+      await until(() => run().phase === 'armed' || run().phase === 'running', 3000, 'armed');
+      await app.coordinator.durable.flush();
+      const events = readFileSync(eventLogPath, 'utf8')
+        .trim()
+        .split('\n')
+        .map((l) => JSON.parse(l) as { kind: string; detail?: Record<string, unknown> });
+      const startEv = events.find((e) => e.kind === 'run_start');
+      expect(startEv?.detail?.maxRuntimeMs).toBe(12 * 60 * 60 * 1000);
+      expect((await send({ type: 'engageStop' })).ok).toBe(true);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }, 40_000);
+
+  it(
     'lets autonomous multi-loop runs finish after more than one score duration (regression: premature 1-pass deadline)',
     async () => {
       // Reproduces the mid-run stop: watch used score.durationMs only, so after one pass + 4s grace

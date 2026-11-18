@@ -5,6 +5,7 @@
 #include <swarm_limits.h>
 
 #include "choreography/autonomous_policy.h"
+#include "net/ws_reconnect_policy.h"
 
 using swarm::AutonomousPolicy;
 using swarm::DisconnectPlayAction;
@@ -17,9 +18,14 @@ using swarm::epochOffsetMs;
 using swarm::loopBoundaryActionLabel;
 using swarm::loopClosureToleranceSteps;
 using swarm::mayStartNextLoop;
+using swarm::normalizeAutonomousPolicy;
 using swarm::segmentCompletionLabel;
+using swarm::shouldAttemptWsReconnect;
+using swarm::shouldDeferWsReconnect;
+using swarm::shouldServiceWsClient;
 using swarm::trackLoopCompatible;
 using swarm::validateAutonomousPolicy;
+using swarm::wsTcpTimeoutMs;
 
 void test_policy_defaults_ok() {
   AutonomousPolicy p{};
@@ -292,9 +298,62 @@ void test_long_running_continuous_may_start_next_loop() {
   p.autonomous = true;
   p.loop = true;
   p.continuous = true;
+  // Unnormalized continuous + maxRuntimeMs==0 remains unbounded (legacy wire form).
   for (uint32_t passes = 1; passes <= 2000; passes++) {
     TEST_ASSERT_TRUE(mayStartNextLoop(p, passes, passes * 240000u));
   }
+}
+
+void test_normalize_continuous_injects_12h_ceiling() {
+  AutonomousPolicy p{};
+  p.autonomous = true;
+  p.loop = true;
+  p.continuous = true;
+  p.maxRuntimeMs = 0;
+  normalizeAutonomousPolicy(&p);
+  TEST_ASSERT_EQUAL_UINT32(SWARM_AUTONOMOUS_MAX_RUNTIME_MS, p.maxRuntimeMs);
+  TEST_ASSERT_TRUE(mayStartNextLoop(p, 100, SWARM_AUTONOMOUS_MAX_RUNTIME_MS - 1));
+  TEST_ASSERT_FALSE(mayStartNextLoop(p, 100, SWARM_AUTONOMOUS_MAX_RUNTIME_MS));
+  TEST_ASSERT_FALSE(mayStartNextLoop(p, 100, SWARM_AUTONOMOUS_MAX_RUNTIME_MS + 1));
+
+  // Explicit override under ceiling is preserved.
+  p.maxRuntimeMs = 600000;
+  normalizeAutonomousPolicy(&p);
+  TEST_ASSERT_EQUAL_UINT32(600000u, p.maxRuntimeMs);
+}
+
+/** Mac/coordinator unavailable: never attempt or service WS while autonomy is active. */
+void test_ws_reconnect_deferred_during_autonomy() {
+  TEST_ASSERT_TRUE(shouldDeferWsReconnect(true, false));
+  TEST_ASSERT_FALSE(shouldDeferWsReconnect(true, true));
+  TEST_ASSERT_FALSE(shouldDeferWsReconnect(false, false));
+
+  // 15 min / 1 h / longer — policy is time-invariant while autonomy holds.
+  const uint32_t windows[] = {15u * 60u * 1000u, 60u * 60u * 1000u, 12u * 60u * 60u * 1000u};
+  for (uint32_t w : windows) {
+    TEST_ASSERT_FALSE(shouldAttemptWsReconnect(true, true, false, true, w, 0, 5000));
+    TEST_ASSERT_FALSE(shouldServiceWsClient(true, false, true));
+  }
+}
+
+void test_ws_reconnect_paced_after_autonomy() {
+  // After autonomous ends, reconnect is allowed but paced (no tight retry).
+  TEST_ASSERT_TRUE(shouldAttemptWsReconnect(true, true, false, false, 10'000, 0, 5000));
+  TEST_ASSERT_FALSE(shouldAttemptWsReconnect(true, true, false, false, 10'000, 6000, 5000));
+  TEST_ASSERT_TRUE(shouldAttemptWsReconnect(true, true, false, false, 11'001, 6000, 5000));
+  // Repeated failed attempts stay paced.
+  uint32_t last = 0;
+  int attempts = 0;
+  for (uint32_t now = 1; now <= 60'000; now += 50) {
+    if (shouldAttemptWsReconnect(true, true, false, false, now, last, 5000)) {
+      attempts++;
+      last = now;
+    }
+  }
+  TEST_ASSERT_TRUE(attempts >= 10);
+  TEST_ASSERT_TRUE(attempts <= 13);  // ~1 / 5 s over 60 s
+  TEST_ASSERT_TRUE(shouldServiceWsClient(true, false, false));
+  TEST_ASSERT_TRUE(wsTcpTimeoutMs() < (SWARM_STALL_ABORT_US / 1000u));
 }
 
 int main(int, char**) {
@@ -316,5 +375,8 @@ int main(int, char**) {
   RUN_TEST(test_incomplete_segment_then_1000_loop_transitions);
   RUN_TEST(test_wifi_disconnect_keeps_autonomous_policy);
   RUN_TEST(test_long_running_continuous_may_start_next_loop);
+  RUN_TEST(test_normalize_continuous_injects_12h_ceiling);
+  RUN_TEST(test_ws_reconnect_deferred_during_autonomy);
+  RUN_TEST(test_ws_reconnect_paced_after_autonomy);
   return UNITY_END();
 }

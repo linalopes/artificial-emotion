@@ -112,15 +112,17 @@ class RunController {
       }
       return false;
     }
+    AutonomousPolicy normalized = policy;
+    normalizeAutonomousPolicy(&normalized);
     const char* reason = nullptr;
-    if (!validateAutonomousPolicy(policy, &reason)) {
+    if (!validateAutonomousPolicy(normalized, &reason)) {
       setReject(reason ? reason : "invalid autonomous policy");
       if (error) {
         *error = reject_;
       }
       return false;
     }
-    if (policy.autonomous && policy.loop && !track_->loopCompatible()) {
+    if (normalized.autonomous && normalized.loop && !track_->loopCompatible()) {
       setReject("track_not_loop_compatible");
       if (error) {
         *error = reject_;
@@ -156,7 +158,7 @@ class RunController {
       }
       return false;
     }
-    policy_ = policy;
+    policy_ = normalized;
     phase_ = RunPhase::Prepared;
     reject_[0] = '\0';
     return true;

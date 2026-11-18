@@ -27,6 +27,20 @@ inline void clearAutonomousPolicy(AutonomousPolicy* p) {
 }
 
 /**
+ * Apply firmware defaults so continuous runs always carry an explicit runtime bound.
+ * continuous + maxRuntimeMs==0 → SWARM_AUTONOMOUS_MAX_RUNTIME_MS (12 h).
+ * Call before validate/store at prepare.
+ */
+inline void normalizeAutonomousPolicy(AutonomousPolicy* p) {
+  if (!p) {
+    return;
+  }
+  if (p->continuous && p->maxRuntimeMs == 0) {
+    p->maxRuntimeMs = SWARM_AUTONOMOUS_MAX_RUNTIME_MS;
+  }
+}
+
+/**
  * Validate policy fields. Returns false and sets reason on rejection.
  * Non-autonomous policies must not enable loop/continuous.
  */

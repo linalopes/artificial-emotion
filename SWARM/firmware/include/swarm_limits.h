@@ -57,6 +57,16 @@
 #define SWARM_STALL_ABORT_US 100000u
 #endif
 
+// Coordinator WebSocket reconnect (0.3.8). Must stay well below stall abort so a
+ // paced connect attempt cannot starve MotionPlanner::service().
+#ifndef SWARM_WS_RECONNECT_MIN_MS
+#define SWARM_WS_RECONNECT_MIN_MS 5000u
+#endif
+
+#ifndef SWARM_WS_TCP_TIMEOUT_MS
+#define SWARM_WS_TCP_TIMEOUT_MS 50u
+#endif
+
 #ifndef SWARM_START_AT_MAX_DELAY_MS
 #define SWARM_START_AT_MAX_DELAY_MS 120000u
 #endif

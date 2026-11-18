@@ -17,6 +17,19 @@ export type AutonomousWatchOpts = {
 };
 
 /**
+ * Explicit maxRuntimeMs sent on prepare_run so firmware and Mac agree.
+ * Continuous with unset runtime → 12 h ceiling (firmware normalizeAutonomousPolicy).
+ */
+export function resolveAutonomousMaxRuntimeMs(auto: AutonomousWatchOpts): number | undefined {
+  if (!auto.autonomous) return undefined;
+  if (auto.continuous) {
+    return auto.maxRuntimeMs && auto.maxRuntimeMs > 0 ? auto.maxRuntimeMs : AUTONOMOUS_RUNTIME_CEILING_MS;
+  }
+  if (auto.maxRuntimeMs && auto.maxRuntimeMs > 0) return auto.maxRuntimeMs;
+  return undefined;
+}
+
+/**
  * Expected wall-clock duration from startAt until modules should report finished.
  *
  * Non-autonomous / single-pass autonomous: one score duration.
@@ -27,7 +40,7 @@ export function expectedRunDurationMs(scoreDurationMs: number, auto: AutonomousW
   if (!auto.autonomous || !auto.autonomousLoop) return scoreDurationMs;
 
   if (auto.continuous) {
-    return auto.maxRuntimeMs && auto.maxRuntimeMs > 0 ? auto.maxRuntimeMs : AUTONOMOUS_RUNTIME_CEILING_MS;
+    return resolveAutonomousMaxRuntimeMs(auto)!;
   }
 
   const loops = Math.max(1, auto.maxLoops ?? 0);

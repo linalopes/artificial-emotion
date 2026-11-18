@@ -194,7 +194,14 @@ export function createFirmwareCodec(opts: FirmwareCodecOptions): Codec {
         if (!runId) return null;
         if (type === 'run_armed') return { type: 'run_status', runId, state: 'armed' };
         if (type === 'run_started') return { type: 'run_status', runId, state: 'running' };
-        if (type === 'run_completed') return { type: 'run_status', runId, state: 'finished' };
+        if (type === 'run_completed') {
+          return {
+            type: 'run_status',
+            runId,
+            state: 'finished',
+            reason: str(payload.completion_reason) ?? undefined
+          };
+        }
         return { type: 'run_status', runId, state: 'aborted', reason: str(payload.detail) ?? undefined };
       }
 

@@ -14,7 +14,7 @@ Related: [`../firmware/docs/PROTOCOL.md`](../firmware/docs/PROTOCOL.md), [`../FI
 - Optional **local looping**:
   - **Finite:** `loop: true` with `max_loops ≥ 1` and/or `max_runtime_ms ≥ 1000`
   - **Bounded by runtime:** `max_runtime_ms` alone (within firmware ceiling)
-  - **Continuous:** `continuous: true` (still subject to compile-time runtime ceiling and local faults)
+  - **Continuous:** `continuous: true` — firmware and coordinator inject `max_runtime_ms = 12 h` when unset (local faults / Stop / power cut still apply)
 - Epoch-relative scheduling for subsequent passes (no stacked inter-loop delays).
 - Stop/Cancel while linked terminates current and future loops.
 - Reboot never auto-resumes motion.
@@ -54,7 +54,7 @@ Ack `ready_for_commit_autonomous` / `run_armed_autonomous`. Events echo accepted
 |---|---|---|
 | Single pass | `autonomous: true`, `loop: false` | Finish loaded track after disconnect |
 | Finite loops | `loop: true`, `max_loops` and/or `max_runtime_ms` | Local re-arm at epoch boundaries until bound |
-| Continuous | `continuous: true` | Keep looping until Stop (while linked), fault, runtime ceiling, or power cut |
+| Continuous | `continuous: true` (+ injected `max_runtime_ms` = 12 h unless overridden) | Loop until runtime bound, Stop (while linked), fault, or power cut |
 
 Looping requires track closure (first/last `z` within `SWARM_LOOP_CLOSURE_MM`). Without `continuous`, looping needs `max_loops ≥ 1` and/or `max_runtime_ms ≥ 1000`.
 

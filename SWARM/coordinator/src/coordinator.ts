@@ -10,7 +10,12 @@ import type { Codec, DeviceCommand, Telemetry } from './devices/protocol';
 import { DeviceServer } from './devices/server';
 import { DurableLog } from './durable-log';
 import { Fleet } from './fleet';
-import { COMPLETION_GRACE_MS, expectedRunDurationMs, type AutonomousWatchOpts } from './run-duration';
+import {
+  COMPLETION_GRACE_MS,
+  expectedRunDurationMs,
+  resolveAutonomousMaxRuntimeMs,
+  type AutonomousWatchOpts
+} from './run-duration';
 
 export interface IntentResult {
   ok: boolean;
@@ -77,6 +82,8 @@ export class Coordinator {
   /** Last autonomous watch options (for disconnect/fault policy and expected end). */
   private runAuto: AutonomousWatchOpts = { autonomous: false, autonomousLoop: false, continuous: false };
   private expectedEndAtMs: number | null = null;
+  /** True after Mac watch deadline without module completion — modules left alone. */
+  private watchExpired = false;
   /** Incremented to abandon whatever asynchronous run flow is in progress. */
   private token = 0;
   private operator: string | null = null;
@@ -227,7 +234,7 @@ export class Coordinator {
             nodeId: node,
             runId: ev.runId,
             message: `${node} reported run_completed`,
-            detail: { state: ev.state }
+            detail: { state: ev.state, reason: ev.reason ?? null }
           });
         }
         if (ev.state === 'aborted' && ACTIVE.has(this.run.phase)) {
@@ -279,6 +286,10 @@ export class Coordinator {
           homed: t.homed
         }
       });
+      // One reconcile log per reconnect — do not re-log every subsequent status frame.
+      if (!t.faultCode) {
+        this.run.perNode[node] = t.moving || t.autonomous ? 'running' : prev === 'reconnected' ? 'running' : prev;
+      }
     }
     if (t.faultCode) {
       this.run.perNode[node] = 'faulted';
@@ -866,14 +877,20 @@ export class Coordinator {
       keyframes: score.tracks[id],
       presetId: score.name
     }));
+    // Continuous with unset runtime → shared 12 h ceiling (firmware normalizeAutonomousPolicy).
+    const preparedMaxRuntimeMs = auto.autonomous ? resolveAutonomousMaxRuntimeMs(auto) : undefined;
+    const preparedAuto: AutonomousWatchOpts = {
+      ...auto,
+      maxRuntimeMs: preparedMaxRuntimeMs
+    };
     err ??= await stage('preparing', 'ready', () => ({
       name: 'prepare',
       runId,
-      autonomous: auto.autonomous,
-      loop: auto.autonomous && auto.autonomousLoop,
-      continuous: auto.autonomous && auto.continuous,
-      maxLoops: auto.autonomous ? auto.maxLoops : undefined,
-      maxRuntimeMs: auto.autonomous ? auto.maxRuntimeMs : undefined
+      autonomous: preparedAuto.autonomous,
+      loop: preparedAuto.autonomous && preparedAuto.autonomousLoop,
+      continuous: preparedAuto.autonomous && preparedAuto.continuous,
+      maxLoops: preparedAuto.autonomous ? preparedAuto.maxLoops : undefined,
+      maxRuntimeMs: preparedMaxRuntimeMs
     }));
     let startAt = 0;
     if (!err) {
@@ -895,8 +912,9 @@ export class Coordinator {
     }
     this.run.phase = 'armed';
     this.run.startAtMs = startAt;
-    this.runAuto = auto;
-    const expectedMs = expectedRunDurationMs(score.durationMs, auto);
+    this.watchExpired = false;
+    this.runAuto = preparedAuto;
+    const expectedMs = expectedRunDurationMs(score.durationMs, preparedAuto);
     this.expectedEndAtMs = startAt + expectedMs;
     this.note(
       'info',
@@ -915,11 +933,11 @@ export class Coordinator {
         durationMs: score.durationMs,
         startAtMs: startAt,
         expectedEndAtMs: this.expectedEndAtMs,
-        autonomous: auto.autonomous,
-        autonomousLoop: auto.autonomousLoop,
-        continuous: auto.continuous,
-        maxLoops: auto.maxLoops ?? null,
-        maxRuntimeMs: auto.maxRuntimeMs ?? null,
+        autonomous: preparedAuto.autonomous,
+        autonomousLoop: preparedAuto.autonomousLoop,
+        continuous: preparedAuto.continuous,
+        maxLoops: preparedAuto.maxLoops ?? null,
+        maxRuntimeMs: preparedMaxRuntimeMs ?? null,
         pass: this.run.pass
       }
     });
@@ -929,7 +947,7 @@ export class Coordinator {
       message: `Expected completion window ends at +${expectedMs + COMPLETION_GRACE_MS}ms from start (incl. grace)`,
       detail: { expectedMs, graceMs: COMPLETION_GRACE_MS, expectedEndAtMs: this.expectedEndAtMs }
     });
-    this.watch(score, token, startAt, auto);
+    this.watch(score, token, startAt, preparedAuto);
     return null;
   }
 
@@ -1001,10 +1019,27 @@ export class Coordinator {
             });
             return;
           }
-          clearInterval(this.monitor!);
-          void this.failRun(`Completion was not confirmed by ${missingConnected.join(', ')}.`, {
-            initiator: 'coordinator:completion_watch'
-          });
+          // 0.3.8: never cancel/stop healthy autonomous modules because the Mac watch expired.
+          // Firmware owns the runtime bound; wait for run_completed / operator STOP.
+          if (!this.watchExpired) {
+            this.watchExpired = true;
+            this.note(
+              'warn',
+              `${score.name} Mac completion watch expired; modules still active (${missingConnected.join(', ')}). Not issuing cancel/stop — waiting for local completion or operator Stop.`
+            );
+            this.durable.write({
+              kind: 'run_watch_expired',
+              runId: this.run.runId,
+              message: `${score.name} watch expired without cancel/stop`,
+              detail: {
+                missingConnected,
+                away,
+                expectedMs,
+                graceMs: COMPLETION_GRACE_MS,
+                perNode: { ...this.run.perNode }
+              }
+            });
+          }
         }
         return;
       }

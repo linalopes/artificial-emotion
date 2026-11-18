@@ -1,10 +1,20 @@
 #include "track_player.h"
 
 #include <math.h>
+#include <string.h>
 
 #include "../util/log.h"
 
 namespace swarm {
+
+void TrackPlayer::setCompletionReason(const char* reason) {
+  if (!reason) {
+    completionReason_[0] = '\0';
+    return;
+  }
+  strncpy(completionReason_, reason, sizeof(completionReason_) - 1);
+  completionReason_[sizeof(completionReason_) - 1] = '\0';
+}
 
 void TrackPlayer::begin(MotionPlanner* planner, PositionModel* position, ConfigStore* config,
                         ModuleStateMachine* state) {
@@ -21,6 +31,7 @@ void TrackPlayer::begin(MotionPlanner* planner, PositionModel* position, ConfigS
   disconnectPendingStop_ = false;
   activeTargetSteps_ = 0;
   boundaryDiag_ = BoundaryDiag{};
+  completionReason_[0] = '\0';
 }
 
 void TrackPlayer::recordBoundary(LoopBoundaryAction action, int32_t expected, int32_t actual,
@@ -161,20 +172,22 @@ bool TrackPlayer::startAt(uint32_t startAtMillisLocal, const AutonomousPolicy& p
     }
     return false;
   }
+  AutonomousPolicy normalized = policy;
+  normalizeAutonomousPolicy(&normalized);
   const char* reason = nullptr;
-  if (!validateAutonomousPolicy(policy, &reason)) {
+  if (!validateAutonomousPolicy(normalized, &reason)) {
     if (error) {
       *error = reason ? reason : "invalid autonomous policy";
     }
     return false;
   }
-  if (policy.autonomous && policy.loop && !loopCompatible()) {
+  if (normalized.autonomous && normalized.loop && !loopCompatible()) {
     if (error) {
       *error = "track_not_loop_compatible";
     }
     return false;
   }
-  policy_ = policy;
+  policy_ = normalized;
   epochStartMs_ = startAtMillisLocal;
   phase_ = TrackPhase::Playing;
   index_ = 0;
@@ -184,9 +197,10 @@ bool TrackPlayer::startAt(uint32_t startAtMillisLocal, const AutonomousPolicy& p
   disconnectPendingStop_ = false;
   activeTargetSteps_ = 0;
   boundaryDiag_ = BoundaryDiag{};
-  SWARM_LOG("Track start_at local_ms=%lu autonomous=%d loop=%d",
+  completionReason_[0] = '\0';
+  SWARM_LOG("Track start_at local_ms=%lu autonomous=%d loop=%d max_runtime_ms=%lu",
             static_cast<unsigned long>(startAtMillisLocal), policy_.autonomous ? 1 : 0,
-            policy_.loop ? 1 : 0);
+            policy_.loop ? 1 : 0, static_cast<unsigned long>(policy_.maxRuntimeMs));
   return true;
 }
 
@@ -194,6 +208,7 @@ void TrackPlayer::stop() {
   planner_->requestControlledStop();
   phase_ = TrackPhase::Stopped;
   started_ = false;
+  setCompletionReason("operator_stop");
   clearAutonomousPolicy(&policy_);
   if (state_->state() == ModuleState::Moving) {
     state_->setStopping();
@@ -257,6 +272,7 @@ void TrackPlayer::finishPass(uint32_t nowMs) {
   completedPasses_++;
   if (runtimeExpired(nowMs)) {
     phase_ = TrackPhase::Completed;
+    setCompletionReason("max_runtime");
     SWARM_LOG("Track completed (runtime expired) passes=%lu",
               static_cast<unsigned long>(completedPasses_));
     return;
@@ -270,7 +286,9 @@ void TrackPlayer::finishPass(uint32_t nowMs) {
     return;
   }
   phase_ = TrackPhase::Completed;
-  SWARM_LOG("Track completed passes=%lu", static_cast<unsigned long>(completedPasses_));
+  setCompletionReason(policy_.maxLoops != 0 ? "max_loops" : "track_complete");
+  SWARM_LOG("Track completed passes=%lu reason=%s",
+            static_cast<unsigned long>(completedPasses_), completionReason_);
 }
 
 void TrackPlayer::service() {
@@ -285,6 +303,7 @@ void TrackPlayer::service() {
     }
     if (runtimeExpired(now)) {
       phase_ = TrackPhase::Completed;
+      setCompletionReason("max_runtime");
       return;
     }
 
@@ -397,6 +416,7 @@ void TrackPlayer::service() {
 
   if (runtimeExpired(now)) {
     phase_ = TrackPhase::Completed;
+    setCompletionReason("max_runtime");
     return;
   }
 

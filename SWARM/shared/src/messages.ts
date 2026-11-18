@@ -33,7 +33,14 @@ export type Intent =
   | { type: 'cancelRun' }
   | { type: 'simScenario'; scenario: SimScenario; node?: NodeId };
 
-export type SimScenario = 'disconnect' | 'reconnect' | 'homingFault' | 'clockFault' | 'reset';
+export type SimScenario =
+  | 'disconnect'
+  | 'reconnect'
+  | 'homingFault'
+  | 'clockFault'
+  | 'reset'
+  | 'holdAutonomous'
+  | 'releaseAutonomous';
 export type IntentEnvelope = { id: string; intent: Intent };
 
 /** Intents any connected browser may send, operator or not. */

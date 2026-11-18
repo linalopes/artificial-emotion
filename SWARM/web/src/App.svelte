@@ -157,7 +157,7 @@
         {Math.max(...stats.map((s) => s.peakSpeedMmS)).toFixed(1)} mm/s for {Math.round(app.score.durationMs / 1000)} s
         {app.autonomous
           ? (app.loop
-            ? (app.continuousAutonomous ? ', looping on each module until stopped or faulted' : `, looping ${app.autonomousMaxLoops} times on each module`)
+            ? (app.continuousAutonomous ? ', looping on each module for up to 12 hours (or until Stop / fault)' : `, looping ${app.autonomousMaxLoops} times on each module`)
             : ', once on each module')
           : (app.loop ? ', then the Mac re-arms until stopped' : '')}.
         They start from where they are now. Keep the space below clear.
