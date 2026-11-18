@@ -8,10 +8,12 @@
 #include "net/ws_reconnect_policy.h"
 
 using swarm::AutonomousPolicy;
+using swarm::DisconnectMotorAction;
 using swarm::DisconnectPlayAction;
 using swarm::LoopBoundaryAction;
 using swarm::SegmentIdleAction;
 using swarm::decideDisconnectAction;
+using swarm::decideDisconnectMotorAction;
 using swarm::decideLoopBoundary;
 using swarm::decideSegmentIdleAction;
 using swarm::epochOffsetMs;
@@ -293,6 +295,51 @@ void test_wifi_disconnect_keeps_autonomous_policy() {
                     static_cast<int>(decideDisconnectAction(false, true, true, false)));
 }
 
+/**
+ * Regression (physical 0.3.8 fleet test): Mac Wi-Fi loss during BUSY autonomous Wave
+ * stopped all nine motors. TrackPlayer continued, but ProtocolClient still applied
+ * controlled stop when planner was busy. Full disconnect path must keep motors moving.
+ */
+void test_disconnect_motor_busy_autonomous_never_stops() {
+  // plannerBusy=true, ControlledStop NVS policy, autonomy survives.
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectMotorAction(true, false, true, false)));
+  // Same with FinishSegmentThenStop NVS policy.
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectMotorAction(true, false, true, true)));
+  // Idle planner + autonomy: still Continue (no stop / no state change).
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectMotorAction(true, false, false, false)));
+  // Homing must not outrank surviving autonomy (run should not be homing, but be strict).
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectMotorAction(true, true, true, false)));
+
+  // Pair with track-player decision: when autonomous started, both layers Continue.
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectPlayAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectAction(false, true, true, false)));
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectMotorAction(true, false, true, false)));
+
+  // Non-autonomous BUSY still stops / finishes as before.
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ControlledStop),
+                    static_cast<int>(decideDisconnectMotorAction(false, false, true, false)));
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::FinishCurrentMotion),
+                    static_cast<int>(decideDisconnectMotorAction(false, false, true, true)));
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::AbortHoming),
+                    static_cast<int>(decideDisconnectMotorAction(false, true, true, false)));
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::None),
+                    static_cast<int>(decideDisconnectMotorAction(false, false, false, false)));
+}
+
+/** Surviving autonomy must also defer WS reconnect so connect() cannot stall the motor loop. */
+void test_disconnect_autonomy_defers_ws_and_keeps_motor_path() {
+  TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ContinueAutonomous),
+                    static_cast<int>(decideDisconnectMotorAction(true, false, true, false)));
+  TEST_ASSERT_TRUE(shouldDeferWsReconnect(true, false));
+  TEST_ASSERT_FALSE(shouldServiceWsClient(true, false, true));
+  TEST_ASSERT_FALSE(shouldAttemptWsReconnect(true, true, false, true, 60'000, 0, 5000));
+}
+
 void test_long_running_continuous_may_start_next_loop() {
   AutonomousPolicy p{};
   p.autonomous = true;
@@ -374,6 +421,8 @@ int main(int, char**) {
   RUN_TEST(test_segment_idle_requires_target_reached);
   RUN_TEST(test_incomplete_segment_then_1000_loop_transitions);
   RUN_TEST(test_wifi_disconnect_keeps_autonomous_policy);
+  RUN_TEST(test_disconnect_motor_busy_autonomous_never_stops);
+  RUN_TEST(test_disconnect_autonomy_defers_ws_and_keeps_motor_path);
   RUN_TEST(test_long_running_continuous_may_start_next_loop);
   RUN_TEST(test_normalize_continuous_injects_12h_ceiling);
   RUN_TEST(test_ws_reconnect_deferred_during_autonomy);

@@ -8,6 +8,7 @@
 #include "../util/mono_time.h"
 #include "../util/safe_string.h"
 #include "../util/timing.h"
+#include "../choreography/autonomous_policy.h"
 #include "ws_reconnect_policy.h"
 
 namespace swarm {
@@ -208,13 +209,14 @@ void ProtocolClient::onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
 void ProtocolClient::handleDisconnectPolicy() {
   const bool finish =
       c_.config->get().disconnectPolicy == DisconnectPolicy::FinishSegmentThenStop;
+  const bool autonomySurvives = autonomyActive();
 
   if (c_.clock) {
     c_.clock->invalidate();
   }
   if (c_.run) {
     // Before start: cancel. Autonomous runs that have already started continue.
-    if (c_.run->shouldSurviveDisconnect()) {
+    if (autonomySurvives) {
       SWARM_LOG("Disconnect: autonomous run survives (clock invalidated)");
     } else if (c_.run->phase() == RunPhase::Prepared || c_.run->phase() == RunPhase::Armed ||
                c_.run->phase() == RunPhase::Loaded) {
@@ -225,24 +227,28 @@ void ProtocolClient::handleDisconnectPolicy() {
   // Never auto-resume a cancelled run on later reconnect.
   c_.track->onCoordinatorDisconnected(finish);
 
-  if (c_.home->active()) {
-    c_.home->abortToUnhomed();
-    SWARM_LOG("Disconnect: homing aborted to UNHOMED");
-    return;
+  // Host-tested motor decision — must not stop a surviving autonomous BUSY planner.
+  const DisconnectMotorAction motor =
+      decideDisconnectMotorAction(autonomySurvives, c_.home->active(), c_.planner->isBusy(), finish);
+  switch (motor) {
+    case DisconnectMotorAction::ContinueAutonomous:
+      SWARM_LOG("Disconnect: planner continues (autonomous, busy=%d)", c_.planner->isBusy() ? 1 : 0);
+      return;
+    case DisconnectMotorAction::AbortHoming:
+      c_.home->abortToUnhomed();
+      SWARM_LOG("Disconnect: homing aborted to UNHOMED");
+      return;
+    case DisconnectMotorAction::None:
+      return;
+    case DisconnectMotorAction::FinishCurrentMotion:
+      SWARM_LOG("Disconnect: finishing current bounded motion, then hold");
+      return;
+    case DisconnectMotorAction::ControlledStop:
+      c_.planner->requestControlledStop();
+      c_.state->setStopping();
+      SWARM_LOG("Disconnect: controlled stop");
+      return;
   }
-
-  if (!c_.planner->isBusy()) {
-    return;
-  }
-
-  if (finish) {
-    SWARM_LOG("Disconnect: finishing current bounded motion, then hold");
-    return;
-  }
-
-  c_.planner->requestControlledStop();
-  c_.state->setStopping();
-  SWARM_LOG("Disconnect: controlled stop");
 }
 
 bool ProtocolClient::targetMatches(const char* target) const {

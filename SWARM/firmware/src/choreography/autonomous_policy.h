@@ -228,4 +228,35 @@ inline DisconnectPlayAction decideDisconnectAction(bool trackArmedOrWaitingStart
   return DisconnectPlayAction::Ignore;
 }
 
+/**
+ * Planner / coil side of coordinator disconnect (ProtocolClient::handleDisconnectPolicy).
+ *
+ * Critical: when an authorized autonomous run is already executing, never request a
+ * controlled stop or enter STOPPING — even if the planner is BUSY and the NVS
+ * disconnect policy is ControlledStop. TrackPlayer may preserve the run while the
+ * protocol layer previously still stopped the motor (0.3.8 physical regression).
+ */
+enum class DisconnectMotorAction : uint8_t {
+  None = 0,
+  ContinueAutonomous,
+  AbortHoming,
+  FinishCurrentMotion,
+  ControlledStop,
+};
+
+inline DisconnectMotorAction decideDisconnectMotorAction(bool autonomySurvives, bool homeActive,
+                                                         bool plannerBusy, bool finishSegmentPolicy) {
+  if (autonomySurvives) {
+    return DisconnectMotorAction::ContinueAutonomous;
+  }
+  if (homeActive) {
+    return DisconnectMotorAction::AbortHoming;
+  }
+  if (!plannerBusy) {
+    return DisconnectMotorAction::None;
+  }
+  return finishSegmentPolicy ? DisconnectMotorAction::FinishCurrentMotion
+                             : DisconnectMotorAction::ControlledStop;
+}
+
 }  // namespace swarm
