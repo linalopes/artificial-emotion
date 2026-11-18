@@ -1,0 +1,611 @@
+{
+  "fleet": "hardware",
+  "serverTimeMs": 2365540.527834,
+  "wallTimeMs": 1794997878848,
+  "nodes": [
+    {
+      "id": "Mau01",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.8",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -75,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997672068,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 3046903.2376666665,
+        "rttMs": 53.61100000049919,
+        "uncertaintyMs": 26.805500000249594,
+        "ageMs": 4163.103124999907
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997878700,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997878700,
+      "completionReason": "",
+      "wsReconnectDeferred": false,
+      "wsConnectAttempts": 29,
+      "wsConnectFailures": 16,
+      "wsDisconnects": 12,
+      "incompleteStopCount": 0
+    },
+    {
+      "id": "Mau02",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -59,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997701223,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235444.618166667,
+        "rttMs": 52.87000000057742,
+        "uncertaintyMs": 26.43500000028871,
+        "ageMs": 226.0092500001192
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997878662,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997878662,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    },
+    {
+      "id": "Mau03",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -62,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997702248,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235468.675666667,
+        "rttMs": 54.877999999560416,
+        "uncertaintyMs": 27.438999999780208,
+        "ageMs": 3342.704167000018
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997878519,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997878519,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    },
+    {
+      "id": "Mau04",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -55,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997707317,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235451.076666666,
+        "rttMs": 67.60100000025705,
+        "uncertaintyMs": 33.80050000012852,
+        "ageMs": 2956.0977090001106
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997877910,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997877910,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    },
+    {
+      "id": "Mau05",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -56,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997693285,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235416.7360000005,
+        "rttMs": 71.3230000003241,
+        "uncertaintyMs": 35.66150000016205,
+        "ageMs": 2561.615625000093
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997878303,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997878303,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    },
+    {
+      "id": "Mau06",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -56,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997706452,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235408.1475,
+        "rttMs": 54.557999999728054,
+        "uncertaintyMs": 27.278999999864027,
+        "ageMs": 2152.739624999929
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997878711,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997878711,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    },
+    {
+      "id": "Mau07",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -64,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997690453,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235429.548166667,
+        "rttMs": 63.59599999943748,
+        "uncertaintyMs": 31.79799999971874,
+        "ageMs": 1804.0978339998983
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997878056,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997878056,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    },
+    {
+      "id": "Mau08",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -59,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997690827,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235479.632499999,
+        "rttMs": 56.87000000057742,
+        "uncertaintyMs": 28.43500000028871,
+        "ageMs": 1322.8380839996971
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997878557,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997878557,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    },
+    {
+      "id": "Mau09",
+      "connected": true,
+      "simulated": false,
+      "fwVersion": "0.3.7",
+      "homed": true,
+      "homing": false,
+      "moving": false,
+      "faultCode": null,
+      "positionMm": 0,
+      "targetMm": null,
+      "endstop": true,
+      "rssiDbm": -75,
+      "rpm": 15,
+      "accelMmS2": null,
+      "limitMinMm": 0,
+      "limitMaxMm": 500,
+      "lastHomedAtMs": 1794997690267,
+      "travelSinceHomeMm": 0,
+      "clock": {
+        "synced": true,
+        "offsetMs": 4235443.611833333,
+        "rttMs": 41.87099999934435,
+        "uncertaintyMs": 20.935499999672174,
+        "ageMs": 994.7579999999143
+      },
+      "clockSyncedFromNode": true,
+      "lastTelemetryAtMs": 1794997877867,
+      "reportedRunId": "",
+      "loopIndex": 0,
+      "completedPasses": 0,
+      "autonomousReported": false,
+      "positionValid": true,
+      "lastLoopBoundaryAction": null,
+      "lastProgressAtMs": 1794997877867,
+      "completionReason": null,
+      "wsReconnectDeferred": null,
+      "wsConnectAttempts": null,
+      "wsConnectFailures": null,
+      "wsDisconnects": null,
+      "incompleteStopCount": null
+    }
+  ],
+  "stop": {
+    "engaged": false,
+    "atMs": null
+  },
+  "run": {
+    "phase": "idle",
+    "runId": null,
+    "scoreName": null,
+    "scoreFingerprint": null,
+    "durationMs": 0,
+    "startAtMs": null,
+    "repeat": false,
+    "autonomous": false,
+    "autonomousLoop": false,
+    "pass": 0,
+    "error": null,
+    "perNode": {}
+  },
+  "operatorClientId": "9d924414-2c11-40f9-ac21-acdfeb824427",
+  "clients": 2,
+  "you": {
+    "clientId": "6a7ab017-eca1-4550-8de8-1a6b18be6a33",
+    "isOperator": false
+  },
+  "log": [
+    {
+      "atMs": 1794995515197,
+      "level": "info",
+      "message": "Mau08 connected, firmware 0.3.7."
+    },
+    {
+      "atMs": 1794995515200,
+      "level": "info",
+      "message": "Mau02 connected, firmware 0.3.7."
+    },
+    {
+      "atMs": 1794995515201,
+      "level": "info",
+      "message": "Mau03 connected, firmware 0.3.7."
+    },
+    {
+      "atMs": 1794995515209,
+      "level": "info",
+      "message": "Mau05 connected, firmware 0.3.7."
+    },
+    {
+      "atMs": 1794995515212,
+      "level": "info",
+      "message": "Mau04 connected, firmware 0.3.7."
+    },
+    {
+      "atMs": 1794995515214,
+      "level": "info",
+      "message": "Mau07 connected, firmware 0.3.7."
+    },
+    {
+      "atMs": 1794995515230,
+      "level": "info",
+      "message": "Mau06 connected, firmware 0.3.7."
+    },
+    {
+      "atMs": 1794995515519,
+      "level": "info",
+      "message": "Mau08 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995515532,
+      "level": "info",
+      "message": "Mau03 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995515535,
+      "level": "info",
+      "message": "Mau09 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995515597,
+      "level": "info",
+      "message": "Mau06 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995515599,
+      "level": "info",
+      "message": "Mau02 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995515599,
+      "level": "info",
+      "message": "Mau04 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995515600,
+      "level": "info",
+      "message": "Mau05 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995515636,
+      "level": "info",
+      "message": "Mau07 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995522414,
+      "level": "info",
+      "message": "Mau01 connected, firmware 0.3.8."
+    },
+    {
+      "atMs": 1794995522803,
+      "level": "info",
+      "message": "Mau01 clock gate set to ±50 ms."
+    },
+    {
+      "atMs": 1794995533054,
+      "level": "warn",
+      "message": "Mau07 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794995597464,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794995599209,
+      "level": "warn",
+      "message": "Mau09 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794995811392,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794995829181,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794995936675,
+      "level": "warn",
+      "message": "Mau06 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794996001421,
+      "level": "warn",
+      "message": "Mau03 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794996112199,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794996140244,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794996140557,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794996186958,
+      "level": "warn",
+      "message": "Mau05 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794996193589,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794996197845,
+      "level": "info",
+      "message": "The controlling browser disconnected. Control is free. Motion in progress is not affected."
+    },
+    {
+      "atMs": 1794996444906,
+      "level": "warn",
+      "message": "Mau08 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794996581755,
+      "level": "warn",
+      "message": "Mau07 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794996745282,
+      "level": "warn",
+      "message": "Mau01 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794996944822,
+      "level": "warn",
+      "message": "Mau02 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794997037126,
+      "level": "warn",
+      "message": "Mau09 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794997210912,
+      "level": "warn",
+      "message": "Mau01 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794997426872,
+      "level": "warn",
+      "message": "Mau09 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794997524786,
+      "level": "warn",
+      "message": "Mau01 clock_sync_fin refused: rtt out of range"
+    },
+    {
+      "atMs": 1794997671111,
+      "level": "info",
+      "message": "home acknowledged by Mau01, Mau02, Mau03, Mau04, Mau05, Mau06, Mau07, Mau08, Mau09."
+    },
+    {
+      "atMs": 1794997871133,
+      "level": "warn",
+      "message": "Mau09 clock_sync_fin refused: rtt out of range"
+    }
+  ]
+}

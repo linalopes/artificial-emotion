@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { NODE_IDS, type NodeId, type NodeState } from '@swarm/shared';
-import { statusOf, type Status } from './status';
+import { statusOf } from './status';
 import {
   ANCHOR_SPACING_M,
   CAMERA_LOOK_AT,
@@ -237,12 +237,14 @@ export class SwarmScene3D {
         m.sphere.visible = true;
         m.placeholder.visible = false;
         m.sphere.position.set(p.x, p.y, p.z);
-        this.tintSphere(m.sphere, st);
+        m.sphere.scale.setScalar(1);
+        this.tintSphere(m.sphere);
       } else {
         m.sphere.visible = false;
         m.placeholder.visible = st !== 'offline';
         m.placeholder.position.set(anchor.x, anchor.y - 0.12, anchor.z);
-        this.tintPlaceholder(m.placeholder, st);
+        m.placeholder.scale.setScalar(0.75);
+        this.tintPlaceholder(m.placeholder);
       }
 
       if (showGhost) {
@@ -253,6 +255,7 @@ export class SwarmScene3D {
         m.ghost.visible = false;
       }
 
+      // Selection ring only — never changes sphere scale or opacity.
       const sel = selected.has(n.id);
       m.ring.visible = sel && (m.sphere.visible || m.placeholder.visible);
       if (m.ring.visible) {
@@ -331,12 +334,12 @@ export class SwarmScene3D {
   }
 
   private buildModules(): void {
-    // Schematic wireframe language (aligned with 2D stroke aesthetic). No physical glass / IBL.
+    // Schematic white wireframe. No physical glass / IBL. No dashed lines.
     const sphereMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       wireframe: true,
       transparent: true,
-      opacity: 0.95,
+      opacity: 1,
       depthWrite: false
     });
     const ghostMat = new THREE.MeshBasicMaterial({
@@ -353,16 +356,17 @@ export class SwarmScene3D {
       side: THREE.DoubleSide
     });
     const phMat = new THREE.MeshBasicMaterial({
-      color: 0x22113e,
+      color: 0xffffff,
       transparent: true,
-      opacity: 0.45,
+      opacity: 0.35,
       wireframe: true,
       depthWrite: false
     });
     const lineMat = new THREE.LineBasicMaterial({ color: 0x22113e, transparent: true, opacity: 0.45 });
-    // Same radius for reported spheres and unknown placeholders — state must not change volume.
     const sphereGeo = new THREE.SphereGeometry(SPHERE_RADIUS_M, 24, 16);
     const ringGeo = new THREE.RingGeometry(SPHERE_RADIUS_M + 0.012, SPHERE_RADIUS_M + 0.02, 32);
+    /** Unknown/unhomed display scale vs homed radius (geometry segments unchanged). */
+    const unknownScale = 0.75;
 
     for (const id of NODE_IDS) {
       const group = new THREE.Group();
@@ -372,6 +376,7 @@ export class SwarmScene3D {
       const string = new THREE.Line(lineGeo, lineMat.clone());
       const sphere = new THREE.Mesh(sphereGeo, sphereMat.clone());
       sphere.userData.nodeId = id;
+      sphere.scale.setScalar(1);
       const ghost = new THREE.Mesh(sphereGeo, ghostMat.clone());
       ghost.visible = false;
       const ring = new THREE.Mesh(ringGeo, ringMat.clone());
@@ -379,6 +384,7 @@ export class SwarmScene3D {
       ring.visible = false;
       const placeholder = new THREE.Mesh(sphereGeo, phMat.clone());
       placeholder.userData.nodeId = id;
+      placeholder.scale.setScalar(unknownScale);
       placeholder.visible = false;
       const label = makeLabelSprite(id.slice(3), 0x22113e);
       group.add(string, ghost, sphere, ring, placeholder, label);
@@ -416,34 +422,16 @@ export class SwarmScene3D {
     }
   }
 
-  private tintSphere(mesh: THREE.Mesh, st: Status): void {
+  private tintSphere(mesh: THREE.Mesh): void {
     const mat = mesh.material as THREE.MeshBasicMaterial;
-    const p = PALETTE[this.palette];
-    // Wireframe stroke colors mirror 2D body fills / strokes; selection stays on the ring.
-    if (st === 'fault') {
-      mat.color.setHex(p.fault);
-      mat.opacity = 0.95;
-    } else if (st === 'moving') {
-      mat.color.setHex(p.moving);
-      mat.opacity = 0.95;
-    } else if (st === 'homing') {
-      mat.color.setHex(p.homing);
-      mat.opacity = 0.95;
-    } else if (st === 'offline') {
-      mat.color.setHex(p.ink);
-      mat.opacity = 0.28;
-    } else {
-      mat.color.setHex(p.glass);
-      mat.opacity = 0.95;
-    }
+    mat.color.setHex(0xffffff);
+    mat.opacity = 1;
   }
 
-  private tintPlaceholder(mesh: THREE.Mesh, st: Status): void {
+  private tintPlaceholder(mesh: THREE.Mesh): void {
     const mat = mesh.material as THREE.MeshBasicMaterial;
-    const p = PALETTE[this.palette];
-    mat.color.setHex(st === 'fault' ? p.fault : p.ink);
-    // Lighter / schematic for unknown position (2D uses dashed transparent stroke).
-    mat.opacity = st === 'unhomed' ? 0.4 : st === 'offline' ? 0.28 : 0.5;
+    mat.color.setHex(0xffffff);
+    mat.opacity = 0.35;
   }
 
   private hit(ev: PointerEvent): NodeId | null {
