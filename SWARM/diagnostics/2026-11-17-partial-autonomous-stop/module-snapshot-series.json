@@ -1,0 +1,1676 @@
+[
+  {
+    "source": "/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/diagnostics/2026-11-17-moving-but-stationary/snapshots/snapshot-t0-full.json",
+    "utc": "2026-11-17 16:50:06 UTC",
+    "cet": "2026-11-17 17:50:06 CET",
+    "stop": {
+      "engaged": false,
+      "atMs": null
+    },
+    "runPhase": "running",
+    "runError": null,
+    "nodes": [
+      {
+        "id": "Mau01",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 199.1606,
+        "endstop": true,
+        "travelSinceHomeMm": 103068.81779999846,
+        "telemAgeMs": 718
+      },
+      {
+        "id": "Mau02",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 276.9679,
+        "endstop": true,
+        "travelSinceHomeMm": 102989.01349999844,
+        "telemAgeMs": 291
+      },
+      {
+        "id": "Mau03",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 361.9543,
+        "endstop": true,
+        "travelSinceHomeMm": 102684.58429999847,
+        "telemAgeMs": 890
+      },
+      {
+        "id": "Mau04",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 285.3549,
+        "endstop": true,
+        "travelSinceHomeMm": 102978.8316999987,
+        "telemAgeMs": 481
+      },
+      {
+        "id": "Mau05",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 347.7688,
+        "endstop": true,
+        "travelSinceHomeMm": 102679.14199999915,
+        "telemAgeMs": 174
+      },
+      {
+        "id": "Mau06",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.9846,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.73619999998,
+        "telemAgeMs": 44904
+      },
+      {
+        "id": "Mau07",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 362.2764,
+        "endstop": true,
+        "travelSinceHomeMm": 102675.70199999878,
+        "telemAgeMs": 940
+      },
+      {
+        "id": "Mau08",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.9846,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.73619999918,
+        "telemAgeMs": 44936
+      },
+      {
+        "id": "Mau09",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 335.7232,
+        "endstop": true,
+        "travelSinceHomeMm": 102916.88719999859,
+        "telemAgeMs": 119
+      }
+    ]
+  },
+  {
+    "source": "/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/diagnostics/2026-11-17-moving-but-stationary/snapshots/snapshot-t2-full.json",
+    "utc": "2026-11-17 16:50:11 UTC",
+    "cet": "2026-11-17 17:50:11 CET",
+    "stop": {
+      "engaged": false,
+      "atMs": null
+    },
+    "runPhase": "running",
+    "runError": null,
+    "nodes": [
+      {
+        "id": "Mau01",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 141.7973,
+        "endstop": true,
+        "travelSinceHomeMm": 103126.18109999844,
+        "telemAgeMs": 290
+      },
+      {
+        "id": "Mau02",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 224.2526,
+        "endstop": true,
+        "travelSinceHomeMm": 103041.72879999843,
+        "telemAgeMs": 546
+      },
+      {
+        "id": "Mau03",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 300.7254,
+        "endstop": true,
+        "travelSinceHomeMm": 102745.81319999848,
+        "telemAgeMs": 141
+      },
+      {
+        "id": "Mau04",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 232.7202,
+        "endstop": true,
+        "travelSinceHomeMm": 103031.4663999987,
+        "telemAgeMs": 731
+      },
+      {
+        "id": "Mau05",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 293.857,
+        "endstop": true,
+        "travelSinceHomeMm": 102733.05379999915,
+        "telemAgeMs": 321
+      },
+      {
+        "id": "Mau06",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.9846,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.73619999998,
+        "telemAgeMs": 49918
+      },
+      {
+        "id": "Mau07",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 304.8787,
+        "endstop": true,
+        "travelSinceHomeMm": 102733.09969999878,
+        "telemAgeMs": 501
+      },
+      {
+        "id": "Mau08",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.9846,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.73619999918,
+        "telemAgeMs": 49950
+      },
+      {
+        "id": "Mau09",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 360.217,
+        "endstop": true,
+        "travelSinceHomeMm": 102952.40259999859,
+        "telemAgeMs": 684
+      }
+    ]
+  },
+  {
+    "source": "/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/diagnostics/2026-11-17-moving-but-stationary/snapshots/snapshot-prestop-a-full.json",
+    "utc": "2026-11-17 16:51:47 UTC",
+    "cet": "2026-11-17 17:51:47 CET",
+    "stop": {
+      "engaged": false,
+      "atMs": null
+    },
+    "runPhase": "running",
+    "runError": null,
+    "nodes": [
+      {
+        "id": "Mau01",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 165.3938,
+        "endstop": true,
+        "travelSinceHomeMm": 104111.74459999849,
+        "telemAgeMs": 780
+      },
+      {
+        "id": "Mau02",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 163.4725,
+        "endstop": true,
+        "travelSinceHomeMm": 104046.29829999835,
+        "telemAgeMs": 349
+      },
+      {
+        "id": "Mau03",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 250.7483,
+        "endstop": true,
+        "travelSinceHomeMm": 103733.20589999837,
+        "telemAgeMs": 946
+      },
+      {
+        "id": "Mau04",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 171.664,
+        "endstop": true,
+        "travelSinceHomeMm": 104035.52959999852,
+        "telemAgeMs": 538
+      },
+      {
+        "id": "Mau05",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 235.1938,
+        "endstop": true,
+        "travelSinceHomeMm": 103736.44979999914,
+        "telemAgeMs": 133
+      },
+      {
+        "id": "Mau06",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.8236,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.89719999998,
+        "telemAgeMs": 448
+      },
+      {
+        "id": "Mau07",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 243.8799,
+        "endstop": true,
+        "travelSinceHomeMm": 103741.5232999987,
+        "telemAgeMs": 314
+      },
+      {
+        "id": "Mau08",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.9846,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.73619999918,
+        "telemAgeMs": 145018
+      },
+      {
+        "id": "Mau09",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 296.2615,
+        "endstop": true,
+        "travelSinceHomeMm": 103959.54909999849,
+        "telemAgeMs": 182
+      }
+    ]
+  },
+  {
+    "source": "/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/diagnostics/2026-11-17-moving-but-stationary/snapshots/snapshot-prestop-b-full.json",
+    "utc": "2026-11-17 16:51:57 UTC",
+    "cet": "2026-11-17 17:51:57 CET",
+    "stop": {
+      "engaged": false,
+      "atMs": null
+    },
+    "runPhase": "running",
+    "runError": null,
+    "nodes": [
+      {
+        "id": "Mau01",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 274.3678,
+        "endstop": true,
+        "travelSinceHomeMm": 104220.71859999848,
+        "telemAgeMs": 940
+      },
+      {
+        "id": "Mau02",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 197.0897,
+        "endstop": true,
+        "travelSinceHomeMm": 104138.38329999836,
+        "telemAgeMs": 510
+      },
+      {
+        "id": "Mau03",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 134.0086,
+        "endstop": true,
+        "travelSinceHomeMm": 103849.94559999838,
+        "telemAgeMs": 100
+      },
+      {
+        "id": "Mau04",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 187.2415,
+        "endstop": true,
+        "travelSinceHomeMm": 104131.18109999853,
+        "telemAgeMs": 797
+      },
+      {
+        "id": "Mau05",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 132.0067,
+        "endstop": true,
+        "travelSinceHomeMm": 103839.63689999914,
+        "telemAgeMs": 391
+      },
+      {
+        "id": "Mau06",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 263.6913,
+        "endstop": true,
+        "travelSinceHomeMm": 102509.02949999996,
+        "telemAgeMs": 534
+      },
+      {
+        "id": "Mau07",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 134.5723,
+        "endstop": true,
+        "travelSinceHomeMm": 103850.8308999987,
+        "telemAgeMs": 154
+      },
+      {
+        "id": "Mau08",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.9846,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.73619999918,
+        "telemAgeMs": 155026
+      },
+      {
+        "id": "Mau09",
+        "connected": true,
+        "moving": true,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 187.207,
+        "endstop": true,
+        "travelSinceHomeMm": 104068.60359999847,
+        "telemAgeMs": 336
+      }
+    ]
+  },
+  {
+    "source": "/Users/linalopes/Documents/Lina's PKM/03-INITIATIVES/2026 Artificial Emotion/SWARM/diagnostics/2026-11-17-moving-but-stationary/post-stop-snapshot.json",
+    "utc": "2026-11-17 16:52:16 UTC",
+    "cet": "2026-11-17 17:52:16 CET",
+    "stop": {
+      "engaged": true,
+      "atMs": 1794934327955
+    },
+    "runPhase": "cancelled",
+    "runError": "Software stop engaged.",
+    "nodes": [
+      {
+        "id": "Mau01",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 341.3836,
+        "endstop": true,
+        "travelSinceHomeMm": 104343.73999999849,
+        "telemAgeMs": 180
+      },
+      {
+        "id": "Mau02",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 322.3315,
+        "endstop": true,
+        "travelSinceHomeMm": 104263.62509999836,
+        "telemAgeMs": 743
+      },
+      {
+        "id": "Mau03",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 244.7543,
+        "endstop": true,
+        "travelSinceHomeMm": 103960.69129999836,
+        "telemAgeMs": 399
+      },
+      {
+        "id": "Mau04",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 315.8428,
+        "endstop": true,
+        "travelSinceHomeMm": 104259.78239999856,
+        "telemAgeMs": 28
+      },
+      {
+        "id": "Mau05",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 254.4069,
+        "endstop": true,
+        "travelSinceHomeMm": 103962.03709999916,
+        "telemAgeMs": 621
+      },
+      {
+        "id": "Mau06",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 138.0928,
+        "endstop": true,
+        "travelSinceHomeMm": 102634.62799999997,
+        "telemAgeMs": 232
+      },
+      {
+        "id": "Mau07",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 244.6162,
+        "endstop": true,
+        "travelSinceHomeMm": 103966.00599999868,
+        "telemAgeMs": 414
+      },
+      {
+        "id": "Mau08",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 369.9846,
+        "endstop": true,
+        "travelSinceHomeMm": 102402.73619999918,
+        "telemAgeMs": 9546
+      },
+      {
+        "id": "Mau09",
+        "connected": true,
+        "moving": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 189.646,
+        "endstop": true,
+        "travelSinceHomeMm": 104184.02019999849,
+        "telemAgeMs": 570
+      }
+    ]
+  },
+  {
+    "source": "live",
+    "capturedAt": "2026-11-17T17:05:31.319Z",
+    "stop": {
+      "engaged": true,
+      "atMs": 1794934327955
+    },
+    "runPhase": "cancelled",
+    "nodes": [
+      {
+        "id": "Mau01",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 341.3836,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 104343.73999999849,
+        "lastHomedAtMs": 1794907411327,
+        "lastTelemetryAtMs": 1794935131086,
+        "telemAgeMs": 228,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2662882.764833333,
+          "rttMs": 54.761000003665686,
+          "uncertaintyMs": 27.380500001832843,
+          "ageMs": 249.3322080001235
+        }
+      },
+      {
+        "id": "Mau02",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 322.3315,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 104263.62509999836,
+        "lastHomedAtMs": 1794907414290,
+        "lastTelemetryAtMs": 1794935130931,
+        "telemAgeMs": 383,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2673768.3811666663,
+          "rttMs": 57.3830000013113,
+          "uncertaintyMs": 28.69150000065565,
+          "ageMs": 3398.403792001307
+        }
+      },
+      {
+        "id": "Mau03",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 244.7543,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 103960.69129999836,
+        "lastHomedAtMs": 1794907410435,
+        "lastTelemetryAtMs": 1794935130337,
+        "telemAgeMs": 977,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2685057.2953333333,
+          "rttMs": 59.66799999773502,
+          "uncertaintyMs": 29.83399999886751,
+          "ageMs": 2990.2640830017626
+        }
+      },
+      {
+        "id": "Mau04",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 315.8428,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 104259.78239999856,
+        "lastHomedAtMs": 1794907409843,
+        "lastTelemetryAtMs": 1794935130751,
+        "telemAgeMs": 563,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2699793.6304999995,
+          "rttMs": 47.39200000092387,
+          "uncertaintyMs": 23.696000000461936,
+          "ageMs": 2579.029000002891
+        }
+      },
+      {
+        "id": "Mau05",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 254.4069,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 103962.03709999916,
+        "lastHomedAtMs": 1794907406666,
+        "lastTelemetryAtMs": 1794935131158,
+        "telemAgeMs": 156,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2710308.1996666673,
+          "rttMs": 45.46499999985099,
+          "uncertaintyMs": 22.732499999925494,
+          "ageMs": 2170.8160420022905
+        }
+      },
+      {
+        "id": "Mau06",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 138.0928,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 102634.62799999997,
+        "lastHomedAtMs": 1794907408104,
+        "lastTelemetryAtMs": 1794935130547,
+        "telemAgeMs": 767,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2721819.218833333,
+          "rttMs": 51.32300000265241,
+          "uncertaintyMs": 25.661500001326203,
+          "ageMs": 1788.3630420006812
+        }
+      },
+      {
+        "id": "Mau07",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 244.6162,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 103966.00599999868,
+        "lastHomedAtMs": 1794907407485,
+        "lastTelemetryAtMs": 1794935130880,
+        "telemAgeMs": 434,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2733025.1915,
+          "rttMs": 50.98299999907613,
+          "uncertaintyMs": 25.491499999538064,
+          "ageMs": 1453.2474170029163
+        }
+      },
+      {
+        "id": "Mau08",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 211.1946,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 108216.23159999876,
+        "lastHomedAtMs": 1794907407893,
+        "lastTelemetryAtMs": 1794935131290,
+        "telemAgeMs": 24,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2743708.6394999996,
+          "rttMs": 51.872999999672174,
+          "uncertaintyMs": 25.936499999836087,
+          "ageMs": 1044.6485420018435
+        }
+      },
+      {
+        "id": "Mau09",
+        "connected": true,
+        "fwVersion": "0.3.7",
+        "moving": false,
+        "homing": false,
+        "homed": true,
+        "faultCode": null,
+        "positionMm": 189.646,
+        "endstop": true,
+        "rpm": 15,
+        "travelSinceHomeMm": 104184.02019999849,
+        "lastHomedAtMs": 1794907392897,
+        "lastTelemetryAtMs": 1794935130693,
+        "telemAgeMs": 621,
+        "clockSyncedFromNode": true,
+        "clock": {
+          "synced": true,
+          "offsetMs": -2754908.873666667,
+          "rttMs": 59.37600000202656,
+          "uncertaintyMs": 29.68800000101328,
+          "ageMs": 635.0199580006301
+        }
+      }
+    ]
+  },
+  {
+    "source": "position-delta-5s.json",
+    "kind": "delta",
+    "payload": {
+      "capturedAt": "2026-11-17T16:50:11.994Z",
+      "sampleIntervalMs": 2500,
+      "run": {
+        "t0": {
+          "phase": "running",
+          "runId": "21133e3756d74d1bb81b0660712151e",
+          "scoreName": "Wave",
+          "scoreFingerprint": "4eef727e",
+          "durationMs": 240000,
+          "startAtMs": 2986148.55825,
+          "repeat": false,
+          "autonomous": true,
+          "autonomousLoop": true,
+          "pass": 1,
+          "error": null,
+          "perNode": {
+            "Mau05": "running",
+            "Mau06": "running",
+            "Mau01": "running",
+            "Mau09": "running",
+            "Mau08": "running",
+            "Mau07": "running",
+            "Mau03": "running",
+            "Mau02": "running",
+            "Mau04": "running"
+          }
+        },
+        "t1": {
+          "phase": "running",
+          "runId": "21133e3756d74d1bb81b0660712151e",
+          "scoreName": "Wave",
+          "scoreFingerprint": "4eef727e",
+          "durationMs": 240000,
+          "startAtMs": 2986148.55825,
+          "repeat": false,
+          "autonomous": true,
+          "autonomousLoop": true,
+          "pass": 1,
+          "error": null,
+          "perNode": {
+            "Mau05": "running",
+            "Mau06": "running",
+            "Mau01": "running",
+            "Mau09": "running",
+            "Mau08": "running",
+            "Mau07": "running",
+            "Mau03": "running",
+            "Mau02": "running",
+            "Mau04": "running"
+          }
+        },
+        "t2": {
+          "phase": "running",
+          "runId": "21133e3756d74d1bb81b0660712151e",
+          "scoreName": "Wave",
+          "scoreFingerprint": "4eef727e",
+          "durationMs": 240000,
+          "startAtMs": 2986148.55825,
+          "repeat": false,
+          "autonomous": true,
+          "autonomousLoop": true,
+          "pass": 1,
+          "error": null,
+          "perNode": {
+            "Mau05": "running",
+            "Mau06": "running",
+            "Mau01": "running",
+            "Mau09": "running",
+            "Mau08": "running",
+            "Mau07": "running",
+            "Mau03": "running",
+            "Mau02": "running",
+            "Mau04": "running"
+          }
+        }
+      },
+      "diffs": [
+        {
+          "id": "Mau01",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            true,
+            true,
+            true
+          ],
+          "positionMm": [
+            199.1606,
+            169.9727,
+            141.7973
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": -57.363
+        },
+        {
+          "id": "Mau02",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            true,
+            true,
+            true
+          ],
+          "positionMm": [
+            276.9679,
+            247.7456,
+            224.2526
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": -52.715
+        },
+        {
+          "id": "Mau03",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            true,
+            true,
+            true
+          ],
+          "positionMm": [
+            361.9543,
+            332.801,
+            300.7254
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": -61.229
+        },
+        {
+          "id": "Mau04",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            true,
+            true,
+            true
+          ],
+          "positionMm": [
+            285.3549,
+            253.0378,
+            232.7202
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": -52.635
+        },
+        {
+          "id": "Mau05",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            true,
+            true,
+            true
+          ],
+          "positionMm": [
+            347.7688,
+            326.3122,
+            293.857
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": -53.912
+        },
+        {
+          "id": "Mau06",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            false,
+            false,
+            false
+          ],
+          "positionMm": [
+            369.9846,
+            369.9846,
+            369.9846
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": 0
+        },
+        {
+          "id": "Mau07",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            true,
+            true,
+            true
+          ],
+          "positionMm": [
+            362.2764,
+            328.4176,
+            304.8787
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": -57.398
+        },
+        {
+          "id": "Mau08",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            false,
+            false,
+            false
+          ],
+          "positionMm": [
+            369.9846,
+            369.9846,
+            369.9846
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": 0
+        },
+        {
+          "id": "Mau09",
+          "state": [
+            null,
+            null,
+            null
+          ],
+          "moving": [
+            true,
+            true,
+            true
+          ],
+          "positionMm": [
+            335.7232,
+            354.3841,
+            360.217
+          ],
+          "targetMm": [
+            null,
+            null,
+            null
+          ],
+          "plannedMm": [
+            null,
+            null,
+            null
+          ],
+          "steps": [
+            null,
+            null,
+            null
+          ],
+          "positionSteps": [
+            null,
+            null,
+            null
+          ],
+          "targetReached": [
+            null,
+            null,
+            null
+          ],
+          "stall": [
+            null,
+            null,
+            null
+          ],
+          "plannerBusy": [
+            null,
+            null,
+            null
+          ],
+          "completedPasses": [
+            null,
+            null,
+            null
+          ],
+          "loopIndex": [
+            null,
+            null,
+            null
+          ],
+          "loopBoundary": [
+            null,
+            null,
+            null
+          ],
+          "faultCode": [
+            null,
+            null,
+            null
+          ],
+          "posDeltaT0T2": 24.494
+        }
+      ],
+      "movingCount": {
+        "t0": 7,
+        "t1": 7,
+        "t2": 7
+      }
+    }
+  },
+  {
+    "source": "position-delta-10s-prestop.json",
+    "kind": "delta",
+    "payload": {
+      "dt": 10.008,
+      "run": {
+        "phase": "running",
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "scoreName": "Wave",
+        "scoreFingerprint": "4eef727e",
+        "durationMs": 240000,
+        "startAtMs": 2986148.55825,
+        "repeat": false,
+        "autonomous": true,
+        "autonomousLoop": true,
+        "pass": 1,
+        "error": null,
+        "perNode": {
+          "Mau05": "running",
+          "Mau06": "reconnected",
+          "Mau01": "running",
+          "Mau09": "running",
+          "Mau08": "running",
+          "Mau07": "running",
+          "Mau03": "running",
+          "Mau02": "running",
+          "Mau04": "running"
+        }
+      },
+      "delta": [
+        {
+          "id": "Mau01",
+          "dpos": 108.974,
+          "rate": 10.889,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 940
+        },
+        {
+          "id": "Mau02",
+          "dpos": 33.617,
+          "rate": 3.359,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 510
+        },
+        {
+          "id": "Mau03",
+          "dpos": -116.74,
+          "rate": -11.665,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 100
+        },
+        {
+          "id": "Mau04",
+          "dpos": 15.578,
+          "rate": 1.557,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 797
+        },
+        {
+          "id": "Mau05",
+          "dpos": -103.187,
+          "rate": -10.31,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 391
+        },
+        {
+          "id": "Mau06",
+          "dpos": -106.132,
+          "rate": -10.605,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 534
+        },
+        {
+          "id": "Mau07",
+          "dpos": -109.308,
+          "rate": -10.922,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 154
+        },
+        {
+          "id": "Mau08",
+          "dpos": 0,
+          "rate": 0,
+          "moving": [
+            false,
+            false
+          ],
+          "endstop": true,
+          "telemAgeB": 155026
+        },
+        {
+          "id": "Mau09",
+          "dpos": -109.055,
+          "rate": -10.897,
+          "moving": [
+            true,
+            true
+          ],
+          "endstop": true,
+          "telemAgeB": 336
+        }
+      ]
+    }
+  }
+]

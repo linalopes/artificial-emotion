@@ -6,7 +6,9 @@ function blank(id: NodeId): NodeState {
     id, connected: false, simulated: false, fwVersion: null, homed: false, homing: false, moving: false,
     faultCode: null, positionMm: null, targetMm: null, endstop: null, rssiDbm: null, rpm: null, accelMmS2: null,
     limitMinMm: null, limitMaxMm: null, lastHomedAtMs: null, travelSinceHomeMm: 0, clock: null,
-    clockSyncedFromNode: null, lastTelemetryAtMs: null
+    clockSyncedFromNode: null, lastTelemetryAtMs: null,
+    reportedRunId: null, loopIndex: null, completedPasses: null, autonomousReported: null,
+    positionValid: null, lastLoopBoundaryAction: null, lastProgressAtMs: null
   };
 }
 
@@ -64,5 +66,18 @@ export class Fleet {
     if (t.limitMaxMm !== null) s.limitMaxMm = t.limitMaxMm;
     if (t.clockSynced !== undefined) s.clockSyncedFromNode = t.clockSynced;
     s.lastTelemetryAtMs = wallMs;
+    if (t.runId !== undefined) s.reportedRunId = t.runId ?? null;
+    if (t.loopIndex !== undefined && t.loopIndex !== null) s.loopIndex = t.loopIndex;
+    if (t.completedPasses !== undefined && t.completedPasses !== null) s.completedPasses = t.completedPasses;
+    if (t.autonomous !== undefined) s.autonomousReported = t.autonomous ?? null;
+    if (t.positionValid !== undefined) s.positionValid = t.positionValid ?? null;
+    if (t.loopBoundary?.action != null) s.lastLoopBoundaryAction = t.loopBoundary.action;
+    if (
+      (t.completedPasses !== undefined && t.completedPasses !== null) ||
+      (t.loopIndex !== undefined && t.loopIndex !== null) ||
+      (t.loopBoundary != null)
+    ) {
+      s.lastProgressAtMs = wallMs;
+    }
   }
 }

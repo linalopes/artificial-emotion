@@ -1,3 +1,5 @@
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import WebSocket from 'ws';
 import { isValidFirmwareRunId, NODE_IDS, SCORE_SCHEMA, type Intent, type NodeId, type Score, type ServerMessage } from '@swarm/shared';
@@ -187,6 +189,32 @@ describe('commands', () => {
     expect((await send({ type: 'goToStart', score: shortScore() })).error).toContain('Software stop');
     await send({ type: 'releaseStop' });
     expect((await send({ type: 'move', nodes: ['Mau01'], targetMm: 100 })).ok).toBe(true);
+  });
+
+  it('does not report collective STOP success when a module is disconnected', async () => {
+    app.sim!.scenario('disconnect', 'Mau08');
+    await until(() => !node('Mau08').connected);
+    const stop = await send({ type: 'stopAll' });
+    expect(stop.ok).toBe(false);
+    expect(stop.error).toContain('NOT confirmed by: Mau08');
+    expect(stop.outcomes!.find((o) => o.node === 'Mau08')?.error).toMatch(/not connected/i);
+  });
+
+  it('re-sends STOP on reconnect while software stop remains engaged', async () => {
+    await homeAll();
+    expect((await send({ type: 'engageStop' })).ok).toBe(true);
+    app.sim!.scenario('disconnect', 'Mau08');
+    await until(() => !node('Mau08').connected);
+    app.sim!.scenario('reconnect', 'Mau08');
+    await until(() => node('Mau08').connected);
+    await until(
+      () =>
+        app.coordinator
+          .snapshot(OP)
+          .log.some((l) => l.message.includes('Mau08') && l.message.includes('STOP re-sent')),
+      4000,
+      'reconnect STOP'
+    );
   });
 });
 
@@ -514,5 +542,89 @@ describe('collective run', () => {
       expect(run().phase).toBe('positioned');
     },
     20_000
+  );
+
+  it(
+    'records STOP initiator and durable pass progress; surfaces loop counters on NodeState',
+    async () => {
+      await app.close();
+      const dir = mkdtempSync(join(process.cwd(), 'tmp-stop-pass-'));
+      const eventLogPath = join(dir, 'events.jsonl');
+      try {
+        const cfg = {
+          ...loadConfig({}),
+          port: 0,
+          host: '127.0.0.1',
+          ackTimeoutMs: 300,
+          clockIntervalMs: 50,
+          clockMaxAgeMs: 2500,
+          startLeadMs: 500,
+          snapshotIntervalMs: 50,
+          eventLogPath
+        };
+        app = await createApp(cfg, { speedFactor: 150, telemetryMs: 40, tickMs: 10, reconnectMs: 100 });
+        app.coordinator.clientJoined(OP);
+        await send({ type: 'claimOperator' });
+        await until(
+          () =>
+            NODE_IDS.every(
+              (id) =>
+                node(id).connected &&
+                node(id).lastTelemetryAtMs !== null &&
+                app.coordinator.device.clockStatus(id)?.synced === true
+            ),
+          6000,
+          'nine synced'
+        );
+        await homeAll();
+        const score = shortScore(600);
+        await positioned(score);
+        expect(
+          await send({
+            type: 'execute',
+            score,
+            confirmed: true,
+            repeat: false,
+            autonomous: true,
+            autonomousLoop: true,
+            maxLoops: 3
+          })
+        ).toEqual({ ok: true });
+        await until(() => run().phase === 'running', 3000, 'running');
+        await until(
+          () => NODE_IDS.every((id) => (node(id).completedPasses ?? 0) >= 1),
+          8000,
+          'pass counters on NodeState'
+        );
+        expect(node('Mau01').loopIndex).not.toBeNull();
+        expect(node('Mau01').reportedRunId).toBe(run().runId);
+
+        app.coordinator.clientJoined('diag-agent');
+        expect((await send({ type: 'engageStop' }, 'diag-agent')).ok).toBe(true);
+        await app.coordinator.durable.flush();
+
+        const events = readFileSync(eventLogPath, 'utf8')
+          .trim()
+          .split('\n')
+          .map((l) => JSON.parse(l) as { kind: string; detail?: Record<string, unknown>; nodeId?: string });
+        const stopEv = events.find(
+          (e) => e.kind === 'cancel_stop' && e.detail?.intentType === 'engageStop'
+        );
+        expect(stopEv?.detail?.initiator).toBe('client:diag-agent:engageStop');
+        expect(stopEv?.detail?.clientId).toBe('diag-agent');
+        expect(events.some((e) => e.kind === 'pass' && (e.detail?.completedPasses as number) >= 1)).toBe(true);
+        expect(
+          events.some(
+            (e) =>
+              e.kind === 'cancel_stop' &&
+              Array.isArray(e.detail?.confirmed) &&
+              (e.detail?.confirmed as string[]).length === 9
+          )
+        ).toBe(true);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+    40_000
   );
 });

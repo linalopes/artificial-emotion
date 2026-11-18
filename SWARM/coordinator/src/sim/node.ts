@@ -314,6 +314,19 @@ export class SimNode {
   }
 
   private telemetry(): Telemetry {
+    let runId: string | null = null;
+    let loopIndex: number | null = null;
+    let completedPasses: number | null = null;
+    let autonomous: boolean | null = null;
+    const tr = this.traj;
+    if (tr?.startAt != null && tr.started) {
+      const elapsed = Math.max(0, this.clock() - tr.startAt);
+      const duration = tr.score.durationMs;
+      completedPasses = duration > 0 ? Math.floor(elapsed / duration) : 0;
+      loopIndex = completedPasses;
+      runId = tr.runId;
+      autonomous = tr.autonomous === true;
+    }
     return {
       positionMm: this.homed ? Math.round(this.pos * 10) / 10 : null,
       targetMm: this.homed ? Math.round(this.target * 10) / 10 : null,
@@ -326,7 +339,12 @@ export class SimNode {
       rpm: this.rpm,
       accelMmS2: this.accel,
       limitMinMm: this.limitMin,
-      limitMaxMm: this.limitMax
+      limitMaxMm: this.limitMax,
+      runId,
+      loopIndex,
+      completedPasses,
+      autonomous,
+      positionValid: this.homed
     };
   }
 }

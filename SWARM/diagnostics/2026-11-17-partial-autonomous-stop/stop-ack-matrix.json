@@ -1,0 +1,107 @@
+{
+  "at": "2026-11-17T16:52:16.964Z",
+  "engageStop": {
+    "type": "result",
+    "id": "diag-mwkxjzbl-wnq6k",
+    "ok": false,
+    "error": "Stop was NOT confirmed by: Mau08. Use the physical power cut-off if they are moving.",
+    "outcomes": [
+      {
+        "node": "Mau01",
+        "ok": true
+      },
+      {
+        "node": "Mau02",
+        "ok": true
+      },
+      {
+        "node": "Mau03",
+        "ok": true
+      },
+      {
+        "node": "Mau04",
+        "ok": true
+      },
+      {
+        "node": "Mau05",
+        "ok": true
+      },
+      {
+        "node": "Mau06",
+        "ok": true
+      },
+      {
+        "node": "Mau07",
+        "ok": true
+      },
+      {
+        "node": "Mau08",
+        "ok": false,
+        "error": "no acknowledgment within 1500 ms"
+      },
+      {
+        "node": "Mau09",
+        "ok": true
+      }
+    ],
+    "intentType": "engageStop"
+  },
+  "stopAll": {
+    "type": "result",
+    "id": "diag-mwkxk1n2-kod90",
+    "ok": false,
+    "error": "Stop was NOT confirmed by: Mau08. Use the physical power cut-off if they are moving.",
+    "outcomes": [
+      {
+        "node": "Mau01",
+        "ok": true
+      },
+      {
+        "node": "Mau02",
+        "ok": true
+      },
+      {
+        "node": "Mau03",
+        "ok": true
+      },
+      {
+        "node": "Mau04",
+        "ok": true
+      },
+      {
+        "node": "Mau05",
+        "ok": true
+      },
+      {
+        "node": "Mau06",
+        "ok": true
+      },
+      {
+        "node": "Mau07",
+        "ok": true
+      },
+      {
+        "node": "Mau08",
+        "ok": false,
+        "error": "no acknowledgment within 1500 ms"
+      },
+      {
+        "node": "Mau09",
+        "ok": true
+      }
+    ],
+    "intentType": "stopAll"
+  },
+  "postStopMoving": [],
+  "postStopPositions": {
+    "Mau01": 341.3836,
+    "Mau02": 322.3315,
+    "Mau03": 244.7543,
+    "Mau04": 315.8428,
+    "Mau05": 254.4069,
+    "Mau06": 138.0928,
+    "Mau07": 244.6162,
+    "Mau08": 369.9846,
+    "Mau09": 189.646
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "runId": "6de33fc3098a4020944771ab5456e42",
+  "events": [
+    {
+      "at": "2026-11-17T17:30:59.237Z",
+      "kind": "run_start",
+      "message": "Wave armed",
+      "detail": {
+        "score": "Wave",
+        "durationMs": 240000,
+        "startAtMs": 719685.2645,
+        "expectedEndAtMs": 43919685.2645,
+        "autonomous": true,
+        "autonomousLoop": true,
+        "continuous": true,
+        "maxLoops": null,
+        "maxRuntimeMs": null,
+        "pass": 1
+      }
+    },
+    {
+      "at": "2026-11-17T17:30:59.237Z",
+      "kind": "run_expected_end",
+      "message": "Expected completion window ends at +43204000ms from start (incl. grace)",
+      "detail": {
+        "expectedMs": 43200000,
+        "graceMs": 4000,
+        "expectedEndAtMs": 43919685.2645
+      }
+    },
+    {
+      "at": "2026-11-17T17:31:01.728Z",
+      "kind": "run_phase",
+      "message": "Wave phase → running",
+      "detail": {
+        "startAtMs": 719685.2645
+      }
+    },
+    {
+      "at": "2026-11-18T05:31:05.538Z",
+      "kind": "run_failed",
+      "message": "Completion was not confirmed by Mau01, Mau02, Mau03, Mau04, Mau05, Mau06, Mau07, Mau08, Mau09.",
+      "detail": {
+        "initiator": "coordinator:completion_watch",
+        "stopping": true
+      }
+    },
+    {
+      "at": "2026-11-18T05:31:05.538Z",
+      "kind": "cancel_stop",
+      "message": "cancel+stop after failRun: Completion was not confirmed by Mau01, Mau02, Mau03, Mau04, Mau05, Mau06, Mau07, Mau08, Mau09.",
+      "detail": {
+        "initiator": "coordinator:completion_watch"
+      }
+    }
+  ],
+  "table": {
+    "Mau01": {
+      "passEvents": 176,
+      "maxPasses": 176,
+      "firstAt": "2026-11-17T17:34:58.961Z",
+      "lastAt": "2026-11-18T05:30:24.108Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 253.1644,
+      "disconnects": 7,
+      "boundary": {
+        "CONTINUE": 176,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau02": {
+      "passEvents": 175,
+      "maxPasses": 175,
+      "firstAt": "2026-11-17T17:34:57.409Z",
+      "lastAt": "2026-11-18T05:30:17.318Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 180.074,
+      "disconnects": 8,
+      "boundary": {
+        "CONTINUE": 175,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau03": {
+      "passEvents": 176,
+      "maxPasses": 176,
+      "firstAt": "2026-11-17T17:34:55.227Z",
+      "lastAt": "2026-11-18T05:30:14.043Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 135.4812,
+      "disconnects": 8,
+      "boundary": {
+        "CONTINUE": 176,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau04": {
+      "passEvents": 176,
+      "maxPasses": 176,
+      "firstAt": "2026-11-17T17:34:57.222Z",
+      "lastAt": "2026-11-18T05:30:15.449Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 177.1172,
+      "disconnects": 8,
+      "boundary": {
+        "CONTINUE": 176,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau05": {
+      "passEvents": 176,
+      "maxPasses": 176,
+      "firstAt": "2026-11-17T17:34:54.946Z",
+      "lastAt": "2026-11-18T05:30:22.129Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 140.2442,
+      "disconnects": 8,
+      "boundary": {
+        "CONTINUE": 176,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau06": {
+      "passEvents": 174,
+      "maxPasses": 174,
+      "firstAt": "2026-11-17T17:34:57.425Z",
+      "lastAt": "2026-11-18T05:29:58.865Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 139.853,
+      "disconnects": 8,
+      "boundary": {
+        "CONTINUE": 174,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau07": {
+      "passEvents": 176,
+      "maxPasses": 176,
+      "firstAt": "2026-11-17T17:34:54.767Z",
+      "lastAt": "2026-11-18T05:30:15.678Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 139.5309,
+      "disconnects": 7,
+      "boundary": {
+        "CONTINUE": 176,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau08": {
+      "passEvents": 176,
+      "maxPasses": 176,
+      "firstAt": "2026-11-17T17:34:57.175Z",
+      "lastAt": "2026-11-18T05:30:17.674Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 142.5682,
+      "disconnects": 8,
+      "boundary": {
+        "CONTINUE": 176,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    },
+    "Mau09": {
+      "passEvents": 176,
+      "maxPasses": 176,
+      "firstAt": "2026-11-17T17:34:58.583Z",
+      "lastAt": "2026-11-18T05:30:15.504Z",
+      "lastMoving": true,
+      "lastAction": "CONTINUE",
+      "lastPos": 198.3667,
+      "disconnects": 8,
+      "boundary": {
+        "CONTINUE": 176,
+        "CORRECT": 0,
+        "FAULT": 0
+      }
+    }
+  }
+}

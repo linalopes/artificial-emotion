@@ -1,0 +1,596 @@
+{
+  "runId": "21133e3756d74d1bb81b0660712151e",
+  "eventCount": 34,
+  "events": [
+    {
+      "at": "2026-11-17T09:24:16.470Z",
+      "utc": "2026-11-17 09:24:16 UTC",
+      "cet": "2026-11-17 10:24:16 CET",
+      "kind": "run_start",
+      "nodeId": null,
+      "message": "Wave armed",
+      "detail": {
+        "score": "Wave",
+        "durationMs": 240000,
+        "startAtMs": 2986148.55825,
+        "expectedEndAtMs": 46186148.55825,
+        "autonomous": true,
+        "autonomousLoop": true,
+        "continuous": true,
+        "maxLoops": null,
+        "maxRuntimeMs": null,
+        "pass": 1
+      }
+    },
+    {
+      "at": "2026-11-17T09:24:16.470Z",
+      "utc": "2026-11-17 09:24:16 UTC",
+      "cet": "2026-11-17 10:24:16 CET",
+      "kind": "run_expected_end",
+      "nodeId": null,
+      "message": "Expected completion window ends at +43204000ms from start (incl. grace)",
+      "detail": {
+        "expectedMs": 43200000,
+        "graceMs": 4000,
+        "expectedEndAtMs": 46186148.55825
+      }
+    },
+    {
+      "at": "2026-11-17T09:24:18.911Z",
+      "utc": "2026-11-17 09:24:18 UTC",
+      "cet": "2026-11-17 10:24:18 CET",
+      "kind": "run_phase",
+      "nodeId": null,
+      "message": "Wave phase \u2192 running",
+      "detail": {
+        "startAtMs": 2986148.55825
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:46.476Z",
+      "utc": "2026-11-17 16:51:46 UTC",
+      "cet": "2026-11-17 17:51:46 CET",
+      "kind": "disconnect",
+      "nodeId": "Mau06",
+      "message": "Mau06 disconnected",
+      "detail": {
+        "phase": "running",
+        "autonomous": true,
+        "autonomousStarted": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:46.612Z",
+      "utc": "2026-11-17 16:51:46 UTC",
+      "cet": "2026-11-17 17:51:46 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 connected (fw 0.3.7)",
+      "detail": {
+        "simulated": false,
+        "wasInRun": true,
+        "phase": "running"
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:46.612Z",
+      "utc": "2026-11-17 16:51:46 UTC",
+      "cet": "2026-11-17 17:51:46 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:47.445Z",
+      "utc": "2026-11-17 16:51:47 UTC",
+      "cet": "2026-11-17 17:51:47 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:48.450Z",
+      "utc": "2026-11-17 16:51:48 UTC",
+      "cet": "2026-11-17 17:51:48 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:49.441Z",
+      "utc": "2026-11-17 16:51:49 UTC",
+      "cet": "2026-11-17 17:51:49 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:50.313Z",
+      "utc": "2026-11-17 16:51:50 UTC",
+      "cet": "2026-11-17 17:51:50 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:51.315Z",
+      "utc": "2026-11-17 16:51:51 UTC",
+      "cet": "2026-11-17 17:51:51 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:52.311Z",
+      "utc": "2026-11-17 16:51:52 UTC",
+      "cet": "2026-11-17 17:51:52 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:53.311Z",
+      "utc": "2026-11-17 16:51:53 UTC",
+      "cet": "2026-11-17 17:51:53 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:53.486Z",
+      "utc": "2026-11-17 16:51:53 UTC",
+      "cet": "2026-11-17 17:51:53 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:54.488Z",
+      "utc": "2026-11-17 16:51:54 UTC",
+      "cet": "2026-11-17 17:51:54 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:55.482Z",
+      "utc": "2026-11-17 16:51:55 UTC",
+      "cet": "2026-11-17 17:51:55 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:56.534Z",
+      "utc": "2026-11-17 16:51:56 UTC",
+      "cet": "2026-11-17 17:51:56 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:57.174Z",
+      "utc": "2026-11-17 16:51:57 UTC",
+      "cet": "2026-11-17 17:51:57 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:58.175Z",
+      "utc": "2026-11-17 16:51:58 UTC",
+      "cet": "2026-11-17 17:51:58 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:51:59.171Z",
+      "utc": "2026-11-17 16:51:59 UTC",
+      "cet": "2026-11-17 17:51:59 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:00.173Z",
+      "utc": "2026-11-17 16:52:00 UTC",
+      "cet": "2026-11-17 17:52:00 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:00.347Z",
+      "utc": "2026-11-17 16:52:00 UTC",
+      "cet": "2026-11-17 17:52:00 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:01.350Z",
+      "utc": "2026-11-17 16:52:01 UTC",
+      "cet": "2026-11-17 17:52:01 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:02.347Z",
+      "utc": "2026-11-17 16:52:02 UTC",
+      "cet": "2026-11-17 17:52:02 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:03.344Z",
+      "utc": "2026-11-17 16:52:03 UTC",
+      "cet": "2026-11-17 17:52:03 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:03.932Z",
+      "utc": "2026-11-17 16:52:03 UTC",
+      "cet": "2026-11-17 17:52:03 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:04.933Z",
+      "utc": "2026-11-17 16:52:04 UTC",
+      "cet": "2026-11-17 17:52:04 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:05.930Z",
+      "utc": "2026-11-17 16:52:05 UTC",
+      "cet": "2026-11-17 17:52:05 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:06.927Z",
+      "utc": "2026-11-17 16:52:06 UTC",
+      "cet": "2026-11-17 17:52:06 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:07.106Z",
+      "utc": "2026-11-17 16:52:07 UTC",
+      "cet": "2026-11-17 17:52:07 CET",
+      "kind": "reconnect_reconcile",
+      "nodeId": "Mau06",
+      "message": "Mau06 status after reconnect",
+      "detail": {
+        "runId": "21133e3756d74d1bb81b0660712151e",
+        "loopIndex": 107,
+        "completedPasses": 107,
+        "positionValid": true,
+        "autonomous": true,
+        "fault": null,
+        "moving": true,
+        "homed": true
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:07.955Z",
+      "utc": "2026-11-17 16:52:07 UTC",
+      "cet": "2026-11-17 17:52:07 CET",
+      "kind": "cancel_stop",
+      "nodeId": null,
+      "message": "Software stop engaged.",
+      "detail": {
+        "initiator": "operator_or_stop",
+        "connected": [
+          "Mau01",
+          "Mau02",
+          "Mau03",
+          "Mau04",
+          "Mau05",
+          "Mau06",
+          "Mau07",
+          "Mau08",
+          "Mau09"
+        ]
+      }
+    },
+    {
+      "at": "2026-11-17T16:52:10.958Z",
+      "utc": "2026-11-17 16:52:10 UTC",
+      "cet": "2026-11-17 17:52:10 CET",
+      "kind": "cancel_stop",
+      "nodeId": null,
+      "message": "Stop all requested.",
+      "detail": {
+        "initiator": "operator_or_stop",
+        "connected": [
+          "Mau01",
+          "Mau02",
+          "Mau03",
+          "Mau04",
+          "Mau05",
+          "Mau06",
+          "Mau07",
+          "Mau08",
+          "Mau09"
+        ]
+      }
+    },
+    {
+      "at": "2026-11-17T16:53:36.593Z",
+      "utc": "2026-11-17 16:53:36 UTC",
+      "cet": "2026-11-17 17:53:36 CET",
+      "kind": "disconnect",
+      "nodeId": "Mau08",
+      "message": "Mau08 disconnected",
+      "detail": {
+        "phase": "cancelled",
+        "autonomous": true,
+        "autonomousStarted": false
+      }
+    },
+    {
+      "at": "2026-11-17T16:53:36.747Z",
+      "utc": "2026-11-17 16:53:36 UTC",
+      "cet": "2026-11-17 17:53:36 CET",
+      "kind": "connect",
+      "nodeId": "Mau08",
+      "message": "Mau08 connected (fw 0.3.7)",
+      "detail": {
+        "simulated": false,
+        "wasInRun": false,
+        "phase": "cancelled"
+      }
+    }
+  ]
+}

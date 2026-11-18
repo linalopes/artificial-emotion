@@ -29,6 +29,38 @@ const idleRun = (): RunState => ({
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
+/** Who/what requested a collective cancel+stop (distinct from the later command fan-out). */
+type StopOrigin = {
+  intentType: 'engageStop' | 'stopAll' | 'cancelRun' | 'stopNodes' | 'failRun' | 'reconnect';
+  clientId?: string | null;
+  initiator?: string;
+};
+
+const STOP_ACK_ATTEMPTS = 3;
+const STOP_RETRY_GAP_MS = 150;
+const STOP_VERIFY_MS = 2500;
+
+function describeStopInitiator(ctx?: StopOrigin): string {
+  if (ctx?.initiator) return ctx.initiator;
+  const client = ctx?.clientId ?? 'unknown';
+  switch (ctx?.intentType) {
+    case 'engageStop':
+      return `client:${client}:engageStop`;
+    case 'stopAll':
+      return `client:${client}:stopAll`;
+    case 'cancelRun':
+      return `client:${client}:cancelRun`;
+    case 'stopNodes':
+      return `client:${client}:stopNodes`;
+    case 'failRun':
+      return 'coordinator:failRun';
+    case 'reconnect':
+      return 'coordinator:reconnect_while_stop_engaged';
+    default:
+      return 'operator_or_stop';
+  }
+}
+
 /**
  * Authoritative operational state while the Mac is running: who may command, whether the
  * software stop is engaged, what the nodes last reported and where a collective run stands.
@@ -52,6 +84,8 @@ export class Coordinator {
   private monitor: NodeJS.Timeout | null = null;
   /** Serializes cancel/stop vs go-to-start so command floods cannot starve acknowledgments. */
   private fleetIo: Promise<void> = Promise.resolve();
+  /** Last durable-logged completedPasses per node (bounded pass timeline). */
+  private lastLoggedPasses = new Map<NodeId, number>();
   sim: SimControl | null = null;
 
   private enqueueFleetIo<T>(fn: () => Promise<T>): Promise<T> {
@@ -85,6 +119,27 @@ export class Coordinator {
             'info',
             `${node} reconnected during autonomous run ${this.run.runId ?? '?'}; reconciling from module reports (no trajectory replay).`
           );
+        }
+        // Software stop latch: re-deliver STOP when a mute/stale node returns (does not restart trajectories).
+        if (this.stop.engaged) {
+          void this.enqueueFleetIo(async () => {
+            try {
+              await this.device.send(node, { name: 'stop' });
+              this.note('info', `${node} STOP re-sent after reconnect (software stop still engaged).`);
+              this.durable.write({
+                kind: 'cancel_stop',
+                nodeId: node,
+                runId: this.run.runId,
+                message: `${node} stop on reconnect while software stop engaged`,
+                detail: {
+                  initiator: describeStopInitiator({ intentType: 'reconnect' }),
+                  intentType: 'reconnect'
+                }
+              });
+            } catch (e) {
+              this.note('warn', `${node} reconnect STOP failed: ${msg(e)}. Use physical power cut-off if it is still moving.`);
+            }
+          });
         }
         // Align the node's prepare_run gate with Mac clockMaxUncertaintyMs (runtime only, not NVS).
         if (this.cfg.fleet === 'hardware' && this.cfg.authToken) {
@@ -127,6 +182,7 @@ export class Coordinator {
       onTelemetry: (node, t) => {
         const before = this.fleet.get(node).faultCode;
         this.fleet.telemetry(node, t, Date.now());
+        this.maybeLogPassProgress(node, t);
         this.reconcileAutonomousTelemetry(node, t);
         if (t.faultCode && t.faultCode !== before) {
           this.note('error', `${node} reports fault ${t.faultCode}.`);
@@ -236,6 +292,40 @@ export class Coordinator {
     }
   }
 
+  /**
+   * Durable, bounded pass timeline: one JSONL event when completedPasses increases
+   * (or first mid-run sighting). Does not flood on every status frame.
+   */
+  private maybeLogPassProgress(node: NodeId, t: Telemetry): void {
+    const passes = t.completedPasses;
+    if (passes == null || !Number.isFinite(passes)) return;
+    const prev = this.lastLoggedPasses.get(node);
+    if (prev === passes) return;
+    this.lastLoggedPasses.set(node, passes);
+    const increased = prev === undefined ? passes > 0 : passes > prev;
+    const reset = prev !== undefined && passes < prev;
+    if (!increased && !reset) return;
+    this.durable.write({
+      kind: 'pass',
+      nodeId: node,
+      runId: t.runId ?? this.run.runId,
+      message: reset
+        ? `${node} pass counter reset to ${passes}`
+        : `${node} completedPasses=${passes}`,
+      detail: {
+        loopIndex: t.loopIndex ?? null,
+        completedPasses: passes,
+        moving: t.moving,
+        positionMm: t.positionMm,
+        autonomous: t.autonomous ?? null,
+        positionValid: t.positionValid ?? null,
+        loopBoundaryAction: t.loopBoundary?.action ?? null,
+        segmentResult: t.loopBoundary?.segmentResult ?? null,
+        reset
+      }
+    });
+  }
+
   note(level: LogEntry['level'], message: string): void {
     if (!this.durable.accept(level, message)) return;
     const atMs = Date.now();
@@ -290,15 +380,20 @@ export class Coordinator {
         if (this.operator === clientId) this.operator = null;
         return { ok: true };
       case 'engageStop':
-        return this.engageStop();
+        return this.engageStop(clientId);
       case 'releaseStop':
         this.stop = { engaged: false, atMs: null };
         this.note('info', 'Software stop released.');
         return { ok: true };
       case 'stopAll':
-        return this.stopAll('Stop all requested.');
+        return this.stopAll('Stop all requested.', { intentType: 'stopAll', clientId });
       case 'stopNodes':
-        if (ACTIVE.has(this.run.phase)) return this.stopAll('Stop requested during a run: all modules stopped.');
+        if (ACTIVE.has(this.run.phase)) {
+          return this.stopAll('Stop requested during a run: all modules stopped.', {
+            intentType: 'stopNodes',
+            clientId
+          });
+        }
         return this.perNode(intent.nodes, () => null, { name: 'stop' });
       case 'home':
         return this.motion(intent.nodes, { name: 'home' }, (n) => (n.faultCode ? `has fault ${n.faultCode}; clear it first` : null));
@@ -331,7 +426,7 @@ export class Coordinator {
         });
       case 'cancelRun':
         if (!ACTIVE.has(this.run.phase) && this.run.phase !== 'positioned') return { ok: false, error: 'No run to cancel.' };
-        return this.stopAll('Run cancelled by the operator.');
+        return this.stopAll('Run cancelled by the operator.', { intentType: 'cancelRun', clientId });
       case 'simScenario':
         if (this.cfg.fleet !== 'simulator' || !this.sim) return { ok: false, error: 'Scenarios exist only with simulated nodes.' };
         this.sim.scenario(intent.scenario, intent.node);
@@ -430,36 +525,126 @@ export class Coordinator {
 
   // ---- stop -----------------------------------------------------------------------------
 
-  private async stopAll(reason: string): Promise<IntentResult> {
+  private async stopAll(reason: string, origin?: StopOrigin): Promise<IntentResult> {
     return this.enqueueFleetIo(async () => {
       this.token++;
       const runId = this.run.runId;
+      const stopWallMs = Date.now();
+      const initiator = describeStopInitiator(origin);
       if (ACTIVE.has(this.run.phase) || this.run.phase === 'positioned') {
         this.run = { ...this.run, phase: 'cancelled', error: reason, startAtMs: null };
       }
       this.note('warn', reason);
+      const connectedAtRequest = NODE_IDS.filter((id) => this.fleet.get(id).connected);
       this.durable.write({
         kind: 'cancel_stop',
         runId,
         message: reason,
-        detail: { initiator: 'operator_or_stop', connected: NODE_IDS.filter((id) => this.fleet.get(id).connected) }
+        detail: {
+          initiator,
+          intentType: origin?.intentType ?? null,
+          clientId: origin?.clientId ?? null,
+          connected: connectedAtRequest
+        }
       });
+
+      // Collective STOP must account for every module — disconnected nodes are unconfirmed.
+      const disconnected = NODE_IDS.filter((id) => !this.fleet.get(id).connected);
       const connected = NODE_IDS.filter((id) => this.fleet.get(id).connected);
-      if (runId) await Promise.allSettled(connected.map((id) => this.device.send(id, { name: 'cancel', runId })));
-      if (connected.length === 0) return { ok: true, outcomes: [] };
-      const res = await this.perNode(connected, () => null, { name: 'stop' });
-      return res.ok
-        ? res
-        : {
-            ...res,
-            error: `Stop was NOT confirmed by: ${res.outcomes!.filter((o) => !o.ok).map((o) => o.node).join(', ')}. Use the physical power cut-off if they are moving.`
-          };
+      if (runId) {
+        await Promise.allSettled(connected.map((id) => this.device.send(id, { name: 'cancel', runId })));
+      }
+
+      const ackByNode = new Map<NodeId, NodeOutcome>();
+      for (const id of disconnected) {
+        ackByNode.set(id, {
+          node: id,
+          ok: false,
+          error: 'is not connected — cannot confirm software STOP'
+        });
+      }
+
+      let pendingAck = [...connected];
+      for (let attempt = 1; attempt <= STOP_ACK_ATTEMPTS && pendingAck.length > 0; attempt++) {
+        if (attempt > 1) await sleep(STOP_RETRY_GAP_MS);
+        const res = await this.perNode(pendingAck, () => null, { name: 'stop' });
+        const next: NodeId[] = [];
+        for (const o of res.outcomes ?? []) {
+          if (o.ok) ackByNode.set(o.node, o);
+          else {
+            ackByNode.set(o.node, o);
+            next.push(o.node);
+          }
+        }
+        pendingAck = next.filter((id) => this.fleet.get(id).connected);
+        if (pendingAck.length && attempt < STOP_ACK_ATTEMPTS) {
+          this.note(
+            'warn',
+            `Stop ACK retry ${attempt}/${STOP_ACK_ATTEMPTS - 1} for ${pendingAck.join(', ')}.`
+          );
+        }
+      }
+
+      // Require fresh !moving telemetry after the stop was issued — ACK alone is not enough.
+      const outcomes = await Promise.all(
+        NODE_IDS.map(async (id): Promise<NodeOutcome> => {
+          const ack = ackByNode.get(id)!;
+          if (!ack.ok) return ack;
+          const stopped = await this.waitUntil(() => {
+            const n = this.fleet.get(id);
+            if (!n.connected) return false;
+            if (n.moving || n.homing) return false;
+            if (n.lastTelemetryAtMs == null || n.lastTelemetryAtMs < stopWallMs) return false;
+            return true;
+          }, STOP_VERIFY_MS);
+          if (stopped) return { node: id, ok: true };
+          const n = this.fleet.get(id);
+          const why = !n.connected
+            ? 'acknowledged stop then disconnected before stopped telemetry'
+            : n.moving || n.homing
+              ? 'acknowledged stop but still reports moving'
+              : 'acknowledged stop but no fresh stopped telemetry';
+          return { node: id, ok: false, error: why };
+        })
+      );
+
+      const failed = outcomes.filter((o) => !o.ok);
+      this.durable.write({
+        kind: 'cancel_stop',
+        runId,
+        message: failed.length
+          ? `Stop confirmation incomplete (${NODE_IDS.length - failed.length}/${NODE_IDS.length})`
+          : `Stop confirmed on all ${NODE_IDS.length} modules`,
+        detail: {
+          initiator,
+          intentType: origin?.intentType ?? null,
+          clientId: origin?.clientId ?? null,
+          confirmed: outcomes.filter((o) => o.ok).map((o) => o.node),
+          unconfirmed: failed.map((o) => ({ node: o.node, error: o.error })),
+          attempts: STOP_ACK_ATTEMPTS,
+          verifyMs: STOP_VERIFY_MS
+        }
+      });
+
+      if (failed.length) {
+        this.note(
+          'error',
+          `Stop was NOT confirmed by: ${failed.map((o) => `${o.node} (${o.error})`).join('; ')}. Use the physical power cut-off if they are moving.`
+        );
+        return {
+          ok: false,
+          error: `Stop was NOT confirmed by: ${failed.map((o) => o.node).join(', ')}. Use the physical power cut-off if they are moving.`,
+          outcomes
+        };
+      }
+      this.note('info', `Stop confirmed (ACK + fresh idle telemetry) on ${NODE_IDS.join(', ')}.`);
+      return { ok: true, outcomes };
     });
   }
 
-  private async engageStop(): Promise<IntentResult> {
+  private async engageStop(clientId?: string): Promise<IntentResult> {
     this.stop = { engaged: true, atMs: Date.now() };
-    return this.stopAll('Software stop engaged.');
+    return this.stopAll('Software stop engaged.', { intentType: 'engageStop', clientId: clientId ?? null });
   }
 
   // ---- collective run -------------------------------------------------------------------
@@ -651,6 +836,7 @@ export class Coordinator {
   ): Promise<string | null> {
     // Firmware rejects strlen(run_id) >= 32 ("invalid run_id"); dashed UUIDs are 36 chars.
     const runId = newFirmwareRunId();
+    this.lastLoggedPasses.clear();
     this.run = { ...this.run, runId, phase: 'loading', pass: this.run.pass + 1, startAtMs: null, error: null, perNode: {} };
     const stage = async (phase: RunState['phase'], done: string, make: (id: NodeId) => DeviceCommand | null): Promise<string | null> => {
       if (token !== this.token) return 'Cancelled.';

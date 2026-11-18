@@ -46,6 +46,20 @@ export interface NodeState {
   clockSyncedFromNode: boolean | null;
   /** Coordinator wall-clock time of the last telemetry frame. Retained after disconnect. */
   lastTelemetryAtMs: number | null;
+  /** Last firmware-reported run id (status), when present. */
+  reportedRunId: string | null;
+  /** 0-based current pass index from firmware status. */
+  loopIndex: number | null;
+  /** Finished track passes from firmware status. */
+  completedPasses: number | null;
+  /** Firmware status.autonomous when reported. */
+  autonomousReported: boolean | null;
+  /** Firmware status.position_valid when reported. */
+  positionValid: boolean | null;
+  /** Last loop-boundary action string from firmware status, when present. */
+  lastLoopBoundaryAction: string | null;
+  /** Wall time of the last telemetry that advanced run-progress fields. */
+  lastProgressAtMs: number | null;
 }
 
 /**
