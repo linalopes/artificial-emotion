@@ -268,7 +268,9 @@ void ProtocolClient::sendJson(const JsonDocument& doc) {
     SWARM_LOG("status/json truncated or empty — not sent");
     return;
   }
-  if (linked_) {
+  // 0.3.10: never write while autonomy is active — ESP32 WiFiClient::write can
+  // block up to ~10 s on an unreachable coordinator while linked_ is still true.
+  if (shouldEmitWsTraffic(linked_, autonomyActive())) {
     ws_.sendTXT(out, n);
   }
   if (mirrorSerialJson_ && !motionCritical()) {
@@ -342,6 +344,7 @@ void ProtocolClient::fillStatus(JsonObject obj) const {
   obj["coordinator_port"] = c_.config->get().coordinatorPort;
   obj["ws_linked"] = linked_;
   obj["ws_reconnect_deferred"] = shouldDeferWsReconnect(autonomyActive(), linked_);
+  obj["ws_io_deferred"] = shouldDeferWsIo(autonomyActive());
   obj["ws_connect_attempts"] = wsConnectAttempts_;
   obj["ws_connect_failures"] = wsConnectFailures_;
   obj["ws_disconnects"] = wsDisconnects_;
@@ -1015,8 +1018,9 @@ void ProtocolClient::handleMessage(JsonDocument& doc) {
 void ProtocolClient::service() {
   const bool autoRun = autonomyActive();
   ensureSocket();
-  // Never call ws_.loop() while unlinked + autonomous — library connect() can block
-  // up to WEBSOCKETS_TCP_TIMEOUT and starve MotionPlanner (stall abort 100 ms).
+  // Never call ws_.loop() during autonomous playback — covers (1) unlinked
+  // reconnect connect() and (2) still-linked write/read against a dead peer
+  // (WiFiClient::write up to ~10 s) before linked_ flips false.
   if (shouldServiceWsClient(socketStarted_, linked_, autoRun)) {
     ws_.loop();
   }

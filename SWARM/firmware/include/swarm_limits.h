@@ -67,6 +67,16 @@
 #define SWARM_WS_TCP_TIMEOUT_MS 50u
 #endif
 
+// Arduino-ESP32 WiFiClient::write() (framework WiFiClient.cpp) — not overridden by
+// WEBSOCKETS_TCP_TIMEOUT. A single write can stall the cooperative loop this long
+// while tcp->connected() remains true (Mac Wi-Fi abruptly gone / half-open TCP).
+#ifndef SWARM_WIFI_CLIENT_MAX_WRITE_RETRY
+#define SWARM_WIFI_CLIENT_MAX_WRITE_RETRY 10u
+#endif
+#ifndef SWARM_WIFI_CLIENT_SELECT_TIMEOUT_US
+#define SWARM_WIFI_CLIENT_SELECT_TIMEOUT_US 1000000u
+#endif
+
 #ifndef SWARM_START_AT_MAX_DELAY_MS
 #define SWARM_START_AT_MAX_DELAY_MS 120000u
 #endif

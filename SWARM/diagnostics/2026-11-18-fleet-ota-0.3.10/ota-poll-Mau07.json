@@ -1,0 +1,127 @@
+{
+  "node": "Mau07",
+  "result": "success",
+  "log": [
+    {
+      "t": "2026-11-18T14:35:24.132Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.233Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.334Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.436Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.537Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.639Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.741Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.840Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:24.940Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.041Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.142Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.244Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.344Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.445Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.545Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.646Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.748Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.848Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:25.948Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:26.050Z",
+      "connected": true,
+      "fw": "0.3.10",
+      "fault": null
+    }
+  ],
+  "at": "2026-11-18T14:35:26.051Z"
+}

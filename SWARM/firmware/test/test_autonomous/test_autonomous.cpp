@@ -22,9 +22,15 @@ using swarm::loopClosureToleranceSteps;
 using swarm::mayStartNextLoop;
 using swarm::normalizeAutonomousPolicy;
 using swarm::segmentCompletionLabel;
+using swarm::AbruptUnreachableSimResult;
+using swarm::esp32WifiClientWriteWorstCaseMs;
 using swarm::shouldAttemptWsReconnect;
+using swarm::shouldDeferWsIo;
 using swarm::shouldDeferWsReconnect;
+using swarm::shouldEmitWsTraffic;
 using swarm::shouldServiceWsClient;
+using swarm::shouldServiceWsClientV038;
+using swarm::simulateAbruptUnreachableCoordinator;
 using swarm::trackLoopCompatible;
 using swarm::validateAutonomousPolicy;
 using swarm::wsTcpTimeoutMs;
@@ -336,7 +342,10 @@ void test_disconnect_autonomy_defers_ws_and_keeps_motor_path() {
   TEST_ASSERT_EQUAL(static_cast<int>(DisconnectMotorAction::ContinueAutonomous),
                     static_cast<int>(decideDisconnectMotorAction(true, false, true, false)));
   TEST_ASSERT_TRUE(shouldDeferWsReconnect(true, false));
+  TEST_ASSERT_TRUE(shouldDeferWsIo(true));
   TEST_ASSERT_FALSE(shouldServiceWsClient(true, false, true));
+  TEST_ASSERT_FALSE(shouldServiceWsClient(true, true, true));  // still-linked hole closed
+  TEST_ASSERT_FALSE(shouldEmitWsTraffic(true, true));
   TEST_ASSERT_FALSE(shouldAttemptWsReconnect(true, true, false, true, 60'000, 0, 5000));
 }
 
@@ -372,15 +381,58 @@ void test_normalize_continuous_injects_12h_ceiling() {
 /** Mac/coordinator unavailable: never attempt or service WS while autonomy is active. */
 void test_ws_reconnect_deferred_during_autonomy() {
   TEST_ASSERT_TRUE(shouldDeferWsReconnect(true, false));
-  TEST_ASSERT_FALSE(shouldDeferWsReconnect(true, true));
+  TEST_ASSERT_FALSE(shouldDeferWsReconnect(true, true));  // reconnect-specific
+  TEST_ASSERT_TRUE(shouldDeferWsIo(true));                // I/O deferred even while linked
   TEST_ASSERT_FALSE(shouldDeferWsReconnect(false, false));
+  TEST_ASSERT_FALSE(shouldDeferWsIo(false));
 
   // 15 min / 1 h / longer — policy is time-invariant while autonomy holds.
   const uint32_t windows[] = {15u * 60u * 1000u, 60u * 60u * 1000u, 12u * 60u * 60u * 1000u};
   for (uint32_t w : windows) {
     TEST_ASSERT_FALSE(shouldAttemptWsReconnect(true, true, false, true, w, 0, 5000));
     TEST_ASSERT_FALSE(shouldServiceWsClient(true, false, true));
+    TEST_ASSERT_FALSE(shouldServiceWsClient(true, true, true));
+    TEST_ASSERT_FALSE(shouldEmitWsTraffic(true, true));
   }
+}
+
+/**
+ * Confirmed still-linked hole (0.3.8/0.3.9): WiFiClient::write worst-case exceeds
+ * stall abort while linked_ stays true — IncompleteStop + coil release, no FAULT.
+ */
+void test_esp32_wificlient_write_exceeds_stall_abort() {
+  TEST_ASSERT_TRUE(esp32WifiClientWriteWorstCaseMs() > (SWARM_STALL_ABORT_US / 1000u));
+  TEST_ASSERT_EQUAL_UINT32(10000u, esp32WifiClientWriteWorstCaseMs());
+  // Library millis fence alone is insufficient — nested write ignores it.
+  TEST_ASSERT_TRUE(wsTcpTimeoutMs() < (SWARM_STALL_ABORT_US / 1000u));
+  TEST_ASSERT_TRUE(shouldServiceWsClientV038(true, true, true));  // hole: still services
+  TEST_ASSERT_FALSE(shouldServiceWsClient(true, true, true));     // 0.3.10 closed
+}
+
+/**
+ * Full production-path regression: abrupt unreachable coordinator (not a clean
+ * WStype_DISCONNECTED). Planner mid-move, linked_ still true.
+ * Acceptance: physical steps continue; no STOP/coil-release storm; run active.
+ */
+void test_abrupt_unreachable_coordinator_keeps_stepping() {
+  const uint32_t blockMs = esp32WifiClientWriteWorstCaseMs();  // 10 s nested write
+
+  const AbruptUnreachableSimResult legacy =
+      simulateAbruptUnreachableCoordinator(/*useV038WsGating=*/true, blockMs, 40);
+  TEST_ASSERT_TRUE(legacy.runStillActive);
+  TEST_ASSERT_FALSE(legacy.faulted);
+  // Still-linked blocking write → IncompleteStop + coil release every loop; no FAULT.
+  TEST_ASSERT_TRUE(legacy.incompleteStops >= 30);
+  TEST_ASSERT_TRUE(legacy.loopsWithCoilsDark >= 30);
+
+  const AbruptUnreachableSimResult fixed =
+      simulateAbruptUnreachableCoordinator(/*useV038WsGating=*/false, blockMs, 40);
+  TEST_ASSERT_TRUE(fixed.runStillActive);
+  TEST_ASSERT_FALSE(fixed.faulted);
+  TEST_ASSERT_EQUAL_UINT32(0, fixed.incompleteStops);
+  TEST_ASSERT_EQUAL_UINT32(0, fixed.loopsWithCoilsDark);
+  TEST_ASSERT_TRUE(fixed.stepsAfterFault > 30);  // sustained stepping, no stall thrash
+  TEST_ASSERT_TRUE(fixed.stepsAfterFault > legacy.stepsAfterFault);
 }
 
 void test_ws_reconnect_paced_after_autonomy() {
@@ -427,5 +479,7 @@ int main(int, char**) {
   RUN_TEST(test_normalize_continuous_injects_12h_ceiling);
   RUN_TEST(test_ws_reconnect_deferred_during_autonomy);
   RUN_TEST(test_ws_reconnect_paced_after_autonomy);
+  RUN_TEST(test_esp32_wificlient_write_exceeds_stall_abort);
+  RUN_TEST(test_abrupt_unreachable_coordinator_keeps_stepping);
   return UNITY_END();
 }

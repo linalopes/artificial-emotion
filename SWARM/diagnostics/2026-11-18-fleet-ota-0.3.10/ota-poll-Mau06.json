@@ -1,0 +1,247 @@
+{
+  "node": "Mau06",
+  "result": "success",
+  "log": [
+    {
+      "t": "2026-11-18T14:35:09.799Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:09.897Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:09.999Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.099Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.200Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.301Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.401Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.503Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.606Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.705Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.806Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:10.906Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.007Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.107Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.208Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.310Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.411Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.512Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.613Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.714Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.815Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:11.915Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.016Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.117Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.218Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.318Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.420Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.522Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.621Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.723Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.838Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:12.923Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.023Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.124Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.225Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.327Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.428Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.529Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.631Z",
+      "connected": false,
+      "fw": "0.3.8",
+      "fault": null
+    },
+    {
+      "t": "2026-11-18T14:35:13.731Z",
+      "connected": true,
+      "fw": "0.3.10",
+      "fault": null
+    }
+  ],
+  "at": "2026-11-18T14:35:13.732Z"
+}
