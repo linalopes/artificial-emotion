@@ -4,9 +4,10 @@
  * About / Program / Documentation / Reflection independently, and skip empty headings.
  *
  * Raw HTML is escaped on purpose. Complete `<iframe>` and `<video>` blocks
- * are rebuilt from an attribute allowlist. Complete ```mermaid fences become
- * typed parts (the diagram source is never treated as trusted HTML). Internal
- * labs use `::lab{src title}`; repository STL/GLB files use `::model{src title caption?}`.
+ * are rebuilt from an attribute allowlist. Complete fenced blocks are detected
+ * first: ```mermaid becomes a typed Mermaid part; every other complete fence
+ * becomes an escaped `<pre><code>` block (never trusted HTML). Internal labs
+ * use `::lab{src title}`; repository STL/GLB files use `::model{src title caption?}`.
  * Obsidian SVG embeds use `![[file.svg]]` / `![[file.svg|alt]]`.
  * `::youtube` remains a compatibility alias; prefer ordinary iframe HTML.
  */
@@ -119,25 +120,45 @@ export function markdownSectionToParts(section: MarkdownSection): MarkdownPart[]
   return [{ type: 'html', html: heading }, ...parts];
 }
 
-const MERMAID_FENCE =
-  /^[ \t]*```mermaid[ \t]*\r?\n([\s\S]*?)^[ \t]*```[ \t]*\r?$/gim;
+/** Complete triple-backtick fences (optional language). Unclosed fences are left alone. */
+const FENCED_BLOCK =
+  /^[ \t]*```([^\n`]*)\r?\n([\s\S]*?)^[ \t]*```[ \t]*\r?$/gim;
 
-/** Complete ```mermaid fences only. Unclosed or non-mermaid fences are left alone. */
-function findCompleteMermaidFences(markdown: string): Array<{
+function findCompleteFencedBlocks(markdown: string): Array<{
   index: number;
   length: number;
+  language: string;
   source: string;
 }> {
-  const pattern = new RegExp(MERMAID_FENCE.source, MERMAID_FENCE.flags);
+  const pattern = new RegExp(FENCED_BLOCK.source, FENCED_BLOCK.flags);
   return [...markdown.matchAll(pattern)].map((match) => ({
     index: match.index ?? 0,
     length: match[0].length,
-    source: match[1] ?? '',
+    language: (match[1] ?? '').trim(),
+    source: match[2] ?? '',
   }));
 }
 
 function escapeHtml(value: string): string {
-  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Safe CSS language token for `language-*` classes; empty when absent/unsafe. */
+function codeLanguageClass(language: string): string {
+  if (!/^[A-Za-z0-9_+#.-]+$/.test(language)) return '';
+  return `language-${language}`;
+}
+
+/** Ordinary Obsidian/GFM fenced code — text only, never interpreted as Markdown/HTML. */
+function codeBlockHtml(source: string, language: string): string {
+  const langClass = codeLanguageClass(language);
+  const classAttr = langClass ? ` class="${langClass}"` : '';
+  return `<pre class="code-block"><code${classAttr}>${escapeHtml(source)}</code></pre>`;
 }
 
 function countChar(value: string, char: string): number {
@@ -340,10 +361,10 @@ function renderRun(kind: BlockKind, lines: readonly string[]): string {
 /**
  * Render a Markdown fragment (no frontmatter) to HTML.
  * Covers paragraphs, lists, blockquotes, GFM tables, links, bare http(s) URLs,
- * emphasis, images, sanitized HTTPS iframes and videos, ordinary ```mermaid
- * fences, internal `::lab` embeds, `::model` STL/GLB viewers, Obsidian
- * `![[file.svg]]` embeds, and a `::youtube` compatibility alias. Other raw
- * HTML is escaped.
+ * emphasis, images, sanitized HTTPS iframes and videos, ordinary fenced code
+ * blocks (```lang), ```mermaid fences as interactive diagrams, internal
+ * `::lab` embeds, `::model` STL/GLB viewers, Obsidian `![[file.svg]]` embeds,
+ * and a `::youtube` compatibility alias. Other raw HTML is escaped.
  */
 export function markdownToSafeHtml(markdown: string): string {
   return markdownToParts(markdown).map(embedPart).join('');
@@ -452,12 +473,16 @@ function appendMarkdownBlocks(parts: MarkdownPart[], markdown: string): void {
 export function markdownToParts(markdown: string): MarkdownPart[] {
   const prepared = markdown.replace(/^\uFEFF/, '').trim();
   const parts: MarkdownPart[] = [];
-  const fences = findCompleteMermaidFences(prepared);
+  const fences = findCompleteFencedBlocks(prepared);
   let cursor = 0;
 
   for (const fence of fences) {
     if (fence.index > cursor) appendMarkdownBlocks(parts, prepared.slice(cursor, fence.index));
-    parts.push({ type: 'mermaid', source: fence.source });
+    if (fence.language.toLowerCase() === 'mermaid') {
+      parts.push({ type: 'mermaid', source: fence.source });
+    } else {
+      parts.push({ type: 'html', html: codeBlockHtml(fence.source, fence.language) });
+    }
     cursor = fence.index + fence.length;
   }
   if (cursor < prepared.length || fences.length === 0) {

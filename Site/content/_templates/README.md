@@ -303,13 +303,31 @@ Prefer:
 - Markdown images
 - tables
 - blockquotes
+- ordinary fenced code blocks
 - Mermaid fenced blocks
 - ordinary iframe HTML when an embed is needed and allowed
 - ordinary video HTML when a hosted HTTPS file is needed
 
+### Fenced code
+
+Use ordinary Obsidian/GFM fences. The language tag is optional:
+
+````md
+```cpp
+const uint8_t motorPins[] = {10, 11, 12, 13};
+```
+
+```
+plain text across
+multiple lines
+```
+````
+
+Do not invent a `::code` directive. Code is escaped as text (HTML inside the fence is shown, not executed).
+
 ### Mermaid
 
-Use a standard fenced block. This works in Obsidian and on the site:
+Mermaid is the special case of the same fence syntax. Use `mermaid` as the language so the site keeps the interactive diagram:
 
 ````md
 ```mermaid
@@ -318,7 +336,7 @@ flowchart LR
 ```
 ````
 
-Do not use project-specific Mermaid syntax.
+Do not use project-specific Mermaid syntax. Do not write Mermaid as a custom directive.
 
 ### iframe
 
