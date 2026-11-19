@@ -1,0 +1,24 @@
+{"at":"2026-11-17T17:19:46.934Z","atMs":1794935986934,"kind":"connect","message":"Mau01 connected (fw 0.2.0)","runId":null,"nodeId":"Mau01","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-17T17:19:47.636Z","atMs":1794935987636,"kind":"disconnect","message":"Mau01 disconnected","runId":null,"nodeId":"Mau01","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-17T17:19:47.637Z","atMs":1794935987637,"kind":"connect","message":"Mau02 connected (fw 0.2.0)","runId":null,"nodeId":"Mau02","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-17T17:19:47.674Z","atMs":1794935987674,"kind":"disconnect","message":"Mau02 disconnected","runId":null,"nodeId":"Mau02","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-17T17:20:18.818Z","atMs":1794936018818,"kind":"connect","message":"Mau01 connected (fw 0.2.0)","runId":null,"nodeId":"Mau01","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-17T17:20:19.505Z","atMs":1794936019505,"kind":"disconnect","message":"Mau01 disconnected","runId":null,"nodeId":"Mau01","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-17T17:20:19.507Z","atMs":1794936019507,"kind":"connect","message":"Mau02 connected (fw 0.2.0)","runId":null,"nodeId":"Mau02","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-17T17:20:19.535Z","atMs":1794936019535,"kind":"disconnect","message":"Mau02 disconnected","runId":null,"nodeId":"Mau02","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T08:22:01.109Z","atMs":1794990121109,"kind":"connect","message":"Mau01 connected (fw 0.2.0)","runId":null,"nodeId":"Mau01","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T08:22:01.798Z","atMs":1794990121798,"kind":"disconnect","message":"Mau01 disconnected","runId":null,"nodeId":"Mau01","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T08:22:01.800Z","atMs":1794990121800,"kind":"connect","message":"Mau02 connected (fw 0.2.0)","runId":null,"nodeId":"Mau02","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T08:22:01.825Z","atMs":1794990121825,"kind":"disconnect","message":"Mau02 disconnected","runId":null,"nodeId":"Mau02","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T09:56:25.570Z","atMs":1794995785570,"kind":"connect","message":"Mau01 connected (fw 0.2.0)","runId":null,"nodeId":"Mau01","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T09:56:26.312Z","atMs":1794995786312,"kind":"disconnect","message":"Mau01 disconnected","runId":null,"nodeId":"Mau01","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T09:56:26.319Z","atMs":1794995786319,"kind":"connect","message":"Mau02 connected (fw 0.2.0)","runId":null,"nodeId":"Mau02","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T09:56:26.368Z","atMs":1794995786368,"kind":"disconnect","message":"Mau02 disconnected","runId":null,"nodeId":"Mau02","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T09:57:32.813Z","atMs":1794995852813,"kind":"connect","message":"Mau01 connected (fw 0.2.0)","runId":null,"nodeId":"Mau01","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T09:57:33.593Z","atMs":1794995853593,"kind":"disconnect","message":"Mau01 disconnected","runId":null,"nodeId":"Mau01","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T09:57:33.637Z","atMs":1794995853637,"kind":"connect","message":"Mau02 connected (fw 0.2.0)","runId":null,"nodeId":"Mau02","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T09:57:33.663Z","atMs":1794995853663,"kind":"disconnect","message":"Mau02 disconnected","runId":null,"nodeId":"Mau02","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T16:34:01.996Z","atMs":1795019641996,"kind":"connect","message":"Mau01 connected (fw 0.2.0)","runId":null,"nodeId":"Mau01","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T16:34:02.674Z","atMs":1795019642674,"kind":"disconnect","message":"Mau01 disconnected","runId":null,"nodeId":"Mau01","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
+{"at":"2026-11-18T16:34:02.676Z","atMs":1795019642676,"kind":"connect","message":"Mau02 connected (fw 0.2.0)","runId":null,"nodeId":"Mau02","detail":{"simulated":false,"wasInRun":false,"phase":"idle"}}
+{"at":"2026-11-18T16:34:02.703Z","atMs":1795019642703,"kind":"disconnect","message":"Mau02 disconnected","runId":null,"nodeId":"Mau02","detail":{"phase":"idle","autonomous":false,"autonomousStarted":false}}
