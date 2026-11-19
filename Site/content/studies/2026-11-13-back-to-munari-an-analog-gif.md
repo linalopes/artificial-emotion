@@ -25,10 +25,6 @@ related:
   - studies/heartbeat-slit-animation
 cover: https://res.cloudinary.com/da1flkgyb/video/upload/so_0/v1794917046/IMG_9918.jpg
 gallery:
-  - type: video
-    src: https://res.cloudinary.com/da1flkgyb/video/upload/v1794917046/IMG_9918.mp4
-    poster: https://res.cloudinary.com/da1flkgyb/video/upload/so_0/v1794917046/IMG_9918.jpg
-    caption: The standalone rotational heartbeat animation prototype in motion.
 draft: false
 ---
 
