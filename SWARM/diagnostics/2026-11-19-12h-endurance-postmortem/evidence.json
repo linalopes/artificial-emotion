@@ -1,0 +1,151 @@
+{
+  "runId": "2d448b2d51c644b897547f61649dc7f",
+  "firmware": "0.3.10",
+  "score": {
+    "name": "Wave",
+    "amplitudeMm": 120,
+    "periodS": 120,
+    "durationMs": 240000,
+    "phaseDeg": 40,
+    "direction": "diagonal",
+    "rangeMm": [
+      130,
+      370
+    ]
+  },
+  "schedule": {
+    "armedAt": "2026-11-18T20:29:28.381Z",
+    "runningAt": "2026-11-18T20:29:30.817Z",
+    "expectedEndAt": "2026-11-19T08:30:05.approxZ",
+    "completedAt": "2026-11-19T08:30:05.970Z",
+    "maxRuntimeMs": 43200000,
+    "expectedPasses": 180,
+    "elapsedHours": 12.01
+  },
+  "fleetDisconnectMute": {
+    "note": "0.3.10 shouldDeferWsIo muted WS within ~7 min; no mid-run telemetry until fault reconnect or max_runtime",
+    "firstDisconnect": "2026-11-18T20:32:54.158Z Mau05",
+    "lastInitialDisconnect": "2026-11-18T20:36:26.804Z Mau02"
+  },
+  "completions": {
+    "Mau01": {
+      "completedPasses": 180,
+      "completionReason": "max_runtime (inferred)",
+      "positionMm_model": 297.32,
+      "positionValid": true
+    },
+    "Mau02": {
+      "completedPasses": 180,
+      "completionReason": "max_runtime (inferred)",
+      "positionMm_model": 215.3709,
+      "positionValid": true
+    },
+    "Mau03": {
+      "completedPasses": 180,
+      "completionReason": "max_runtime (inferred)",
+      "positionMm_model": 149.6207,
+      "positionValid": true
+    },
+    "Mau04": {
+      "completedPasses": 180,
+      "completionReason": "max_runtime (inferred)",
+      "positionMm_model": 215.3709,
+      "positionValid": true
+    },
+    "Mau05": {
+      "completedPasses": 180,
+      "completionReason": "max_runtime (inferred)",
+      "positionMm_model": 149.6207,
+      "positionValid": true
+    },
+    "Mau06": {
+      "completedPasses": 180,
+      "completionReason": "max_runtime (inferred)",
+      "positionMm_model": 130.8447,
+      "positionValid": true
+    },
+    "Mau07": {
+      "completedPasses": 180,
+      "completionReason": "max_runtime (inferred)",
+      "positionMm_model": 149.6207,
+      "positionValid": true
+    },
+    "Mau08": {
+      "completedPasses": 84,
+      "completionReason": "fault",
+      "fault": "unexpected_endstop_open",
+      "faultAt": "2026-11-19T02:10:38.237Z",
+      "hoursFromStart": 5.69
+    },
+    "Mau09": {
+      "completedPasses": 124,
+      "completionReason": "fault",
+      "fault": "unexpected_endstop_open",
+      "faultAt": "2026-11-19T05:13:38.147Z",
+      "hoursFromStart": 8.74,
+      "postHomingFault": "homing_recovery_disabled@2026-11-19T08:53:39.222Z"
+    }
+  },
+  "run_complete": {
+    "at": "2026-11-19T08:30:05.970Z",
+    "message": "Wave watch ended without fleet stop",
+    "perNode": {
+      "Mau01": "disconnected",
+      "Mau02": "disconnected",
+      "Mau03": "disconnected",
+      "Mau04": "disconnected",
+      "Mau05": "disconnected",
+      "Mau06": "disconnected",
+      "Mau07": "disconnected",
+      "Mau08": "faulted",
+      "Mau09": "faulted"
+    }
+  },
+  "waveFirstKeyframesMm": {
+    "Mau01": 250.0,
+    "Mau02": 172.87,
+    "Mau03": 131.82,
+    "Mau04": 172.87,
+    "Mau05": 131.82,
+    "Mau06": 146.08,
+    "Mau07": 131.82,
+    "Mau08": 146.08,
+    "Mau09": 208.96
+  },
+  "configFleet": {
+    "spool_diameter_mm": 15,
+    "steps_per_output_rev": 4096,
+    "calibration_factor": 1,
+    "steps_per_mm": 86.91982,
+    "coil_hold_mode": 0,
+    "coil_hold_meaning": "Release"
+  },
+  "unavailableDueToWsMute": [
+    "incomplete_stop_count mid-run",
+    "loop_boundary delta series",
+    "ws reconnect counters mid-run",
+    "continuous position telemetry",
+    "segmentResult stream"
+  ],
+  "artistPhysicalAt~11h": {
+    "lower_than_range": [
+      "Mau01",
+      "Mau02",
+      "Mau03",
+      "Mau05"
+    ],
+    "within_range": [
+      "Mau04",
+      "Mau07"
+    ],
+    "higher_near_endstop": [
+      "Mau06"
+    ],
+    "endstop_fault": [
+      "Mau08"
+    ],
+    "stopped_at_endstop": [
+      "Mau09"
+    ]
+  }
+}
