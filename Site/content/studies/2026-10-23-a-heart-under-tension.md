@@ -1,12 +1,10 @@
 ---
 title: A Heart Under Tension
 subtitle: Hand embroidery, folded tulle and an upside-down kinetic module
-date: 2026-10-22
+date: 2026-10-23
 slug: a-heart-under-tension
 lede: A hand-embroidered anatomical heart on heat-set nude tulle becomes a soft mechanism that opens horizontally and returns to its folded state when released, while an inverted MauMau module offers a possible route toward motorized actuation.
-
 status: experiment
-
 threads:
   - soft-mechanisms
   - kinetic-studies
@@ -29,7 +27,6 @@ related:
   - studies/maumau-spool-first-parametric-prototype
   - studies/artificial-emotion-controller-v1
   - events/open-research-studio
-
 cover: https://res.cloudinary.com/da1flkgyb/image/upload/v1793262886/IMG_6452.webp
 gallery:
   - type: image
@@ -51,7 +48,6 @@ gallery:
     src: https://res.cloudinary.com/da1flkgyb/image/upload/v1795098686/IMG_6453.webp
     alt: MauMau kinetic module mounted upside down on the frame
     caption: Reorienting an existing kinetic module for a new direction of movement.
-
 draft: false
 ---
 
