@@ -4,9 +4,7 @@ subtitle: From a hacked clock to a standalone kinetic animation instrument
 date: 2026-11-13
 slug: back-to-munari-an-analog-gif
 lede: Revisiting rotational slit animation through the reusable mechanical framework of MauMau, a stepper motor and a battery-powered Arduino Uno.
-
 status: prototype
-
 threads:
   - kinetic-studies
 tags:
@@ -25,15 +23,13 @@ related:
   - references/ora-x-bruno-munari
   - references/bruno-munari
   - studies/heartbeat-slit-animation
-
 cover: https://res.cloudinary.com/da1flkgyb/video/upload/so_0/v1794917046/IMG_9918.jpg
 gallery:
   - type: video
     src: https://res.cloudinary.com/da1flkgyb/video/upload/v1794917046/IMG_9918.mp4
     poster: https://res.cloudinary.com/da1flkgyb/video/upload/so_0/v1794917046/IMG_9918.jpg
     caption: The standalone rotational heartbeat animation prototype in motion.
-
-draft: true
+draft: false
 ---
 
 ## Question — Back to Munari
